@@ -320,50 +320,6 @@
             border-bottom: 3px solid white;
         }
         
-        /* Sidebar collapse styles */
-        #sidebarContainer.collapsed {
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            overflow: visible !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-        #sidebarContainer.collapsed .bg-white {
-            width: 0 !important;
-            min-width: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-        }
-        #sidebarContent.collapsed {
-            opacity: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-        }
-        #sidebarToggle {
-            transition: all 0.3s;
-            width: 32px;
-            height: 32px;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            z-index: 100 !important;
-            pointer-events: auto !important;
-        }
-        #sidebarContainer.collapsed #sidebarToggle {
-            right: -15px !important;
-            position: absolute !important;
-            z-index: 100 !important;
-            display: flex !important;
-            pointer-events: auto !important;
-        }
-        #sidebarToggleIcon {
-            transition: transform 0.3s;
-            display: inline-block;
-        }
-        
         /* Text selection bookmark context menu */
         #textBookmarkContextMenu {
             display: none;
@@ -373,6 +329,23 @@
         }
         #textBookmarkContextMenu button:active {
             background-color: #f3f4f6;
+        }
+        
+        /* Upload section collapse */
+        #uploadSectionContent {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+            opacity: 1;
+        }
+        #uploadSectionContent.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 !important;
+        }
+        #uploadAreaContainer.collapsed {
+            padding-top: 3rem !important;
+            padding-bottom: 1rem !important;
         }
     </style>
 </head>
@@ -401,8 +374,15 @@
             <!-- Upload Page -->
             <div id="page-upload" class="page-section active">
                 <!-- Upload Area -->
-                <div class="p-8 bg-white border-b-2 border-gray-200">
-                    <div class="max-w-2xl mx-auto">
+                <div class="relative p-8 bg-white border-b-2 border-gray-200" id="uploadAreaContainer">
+                    <button 
+                        onclick="toggleUploadSection()"
+                        class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition-colors z-10"
+                        id="uploadToggleBtn"
+                    >
+                        <span id="uploadToggleIcon">▲</span> 접기
+                    </button>
+                    <div class="max-w-2xl mx-auto" id="uploadSectionContent">
                         <div id="uploadBox" class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center bg-white cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all duration-300">
                             <input type="file" id="fileInput" accept=".txt,.text" multiple class="hidden">
                             <div class="text-6xl mb-4">📁</div>
@@ -922,49 +902,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="stats"></div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-                    <!-- File List -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-white rounded-lg shadow-md p-4">
-                            <!-- Tabs -->
-                            <div class="flex border-b border-gray-200 mb-4">
-                                <button 
-                                    id="tabFiles" 
-                                    onclick="switchTab('files')"
-                                    class="flex-1 px-4 py-2 text-center font-semibold text-gray-900 border-b-2 border-gray-900 transition-colors"
-                                >
-                                    📖 파일
-                                </button>
-                                <button 
-                                    id="tabHistory" 
-                                    onclick="switchTab('history')"
-                                    class="flex-1 px-4 py-2 text-center font-semibold text-gray-500 hover:text-gray-900 transition-colors"
-                                >
-                                    🕐 히스토리
-                                </button>
-                                <button 
-                                    id="tabBookmarks" 
-                                    onclick="switchTab('bookmarks')"
-                                    class="flex-1 px-4 py-2 text-center font-semibold text-gray-500 hover:text-gray-900 transition-colors"
-                                >
-                                    ⭐ 북마크
-                                </button>
-                            </div>
-                            
-                            <!-- Search (only for files tab) -->
-                            <div id="searchContainer" class="mb-4">
-                                <input type="text" id="searchInput" placeholder="파일 검색..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
-                            </div>
-                            
-                            <!-- Content Area -->
-                            <div id="fileList" class="space-y-2 max-h-[70vh] overflow-y-auto">
-                                <!-- Files will be inserted here -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Content Viewer -->
-                    <div class="lg:col-span-2">
+                <div class="p-6">
+                    <!-- Content Viewer (Full Width) -->
+                    <div class="max-w-5xl mx-auto">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <div id="viewerHeader" class="mb-4 pb-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
@@ -1518,6 +1458,21 @@
             console.log('[DOMContentLoaded] 업로드 페이지 히스토리/북마크 표시 시작');
             displayUploadHistory();
             displayUploadBookmarks();
+            
+            // Restore upload section state
+            const savedUploadCollapsed = localStorage.getItem('uploadSectionCollapsed');
+            if (savedUploadCollapsed === 'true') {
+                uploadSectionCollapsed = true;
+                const content = document.getElementById('uploadSectionContent');
+                const container = document.getElementById('uploadAreaContainer');
+                const toggleBtn = document.getElementById('uploadToggleBtn');
+                if (content && container && toggleBtn) {
+                    content.classList.add('collapsed');
+                    container.classList.add('collapsed');
+                    toggleBtn.innerHTML = '<span id="uploadToggleIcon">▼</span> 펼치기';
+                }
+            }
+            
             console.log('[DOMContentLoaded] 페이지 로드 완료');
         });
 
@@ -3387,96 +3342,41 @@
             }
         }
 
-        // Tab switching
-        // Sidebar toggle state
-        let sidebarCollapsed = false;
+        // Upload section toggle
+        let uploadSectionCollapsed = false;
 
-        function toggleSidebar() {
-            const sidebarContainer = document.getElementById('sidebarContainer');
-            const sidebarContent = document.getElementById('sidebarContent');
-            const toggleIcon = document.getElementById('sidebarToggleIcon');
-            const contentViewer = document.querySelector('.lg\\:col-span-2');
-            const viewerContent = document.getElementById('viewerContent');
+        function toggleUploadSection() {
+            const content = document.getElementById('uploadSectionContent');
+            const container = document.getElementById('uploadAreaContainer');
+            const toggleBtn = document.getElementById('uploadToggleBtn');
+            const toggleIcon = document.getElementById('uploadToggleIcon');
             
-            if (!sidebarContainer || !sidebarContent || !toggleIcon) {
-                console.error('사이드바 요소를 찾을 수 없습니다.');
+            if (!content || !container || !toggleBtn || !toggleIcon) {
+                console.error('업로드 섹션 요소를 찾을 수 없습니다.');
                 return;
             }
             
-            sidebarCollapsed = !sidebarCollapsed;
+            uploadSectionCollapsed = !uploadSectionCollapsed;
             
-            if (sidebarCollapsed) {
-                console.log('[toggleSidebar] 사이드바 접기');
-                sidebarContainer.classList.add('collapsed');
-                sidebarContent.classList.add('collapsed');
-                toggleIcon.textContent = '▶';
-                toggleIcon.style.transform = 'rotate(0deg)';
-                
-                // 읽기 영역 확장 (전체 너비 사용)
-                if (contentViewer) {
-                    contentViewer.classList.remove('lg:col-span-2');
-                    contentViewer.classList.add('lg:col-span-3');
-                }
-                
-                // 뷰어 컨텐츠 max-width를 확장
-                if (viewerContent) {
-                    viewerContent.style.maxWidth = '1200px'; // 접었을 때 더 넓게
-                    console.log('[toggleSidebar] 뷰어 컨텐츠 max-width: 1200px');
-                }
+            if (uploadSectionCollapsed) {
+                content.classList.add('collapsed');
+                container.classList.add('collapsed');
+                toggleIcon.textContent = '▼';
+                toggleBtn.innerHTML = '<span id="uploadToggleIcon">▼</span> 펼치기';
             } else {
-                console.log('[toggleSidebar] 사이드바 펼치기');
-                sidebarContainer.classList.remove('collapsed');
-                sidebarContent.classList.remove('collapsed');
-                toggleIcon.textContent = '◀';
-                toggleIcon.style.transform = 'rotate(0deg)';
-                
-                // 읽기 영역 원래 크기로 복원
-                if (contentViewer) {
-                    contentViewer.classList.remove('lg:col-span-3');
-                    contentViewer.classList.add('lg:col-span-2');
-                }
-                
-                // 뷰어 컨텐츠 max-width를 원래대로
-                if (viewerContent) {
-                    viewerContent.style.maxWidth = currentPageWidth + 'px'; // 설정된 페이지 넓이로 복원
-                    console.log('[toggleSidebar] 뷰어 컨텐츠 max-width:', currentPageWidth + 'px');
-                }
+                content.classList.remove('collapsed');
+                container.classList.remove('collapsed');
+                toggleIcon.textContent = '▲';
+                toggleBtn.innerHTML = '<span id="uploadToggleIcon">▲</span> 접기';
             }
             
             // Save state
-            localStorage.setItem('sidebarCollapsed', sidebarCollapsed.toString());
+            localStorage.setItem('uploadSectionCollapsed', uploadSectionCollapsed.toString());
         }
 
         function switchTab(tab) {
+            // Note: Sidebar tabs have been removed, this function is kept for potential future use
             currentTab = tab;
-            
-            // Update tab buttons
-            document.getElementById('tabFiles').classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
-            document.getElementById('tabFiles').classList.add('text-gray-500');
-            document.getElementById('tabHistory').classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
-            document.getElementById('tabHistory').classList.add('text-gray-500');
-            document.getElementById('tabBookmarks').classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
-            document.getElementById('tabBookmarks').classList.add('text-gray-500');
-            
-            const activeTab = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-            activeTab.classList.remove('text-gray-500');
-            activeTab.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
-            
-            // Show/hide search
-            if (tab === 'files') {
-                document.getElementById('searchContainer').classList.remove('hidden');
-            } else {
-                document.getElementById('searchContainer').classList.add('hidden');
-            }
-            
-            // Display appropriate content
-            if (tab === 'files') {
-                displayFiles();
-            } else if (tab === 'history') {
-                displayHistory();
-            } else if (tab === 'bookmarks') {
-                displayBookmarks();
-            }
         }
 
         // History functions
