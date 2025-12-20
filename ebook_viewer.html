@@ -18,6 +18,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         .viewer-container {
             max-width: 1400px;
@@ -27,12 +28,15 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
         .ebook-content {
             max-height: 70vh;
             overflow-y: auto;
+            overflow-x: hidden;
             line-height: 1.8;
             font-size: 16px;
+            width: 100%;
         }
         .font-system { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
         .font-nanum { font-family: 'Nanum Gothic', sans-serif; }
@@ -133,6 +137,70 @@
             margin-top: 1.5em;
             margin-bottom: 0.8em;
             line-height: 1.4;
+        }
+        
+        /* 편집 모드에서 생성된 챕터/제목 스타일 */
+        .ebook-chapter {
+            font-size: 2em !important;
+            font-weight: 900 !important;
+            color: #1f2937 !important;
+            margin-top: 2.5em !important;
+            margin-bottom: 1.2em !important;
+            padding: 0.8em 1em !important;
+            border-left: 6px solid #6366f1 !important;
+            border-bottom: 2px solid #e0e7ff !important;
+            line-height: 1.3 !important;
+            letter-spacing: -0.02em !important;
+            text-align: left !important;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f7ff 50%, transparent 100%) !important;
+            border-radius: 4px !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+        }
+        
+        .ebook-chapter::before {
+            content: "📖" !important;
+            margin-right: 0.5em !important;
+            font-size: 0.9em !important;
+        }
+        
+        #viewerContent[contenteditable="true"] .ebook-chapter:hover {
+            transform: translateX(4px) !important;
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.15) !important;
+            cursor: pointer !important;
+        }
+        
+        /* 테마별 챕터 색상 */
+        .theme-dark .ebook-chapter {
+            color: #f3f4f6 !important;
+            border-left-color: #818cf8 !important;
+            border-bottom-color: rgba(129, 140, 248, 0.2) !important;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 100%) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        }
+        #viewerContent[contenteditable="true"] .theme-dark .ebook-chapter:hover {
+            box-shadow: 0 4px 8px rgba(129, 140, 248, 0.3) !important;
+        }
+        
+        .theme-sepia .ebook-chapter {
+            color: #78350f !important;
+            border-left-color: #d97706 !important;
+            border-bottom-color: #fde68a !important;
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 50%, transparent 100%) !important;
+        }
+        #viewerContent[contenteditable="true"] .theme-sepia .ebook-chapter:hover {
+            box-shadow: 0 4px 8px rgba(217, 119, 6, 0.15) !important;
+        }
+        
+        .theme-green .ebook-chapter {
+            color: #14532d !important;
+            border-left-color: #22c55e !important;
+            border-bottom-color: #bbf7d0 !important;
+            background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 50%, transparent 100%) !important;
+        }
+        #viewerContent[contenteditable="true"] .theme-green .ebook-chapter:hover {
+            box-shadow: 0 4px 8px rgba(34, 197, 94, 0.15) !important;
         }
         .ebook-content::-webkit-scrollbar {
             width: 8px;
@@ -347,13 +415,68 @@
             padding-top: 3rem !important;
             padding-bottom: 1rem !important;
         }
+        #uploadHeaderSection.collapsed,
+        #uploadHistoryBookmarksSection.collapsed {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0 !important;
+            margin: 0 !important;
+            transition: all 0.3s ease-in-out;
+        }
+        #uploadHeaderSection,
+        #uploadHistoryBookmarksSection {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* 페이지뷰 롤아웃(헤더, 설정 패널)과 본문 사이 여백 */
+        #settingsPanel {
+            margin-bottom: 1.5rem !important;
+        }
+        #viewerHeader {
+            margin-bottom: 2rem !important;
+            padding-bottom: 1rem !important;
+        }
+        #viewerContent {
+            margin-top: 1.5rem !important;
+        }
+        
+        /* 페이지뷰 모드 스타일 */
+        body.content-only-mode #contentOnlyBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 편집 모드 스타일 */
+        #editModeButtons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        #editModeButtons.hidden {
+            display: none !important;
+        }
+        
+        /* 편집 가능한 영역 스타일 */
+        #viewerContent[contenteditable="true"] {
+            padding: 1rem;
+            min-height: 400px;
+            background-color: #fefefe;
+        }
+        #viewerContent[contenteditable="true"]:focus {
+            border-color: #7c3aed !important;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        }
     </style>
 </head>
 <body id="bodyElement" class="theme-light min-h-screen">
     <div class="viewer-container">
         <!-- Header -->
         <div class="bg-white shadow-lg mb-4">
-            <div class="bg-white py-8 px-6 border-b-2 border-gray-200">
+            <div class="bg-white py-8 px-6 border-b-2 border-gray-200" id="uploadHeaderSection">
                 <h1 class="text-4xl font-bold text-center mb-2">📚 이북 텍스트 뷰어</h1>
                 <p class="text-center text-gray-600">로컬 텍스트 파일을 업로드하여 정리하고 읽어보세요</p>
             </div>
@@ -367,7 +490,7 @@
                         class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition-colors z-10"
                         id="uploadToggleBtn"
                     >
-                        <span id="uploadToggleIcon">▲</span> 접기
+                        <span id="uploadToggleIcon" style="pointer-events: none;">▲</span> 접기
                     </button>
                     <div class="max-w-2xl mx-auto" id="uploadSectionContent">
                         <div id="uploadBox" class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center bg-white cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all duration-300">
@@ -383,7 +506,7 @@
                 </div>
 
                 <!-- History and Bookmarks Section -->
-                <div class="p-6 bg-white">
+                <div class="p-6 bg-white" id="uploadHistoryBookmarksSection">
                     <div class="max-w-6xl mx-auto">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- History -->
@@ -413,38 +536,43 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Reader Section (통합) -->
-                <!-- Empty State -->
-                <div id="readerEmptyState" class="hidden p-12 text-center bg-white rounded-lg shadow-lg mx-auto my-8 max-w-2xl relative z-10">
-                    <div class="text-6xl mb-4">📚</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">파일을 업로드해주세요</h2>
-                    <p class="text-gray-600 mb-6">읽을 파일이 없습니다. 위에서 텍스트 파일을 업로드하세요.</p>
+                    
+                    <!-- Stats (작게) -->
+                    <div class="mt-4">
+                        <div class="grid grid-cols-3 gap-2 text-center text-sm" id="uploadStats">
+                            <div class="bg-gray-50 rounded p-2">
+                                <div class="font-semibold text-gray-700" id="uploadStatsFiles">0</div>
+                                <div class="text-gray-500 text-xs">파일</div>
+                            </div>
+                            <div class="bg-gray-50 rounded p-2">
+                                <div class="font-semibold text-gray-700" id="uploadStatsSize">0 B</div>
+                                <div class="text-gray-500 text-xs">크기</div>
+                            </div>
+                            <div class="bg-gray-50 rounded p-2">
+                                <div class="font-semibold text-gray-700" id="uploadStatsLines">0</div>
+                                <div class="text-gray-500 text-xs">줄</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Main Content -->
                 <div id="mainContent" class="hidden" style="min-height: 400px; background-color: #ffffff;">
-                <!-- Stats -->
-                <div class="p-6 bg-white border-b-2 border-gray-200">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="stats"></div>
-                </div>
-
                 <div class="p-6">
                     <!-- Content Viewer (Full Width) -->
-                    <div class="w-full px-4">
+                    <div class="w-full">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <div id="viewerHeader" class="mb-4 pb-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h2 class="text-2xl font-bold text-gray-800" id="currentFileName">파일을 선택하세요</h2>
-                                    <div class="flex gap-2">
+                                <div class="flex gap-2">
                                         <button 
-                                            id="fullscreenBtn" 
-                                            onclick="toggleFullscreen()"
+                                            id="contentOnlyBtn" 
+                                            onclick="toggleContentOnly()"
                                             class="hidden bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold"
-                                            title="전체창 보기 (F11)"
+                                            title="페이지뷰만 보기"
                                         >
-                                            ⛶ 전체창
+                                            📄 페이지뷰
                                         </button>
                                         <button 
                                             id="bookmarkBtn" 
@@ -453,6 +581,14 @@
                                             title="북마크 추가/제거"
                                         >
                                             ⭐
+                                        </button>
+                                        <button 
+                                            id="editModeBtn" 
+                                            onclick="toggleEditMode()"
+                                            class="hidden bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold"
+                                            title="편집 모드"
+                                        >
+                                            ✏️ 편집
                                         </button>
                                         <button 
                                             id="normalizeBtn" 
@@ -499,6 +635,38 @@
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-sm text-gray-500">
                                     <span id="fileInfo"></span>
                                     <div class="flex flex-wrap gap-2" id="actionButtons" style="display: none;">
+                                        <!-- 편집 모드 전용 버튼들 -->
+                                        <div id="editModeButtons" class="hidden flex flex-wrap gap-2">
+                                            <button 
+                                                onclick="makeSelectionTitle()"
+                                                class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="선택한 텍스트를 제목으로 설정"
+                                            >
+                                                📌 제목 설정
+                                            </button>
+                                            <button 
+                                                onclick="removeBlankLines()"
+                                                class="bg-orange-600 text-white px-3 py-1.5 rounded-lg hover:bg-orange-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="빈 줄 제거"
+                                            >
+                                                🗜️ 빈칸 제거
+                                            </button>
+                                            <button 
+                                                onclick="saveEditedContent()"
+                                                class="bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="수정 내용을 원본 파일명으로 저장"
+                                            >
+                                                💾 저장
+                                            </button>
+                                            <button 
+                                                onclick="saveEditedAsCopy()"
+                                                class="bg-teal-600 text-white px-3 py-1.5 rounded-lg hover:bg-teal-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="수정 내용을 새 파일로 저장"
+                                            >
+                                                💾 다른 이름으로 저장
+                                            </button>
+                                        </div>
+                                        <!-- 일반 모드 버튼들 -->
                                         <button 
                                             onclick="saveAsCopy()"
                                             class="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-semibold"
@@ -591,8 +759,8 @@
                                                 oninput="updateCustomTheme()"
                                                 class="w-16 h-10 rounded border-2 border-gray-300 cursor-pointer"
                                             >
-                                            <input 
-                                                type="text" 
+                                    <input 
+                                        type="text" 
                                                 id="customBgColorText" 
                                                 value="#ffffff" 
                                                 placeholder="#ffffff"
@@ -626,23 +794,23 @@
                                     
                                     <!-- Action Buttons -->
                                     <div class="flex gap-2 mt-4">
-                                        <button 
+                                    <button 
                                             onclick="applyCustomTheme()" 
                                             class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-                                        >
+                                    >
                                             ✓ 적용
-                                        </button>
-                                        <button 
+                                    </button>
+                                    <button 
                                             onclick="resetCustomTheme()" 
                                             class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-                                        >
+                                    >
                                             ↺ 리셋
-                                        </button>
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-2">
-                                        💡 커스텀 컬러 적용 시 기본 테마는 비활성화됩니다
-                                    </p>
+                                    </button>
                                 </div>
+                                <p class="text-xs text-gray-500 mt-2">
+                                        💡 커스텀 컬러 적용 시 기본 테마는 비활성화됩니다
+                                </p>
+                            </div>
 
                                 <!-- Font Family -->
                                 <div class="mb-6">
@@ -730,33 +898,34 @@
 
                                 <!-- Version Info -->
                                 <div class="mt-6 pt-4 border-t border-gray-300">
-                                    <div class="flex items-center justify-between">
-                                        <div>
+                                <div class="flex items-center justify-between">
+                                    <div>
                                             <p class="text-xs font-semibold text-gray-700">버전 정보</p>
                                             <p class="text-xs text-gray-500 mt-1">
                                                 버전: <span id="settingsVersionNumber">-</span><br>
                                                 업데이트: <span id="settingsUpdateDate">-</span>
                                             </p>
-                                        </div>
-                                        <button 
-                                            onclick="showVersionDetails()"
-                                            class="text-xs text-purple-600 hover:text-purple-800 underline"
-                                            title="상세 버전 정보 보기"
-                                        >
-                                            상세 정보
-                                        </button>
                                     </div>
+                                    <button 
+                                            onclick="showVersionDetails()"
+                                        class="text-xs text-purple-600 hover:text-purple-800 underline"
+                                            title="상세 버전 정보 보기"
+                                    >
+                                            상세 정보
+                                    </button>
                                 </div>
+                            </div>
                             </div>
                             <div id="viewerContent" class="ebook-content text-gray-700" style="min-height: 400px;">
-                                <div class="text-center text-gray-400 py-20">
-                                    <div class="text-6xl mb-4">📄</div>
-                                    <p>왼쪽에서 파일을 선택하여 내용을 확인하세요</p>
-                                </div>
-                            </div>
+                                <div id="viewerEmptyState" class="text-center text-gray-400 py-20 cursor-pointer hover:bg-gray-50 hover:text-gray-600 transition-all duration-300 rounded-xl mx-4">
+                                    <div class="text-6xl mb-4">📁</div>
+                                    <p class="text-xl font-semibold mb-2">파일 선택 또는 드래그 앤 드롭</p>
+                                    <p class="text-sm">텍스트 파일(.txt)을 여기에 드래그하거나 클릭하여 선택하세요</p>
                         </div>
                     </div>
-                    
+                </div>
+            </div>
+
                     <!-- Page Bookmarks Modal -->
                     <div id="pageBookmarksModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onclick="if(event.target === this) closePageBookmarksModal()">
                         <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col" onclick="event.stopPropagation()">
@@ -803,7 +972,7 @@
                                             title="Everything에서 파일 검색 (Everything 앱 실행)"
                                         >
                                             🔍 Everything 열기
-                                        </button>
+                        </button>
                                     </div>
                                     <div class="mt-2 text-xs text-gray-400">
                                         💡 팁: "🔍 Everything 열기" 버튼을 클릭하면 Everything 앱이 실행됩니다.
@@ -827,8 +996,8 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
             </div>
 
             <!-- Settings Page -->
@@ -841,19 +1010,19 @@
 
                 <div class="p-6">
                     <!-- Content Viewer (Full Width) -->
-                    <div class="w-full px-4">
+                    <div class="w-full">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <div id="viewerHeader" class="mb-4 pb-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h2 class="text-2xl font-bold text-gray-800" id="currentFileName">파일을 선택하세요</h2>
                                     <div class="flex gap-2">
                                         <button 
-                                            id="fullscreenBtn" 
-                                            onclick="toggleFullscreen()"
+                                            id="contentOnlyBtn" 
+                                            onclick="toggleContentOnly()"
                                             class="hidden bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold"
-                                            title="전체창 보기 (F11)"
+                                            title="페이지뷰만 보기"
                                         >
-                                            ⛶ 전체창
+                                            📄 페이지뷰
                                         </button>
                                         <button 
                                             id="bookmarkBtn" 
@@ -862,6 +1031,14 @@
                                             title="북마크 추가/제거"
                                         >
                                             ⭐
+                                        </button>
+                                        <button 
+                                            id="editModeBtn" 
+                                            onclick="toggleEditMode()"
+                                            class="hidden bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold"
+                                            title="편집 모드"
+                                        >
+                                            ✏️ 편집
                                         </button>
                                         <button 
                                             id="normalizeBtn" 
@@ -908,6 +1085,38 @@
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-sm text-gray-500">
                                     <span id="fileInfo"></span>
                                     <div class="flex flex-wrap gap-2" id="actionButtons" style="display: none;">
+                                        <!-- 편집 모드 전용 버튼들 -->
+                                        <div id="editModeButtons" class="hidden flex flex-wrap gap-2">
+                                            <button 
+                                                onclick="makeSelectionTitle()"
+                                                class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="선택한 텍스트를 제목으로 설정"
+                                            >
+                                                📌 제목 설정
+                                            </button>
+                                            <button 
+                                                onclick="removeBlankLines()"
+                                                class="bg-orange-600 text-white px-3 py-1.5 rounded-lg hover:bg-orange-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="빈 줄 제거"
+                                            >
+                                                🗜️ 빈칸 제거
+                                            </button>
+                                            <button 
+                                                onclick="saveEditedContent()"
+                                                class="bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="수정 내용을 원본 파일명으로 저장"
+                                            >
+                                                💾 저장
+                                            </button>
+                                            <button 
+                                                onclick="saveEditedAsCopy()"
+                                                class="bg-teal-600 text-white px-3 py-1.5 rounded-lg hover:bg-teal-700 transition-colors text-xs sm:text-sm font-semibold"
+                                                title="수정 내용을 새 파일로 저장"
+                                            >
+                                                💾 다른 이름으로 저장
+                                            </button>
+                                        </div>
+                                        <!-- 일반 모드 버튼들 -->
                                         <button 
                                             onclick="saveAsCopy()"
                                             class="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-semibold"
@@ -990,7 +1199,7 @@
                                     <p class="text-xs text-gray-600 mb-4">원하는 배경색과 텍스트 색상을 직접 설정할 수 있습니다</p>
                                     
                                     <!-- Background Color -->
-                                    <div class="mb-4">
+                            <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">배경 색상</label>
                                         <div class="flex items-center gap-3">
                                             <input 
@@ -1008,8 +1217,8 @@
                                                 onchange="updateCustomThemeFromText('bg')"
                                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm font-mono"
                                             >
-                                        </div>
-                                    </div>
+                            </div>
+                            </div>
                                     
                                     <!-- Text Color -->
                                     <div class="mb-4">
@@ -1030,9 +1239,9 @@
                                                 onchange="updateCustomThemeFromText('text')"
                                                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm font-mono"
                                             >
-                                        </div>
-                                    </div>
-                                    
+                        </div>
+                    </div>
+
                                     <!-- Action Buttons -->
                                     <div class="flex gap-2 mt-4">
                                         <button 
@@ -1047,11 +1256,11 @@
                                         >
                                             ↺ 리셋
                                         </button>
-                                    </div>
+                                </div>
                                     <p class="text-xs text-gray-500 mt-2">
                                         💡 커스텀 컬러 적용 시 기본 테마는 비활성화됩니다
                                     </p>
-                                </div>
+                            </div>
 
                                 <!-- Font Family -->
                                 <div class="mb-6">
@@ -1158,9 +1367,10 @@
                                 </div>
                             </div>
                             <div id="viewerContent" class="ebook-content text-gray-700" style="min-height: 400px;">
-                                <div class="text-center text-gray-400 py-20">
-                                    <div class="text-6xl mb-4">📄</div>
-                                    <p>왼쪽에서 파일을 선택하여 내용을 확인하세요</p>
+                                <div id="viewerEmptyState2" class="text-center text-gray-400 py-20 cursor-pointer hover:bg-gray-50 hover:text-gray-600 transition-all duration-300 rounded-xl mx-4">
+                                    <div class="text-6xl mb-4">📁</div>
+                                    <p class="text-xl font-semibold mb-2">파일 선택 또는 드래그 앤 드롭</p>
+                                    <p class="text-sm">텍스트 파일(.txt)을 여기에 드래그하거나 클릭하여 선택하세요</p>
                                 </div>
                             </div>
                         </div>
@@ -1248,8 +1458,8 @@
 
     <script>
         // Version Information
-        const APP_VERSION = '1.0.0';
-        const APP_UPDATE_DATE = '2024-01-01';
+        const APP_VERSION = '0.9.0-beta';
+        const APP_UPDATE_DATE = '2024-12-20';
         const APP_NAME = '이북 텍스트 뷰어';
         
         let files = [];
@@ -1332,32 +1542,29 @@
             }
             
             // Show/hide empty state based on files
-            if (files.length > 0) {
-                if (window.showReaderSection) {
-                    window.showReaderSection();
-                }
-            } else {
-                if (window.hideReaderSection) {
-                    window.hideReaderSection();
-                }
+            // showReaderSection already handles both cases internally
+            if (window.showReaderSection) {
+                window.showReaderSection();
             }
             
-            const readerEmptyState = document.getElementById('readerEmptyState');
             const mainContent = document.getElementById('mainContent');
             
+            console.log('[DOMContentLoaded] 파일 개수:', files.length);
             if (files.length === 0) {
-                if (readerEmptyState) {
-                    readerEmptyState.classList.remove('hidden');
+                console.log('[DOMContentLoaded] 파일 없음 - 업로드 페이지 표시');
+                
+                // 파일이 없을 때 상단 업로드 섹션 자동 접기
+                if (window.autoCollapseUploadSection) {
+                    window.autoCollapseUploadSection();
                 }
+                
                 if (mainContent) {
                     mainContent.classList.add('hidden');
                 }
+                
                 // Stay on upload page if no files
                 switchPage('upload');
             } else {
-                if (readerEmptyState) {
-                    readerEmptyState.classList.add('hidden');
-                }
                 if (mainContent) {
                     mainContent.classList.remove('hidden');
                 }
@@ -1403,11 +1610,22 @@
                 const content = document.getElementById('uploadSectionContent');
                 const container = document.getElementById('uploadAreaContainer');
                 const toggleBtn = document.getElementById('uploadToggleBtn');
+                const header = document.getElementById('uploadHeaderSection');
+                const historyBookmarks = document.getElementById('uploadHistoryBookmarksSection');
+                
                 if (content && container && toggleBtn) {
                     content.classList.add('collapsed');
                     container.classList.add('collapsed');
-                    toggleBtn.innerHTML = '<span id="uploadToggleIcon">▼</span> 펼치기';
+                    if (header) header.classList.add('collapsed');
+                    if (historyBookmarks) historyBookmarks.classList.add('collapsed');
+                    toggleBtn.innerHTML = '<span id="uploadToggleIcon" style="pointer-events: none;">▼</span> 펼치기';
                 }
+            }
+            
+            // Setup search functionality
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', displayFiles);
             }
             
             console.log('[DOMContentLoaded] 페이지 로드 완료');
@@ -1579,32 +1797,20 @@
                 displayUploadBookmarks();
                 
                 // 파일이 있으면 읽기 영역 표시
-                if (files.length > 0) {
-                    showReaderSection();
-                } else {
-                    hideReaderSection();
-                }
+                // showReaderSection already handles both cases internally
+                showReaderSection();
             }
             
             // 읽기 영역 표시/숨김 함수
             function showReaderSection() {
-                const readerEmptyState = document.getElementById('readerEmptyState');
                 const mainContent = document.getElementById('mainContent');
                 
                 if (files.length === 0) {
-                    if (readerEmptyState) {
-                        readerEmptyState.classList.remove('hidden');
-                        readerEmptyState.style.display = 'block';
-                    }
                     if (mainContent) {
                         mainContent.classList.add('hidden');
                         mainContent.style.display = 'none';
                     }
                 } else {
-                    if (readerEmptyState) {
-                        readerEmptyState.classList.add('hidden');
-                        readerEmptyState.style.display = 'none';
-                    }
                     if (mainContent) {
                         mainContent.classList.remove('hidden');
                         mainContent.style.display = 'block';
@@ -1614,13 +1820,8 @@
             }
             
             function hideReaderSection() {
-                const readerEmptyState = document.getElementById('readerEmptyState');
                 const mainContent = document.getElementById('mainContent');
                 
-                if (readerEmptyState) {
-                    readerEmptyState.classList.add('hidden');
-                    readerEmptyState.style.display = 'none';
-                }
                 if (mainContent) {
                     mainContent.classList.add('hidden');
                     mainContent.style.display = 'none';
@@ -1954,6 +2155,65 @@
                 processFiles(droppedFiles);
             }
         });
+        
+        // Add drag and drop handlers for viewerEmptyState
+        const viewerEmptyState = document.getElementById('viewerEmptyState');
+        const viewerEmptyState2 = document.getElementById('viewerEmptyState2');
+        
+        if (viewerEmptyState) {
+            viewerEmptyState.addEventListener('click', () => {
+                selectFiles();
+            });
+            
+            viewerEmptyState.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                viewerEmptyState.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            viewerEmptyState.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                viewerEmptyState.classList.remove('bg-gray-100', 'text-gray-700');
+            });
+            
+            viewerEmptyState.addEventListener('drop', (e) => {
+                e.preventDefault();
+                viewerEmptyState.classList.remove('bg-gray-100', 'text-gray-700');
+                const droppedFiles = Array.from(e.dataTransfer.files).filter(file => 
+                    file.type === 'text/plain' || file.name.endsWith('.txt')
+                );
+                if (droppedFiles.length > 0) {
+                    processFiles(droppedFiles);
+                }
+            });
+        }
+        
+        if (viewerEmptyState2) {
+            viewerEmptyState2.addEventListener('click', () => {
+                selectFiles();
+            });
+            
+            viewerEmptyState2.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                viewerEmptyState2.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            viewerEmptyState2.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                viewerEmptyState2.classList.remove('bg-gray-100', 'text-gray-700');
+            });
+            
+            viewerEmptyState2.addEventListener('drop', (e) => {
+                e.preventDefault();
+                viewerEmptyState2.classList.remove('bg-gray-100', 'text-gray-700');
+                const droppedFiles = Array.from(e.dataTransfer.files).filter(file => 
+                    file.type === 'text/plain' || file.name.endsWith('.txt')
+                );
+                if (droppedFiles.length > 0) {
+                    processFiles(droppedFiles);
+                }
+            });
+        }
+        
 
         async function handleFiles(e) {
             const selectedFiles = Array.from(e.target.files);
@@ -1970,7 +2230,11 @@
         }
 
         function processFiles(fileList) {
+            console.log('[processFiles] 파일 처리 시작, 이전 파일 수:', files.length, '새 파일 수:', fileList.length);
+            
+            // 기존 파일 목록을 초기화하고 새 파일로 교체합니다.
             files = [];
+            currentFileIndex = -1; // 파일 인덱스도 리셋
             const filePromises = Array.from(fileList).map(file => {
                 return new Promise((resolve) => {
                     // Read file as ArrayBuffer to handle different encodings
@@ -2034,6 +2298,8 @@
             });
 
             return Promise.all(filePromises).then(() => {
+                console.log('[processFiles] 모든 파일 추가 완료, 총 파일 수:', files.length);
+                
                 files.sort((a, b) => a.name.localeCompare(b.name));
                 
                 // Update upload page history and bookmarks first
@@ -2042,7 +2308,6 @@
                 
                 // Ensure main content is visible
                 const mainContent = document.getElementById('mainContent');
-                const readerEmptyState = document.getElementById('readerEmptyState');
                 const pageReader = document.getElementById('page-reader');
                 
                 // CRITICAL: Ensure page-reader is visible FIRST with explicit dimensions
@@ -2074,10 +2339,6 @@
                     mainContent.style.setProperty('height', 'auto', 'important');
                     // Force layout
                     void mainContent.offsetHeight;
-                }
-                if (readerEmptyState) {
-                    readerEmptyState.classList.add('hidden');
-                    readerEmptyState.style.setProperty('display', 'none', 'important');
                 }
                 
                 // Ensure 'files' tab is active
@@ -2120,10 +2381,17 @@
                     }
                 }
                 
+                // Auto-collapse upload section after files are loaded
+                if (files.length > 0) {
+                    autoCollapseUploadSection();
+                }
+                
                 // Switch to reader page after content is ready
                 if (window.showReaderSection) {
                     window.showReaderSection();
                 }
+                
+                console.log('[processFiles] 파일 처리 완료, 총 파일 수:', files.length);
             });
         }
 
@@ -2434,8 +2702,9 @@
             `;
             
             // 버튼 표시
-            document.getElementById('fullscreenBtn').classList.remove('hidden');
+            document.getElementById('contentOnlyBtn').classList.remove('hidden');
             document.getElementById('bookmarkBtn').classList.remove('hidden');
+            document.getElementById('editModeBtn').classList.remove('hidden');
             document.getElementById('normalizeBtn').classList.remove('hidden');
             document.getElementById('settingsBtn').classList.remove('hidden');
             document.getElementById('actionButtons').style.display = 'flex';
@@ -2488,29 +2757,18 @@
         }
 
         function updateStats() {
-            const stats = document.getElementById('stats');
             const totalSize = files.reduce((sum, file) => sum + file.size, 0);
             const totalLines = files.reduce((sum, file) => sum + file.content.split('\n').length, 0);
-            const totalChars = files.reduce((sum, file) => sum + file.content.length, 0);
-
-            stats.innerHTML = `
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 text-white shadow-lg">
-                    <div class="text-3xl font-bold mb-1">${files.length}</div>
-                    <div class="text-purple-100">총 파일 수</div>
-                </div>
-                <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-lg p-6 text-white shadow-lg">
-                    <div class="text-3xl font-bold mb-1">${formatFileSize(totalSize)}</div>
-                    <div class="text-pink-100">총 크기</div>
-                </div>
-                <div class="bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-6 text-white shadow-lg">
-                    <div class="text-3xl font-bold mb-1">${totalLines.toLocaleString()}</div>
-                    <div class="text-red-100">총 줄 수</div>
-                </div>
-            `;
+            
+            // Update upload page stats (작은 버전)
+            const uploadStatsFiles = document.getElementById('uploadStatsFiles');
+            const uploadStatsSize = document.getElementById('uploadStatsSize');
+            const uploadStatsLines = document.getElementById('uploadStatsLines');
+            
+            if (uploadStatsFiles) uploadStatsFiles.textContent = files.length;
+            if (uploadStatsSize) uploadStatsSize.textContent = formatFileSize(totalSize);
+            if (uploadStatsLines) uploadStatsLines.textContent = totalLines.toLocaleString();
         }
-
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', displayFiles);
 
         // Settings functions
         function toggleSettings() {
@@ -2557,64 +2815,256 @@
             alert(details);
         }
 
-        // Fullscreen mode
-        let isFullscreen = false;
+        // Content-only mode (페이지뷰만 보기)
+        let isContentOnly = false;
         
-        function toggleFullscreen() {
-            isFullscreen = !isFullscreen;
+        function toggleContentOnly() {
+            isContentOnly = !isContentOnly;
             const body = document.body;
-            const btn = document.getElementById('fullscreenBtn');
+            const viewerHeader = document.getElementById('viewerHeader');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const viewerContent = document.getElementById('viewerContent');
+            const btn = document.getElementById('contentOnlyBtn');
             
-            if (isFullscreen) {
-                body.classList.add('fullscreen-mode');
-                // 현재 테마 클래스를 body에 추가
-                body.classList.remove('theme-light', 'theme-dark', 'theme-sepia', 'theme-green');
-                body.classList.add(`theme-${currentTheme}`);
-                btn.textContent = '⛶ 일반창';
-                btn.title = '일반창 보기 (F11)';
+            console.log('[toggleContentOnly] 모드:', isContentOnly ? '본문만 보기' : '전체 보기');
+            console.log('[toggleContentOnly] 요소 찾기:', {
+                viewerHeader: !!viewerHeader,
+                settingsPanel: !!settingsPanel,
+                viewerContent: !!viewerContent,
+                btn: !!btn
+            });
+            
+            if (isContentOnly) {
+                // content-only-mode 클래스 추가
+                body.classList.add('content-only-mode');
                 
-                // Try to use browser fullscreen API
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(err => {
-                        console.log('Fullscreen API not available:', err);
-                    });
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen();
-                } else if (document.documentElement.mozRequestFullScreen) {
-                    document.documentElement.mozRequestFullScreen();
-                } else if (document.documentElement.msRequestFullscreen) {
-                    document.documentElement.msRequestFullscreen();
+                // 헤더의 다른 요소들 숨기기 (버튼 제외)
+                if (viewerHeader) {
+                    const headerChildren = viewerHeader.children;
+                    for (let child of headerChildren) {
+                        // 버튼을 포함하는 요소가 아니면 숨기기
+                        if (!child.contains(btn)) {
+                            child.style.display = 'none';
+                        }
+                    }
+                    viewerHeader.style.padding = '0';
+                    viewerHeader.style.border = 'none';
+                    viewerHeader.style.marginBottom = '0';
+                }
+                if (settingsPanel) {
+                    settingsPanel.style.display = 'none';
+                }
+                // 본문 영역 확장
+                if (viewerContent) {
+                    viewerContent.style.maxWidth = '100%';
+                    viewerContent.style.padding = '2rem';
+                }
+                if (btn) {
+                    btn.textContent = '📑 전체보기';
+                    btn.title = '전체 페이지 보기';
                 }
             } else {
-                body.classList.remove('fullscreen-mode');
-                // 테마 클래스 제거 (일반 모드에서는 필요 없음)
-                body.classList.remove('theme-light', 'theme-dark', 'theme-sepia', 'theme-green');
-                btn.textContent = '⛶ 전체창';
-                btn.title = '전체창 보기 (F11)';
+                // content-only-mode 클래스 제거
+                body.classList.remove('content-only-mode');
                 
-                // Exit browser fullscreen if active
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().catch(err => {
-                        console.log('Exit fullscreen error:', err);
-                    });
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
+                // 헤더의 다른 요소들 표시
+                if (viewerHeader) {
+                    const headerChildren = viewerHeader.children;
+                    for (let child of headerChildren) {
+                        child.style.display = '';
+                    }
+                    viewerHeader.style.padding = '';
+                    viewerHeader.style.border = '';
+                    viewerHeader.style.marginBottom = '';
+                }
+                if (settingsPanel) {
+                    settingsPanel.style.display = '';
+                }
+                // 본문 영역 원래대로
+                if (viewerContent) {
+                    viewerContent.style.maxWidth = '';
+                    viewerContent.style.padding = '';
+                }
+                if (btn) {
+                    btn.textContent = '📄 페이지뷰';
+                    btn.title = '페이지뷰만 보기';
                 }
             }
         }
 
+        // Edit mode (편집 모드)
+        let isEditMode = false;
+        
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const viewerContent = document.getElementById('viewerContent');
+            const editModeBtn = document.getElementById('editModeBtn');
+            const editModeButtons = document.getElementById('editModeButtons');
+            
+            if (isEditMode) {
+                // 편집 모드 활성화
+                if (viewerContent) {
+                    viewerContent.contentEditable = 'true';
+                    viewerContent.style.border = '2px solid #9333ea';
+                    viewerContent.style.outline = 'none';
+                    viewerContent.style.cursor = 'text';
+                }
+                if (editModeBtn) {
+                    editModeBtn.textContent = '👁️ 읽기';
+                    editModeBtn.title = '읽기 모드로 전환';
+                    editModeBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                    editModeBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                }
+                if (editModeButtons) {
+                    editModeButtons.classList.remove('hidden');
+                }
+            } else {
+                // 읽기 모드로 복귀
+                if (viewerContent) {
+                    viewerContent.contentEditable = 'false';
+                    viewerContent.style.border = '';
+                    viewerContent.style.cursor = '';
+                }
+                if (editModeBtn) {
+                    editModeBtn.textContent = '✏️ 편집';
+                    editModeBtn.title = '편집 모드';
+                    editModeBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    editModeBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                }
+                if (editModeButtons) {
+                    editModeButtons.classList.add('hidden');
+                }
+            }
+        }
+        
+        // 선택한 텍스트를 제목으로 설정
+        function makeSelectionTitle() {
+            const selection = window.getSelection();
+            if (!selection || selection.isCollapsed) {
+                alert('제목으로 설정할 텍스트를 먼저 선택하세요.');
+                return;
+            }
+            
+            const range = selection.getRangeAt(0);
+            const selectedText = selection.toString().trim();
+            
+            if (!selectedText) {
+                alert('텍스트를 선택하세요.');
+                return;
+            }
+            
+            // 새로운 제목 요소 생성
+            const titleElement = document.createElement('div');
+            titleElement.className = 'ebook-chapter';
+            titleElement.textContent = selectedText;
+            
+            // 선택된 텍스트를 제목 요소로 교체
+            range.deleteContents();
+            range.insertNode(titleElement);
+            
+            // 선택 해제
+            selection.removeAllRanges();
+            
+            alert('선택한 텍스트가 제목으로 설정되었습니다.');
+        }
+        
+        // 빈 줄 제거
+        function removeBlankLines() {
+            const viewerContent = document.getElementById('viewerContent');
+            if (!viewerContent) return;
+            
+            // 현재 내용을 텍스트로 가져오기
+            let content = viewerContent.innerHTML;
+            
+            // 연속된 <br> 태그 제거 (2개 이상)
+            content = content.replace(/(<br\s*\/?>){2,}/gi, '<br>');
+            
+            // 빈 div나 p 태그 제거
+            content = content.replace(/<(div|p)[^>]*>\s*<\/(div|p)>/gi, '');
+            
+            // 공백만 있는 줄 제거
+            content = content.replace(/<(div|p)[^>]*>\s+<\/(div|p)>/gi, '');
+            
+            viewerContent.innerHTML = content;
+            
+            alert('빈 줄이 제거되었습니다.');
+        }
+        
+        // 수정된 내용을 원본 파일명으로 저장
+        function saveEditedContent() {
+            if (!isEditMode) {
+                alert('편집 모드가 아닙니다.');
+                return;
+            }
+            
+            if (currentFileIndex < 0 || !files[currentFileIndex]) {
+                alert('열린 파일이 없습니다.');
+                return;
+            }
+            
+            const viewerContent = document.getElementById('viewerContent');
+            if (!viewerContent) return;
+            
+            // 수정된 내용을 텍스트로 변환
+            const editedText = viewerContent.innerText;
+            
+            // 파일로 다운로드
+            const currentFile = files[currentFileIndex];
+            const blob = new Blob([editedText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentFile.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`${currentFile.name} 파일이 저장되었습니다.`);
+        }
+        
+        // 수정된 내용을 다른 이름으로 저장
+        function saveEditedAsCopy() {
+            if (!isEditMode) {
+                alert('편집 모드가 아닙니다.');
+                return;
+            }
+            
+            if (currentFileIndex < 0 || !files[currentFileIndex]) {
+                alert('열린 파일이 없습니다.');
+                return;
+            }
+            
+            const viewerContent = document.getElementById('viewerContent');
+            if (!viewerContent) return;
+            
+            // 새 파일명 입력 받기
+            const currentFile = files[currentFileIndex];
+            const originalName = currentFile.name.replace(/\.txt$/i, '');
+            const newFileName = prompt('저장할 파일명을 입력하세요:', originalName + '_편집본.txt');
+            
+            if (!newFileName) return;
+            
+            // 수정된 내용을 텍스트로 변환
+            const editedText = viewerContent.innerText;
+            
+            // 파일로 다운로드
+            const blob = new Blob([editedText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = newFileName.endsWith('.txt') ? newFileName : newFileName + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`${a.download} 파일이 저장되었습니다.`);
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'F11') {
-                e.preventDefault();
-                if (document.getElementById('fullscreenBtn') && !document.getElementById('fullscreenBtn').classList.contains('hidden')) {
-                    toggleFullscreen();
-                }
-            } else if (e.key === 'Escape') {
+            if (e.key === 'Escape') {
                 // Close modals
                 const pageBookmarksModal = document.getElementById('pageBookmarksModal');
                 if (pageBookmarksModal && !pageBookmarksModal.classList.contains('hidden')) {
@@ -2624,19 +3074,9 @@
                 if (fileLoadModal && !fileLoadModal.classList.contains('hidden')) {
                     closeFileLoadModal();
                 }
-            }
-        });
-
-        // Listen for fullscreen changes
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement && isFullscreen) {
-                // User exited fullscreen via browser controls
-                isFullscreen = false;
-                document.body.classList.remove('fullscreen-mode');
-                const btn = document.getElementById('fullscreenBtn');
-                if (btn) {
-                    btn.textContent = '⛶ 전체창';
-                    btn.title = '전체창 보기 (F11)';
+                // Exit content-only mode
+                if (isContentOnly) {
+                    toggleContentOnly();
                 }
             }
         });
@@ -3322,6 +3762,8 @@
             const content = document.getElementById('uploadSectionContent');
             const container = document.getElementById('uploadAreaContainer');
             const toggleBtn = document.getElementById('uploadToggleBtn');
+            const header = document.getElementById('uploadHeaderSection');
+            const historyBookmarks = document.getElementById('uploadHistoryBookmarksSection');
             
             if (!content || !container || !toggleBtn) {
                 console.error('업로드 섹션 요소를 찾을 수 없습니다.');
@@ -3333,17 +3775,31 @@
             if (uploadSectionCollapsed) {
                 content.classList.add('collapsed');
                 container.classList.add('collapsed');
-                toggleBtn.innerHTML = '<span id="uploadToggleIcon">▼</span> 펼치기';
+                if (header) header.classList.add('collapsed');
+                if (historyBookmarks) historyBookmarks.classList.add('collapsed');
+                toggleBtn.innerHTML = '<span id="uploadToggleIcon" style="pointer-events: none;">▼</span> 펼치기';
             } else {
                 content.classList.remove('collapsed');
                 container.classList.remove('collapsed');
-                toggleBtn.innerHTML = '<span id="uploadToggleIcon">▲</span> 접기';
+                if (header) header.classList.remove('collapsed');
+                if (historyBookmarks) historyBookmarks.classList.remove('collapsed');
+                toggleBtn.innerHTML = '<span id="uploadToggleIcon" style="pointer-events: none;">▲</span> 접기';
             }
             
             // Save state
             localStorage.setItem('uploadSectionCollapsed', uploadSectionCollapsed.toString());
         }
-
+        
+        // Auto-collapse upload section after file load
+        function autoCollapseUploadSection() {
+            if (!uploadSectionCollapsed) {
+                toggleUploadSection();
+            }
+        }
+        
+        // Export to global scope
+        window.autoCollapseUploadSection = autoCollapseUploadSection;
+        
         function switchTab(tab) {
             // Note: Sidebar tabs have been removed, this function is kept for potential future use
             currentTab = tab;
@@ -5297,7 +5753,6 @@
             const elements = {
                 'page-reader': document.getElementById('page-reader'),
                 'mainContent': document.getElementById('mainContent'),
-                'readerEmptyState': document.getElementById('readerEmptyState'),
                 'fileList': document.getElementById('fileList'),
                 'viewer-container': document.querySelector('.viewer-container'),
                 'nav-reader': document.getElementById('nav-reader')
@@ -5328,7 +5783,6 @@
             console.group('3. 페이지 상태');
             const pageReader = document.getElementById('page-reader');
             const mainContent = document.getElementById('mainContent');
-            const readerEmptyState = document.getElementById('readerEmptyState');
             
             if (pageReader) {
                 console.log('page-reader 상태:', {
@@ -5349,14 +5803,6 @@
                 });
             }
             
-            if (readerEmptyState) {
-                console.log('readerEmptyState 상태:', {
-                    hasHiddenClass: readerEmptyState.classList.contains('hidden'),
-                    computedDisplay: window.getComputedStyle(readerEmptyState).display,
-                    inlineDisplay: readerEmptyState.style.display,
-                    isVisible: readerEmptyState.offsetHeight > 0
-                });
-            }
             console.groupEnd();
             
             // 4. CSS 충돌 확인
@@ -5672,7 +6118,6 @@
             
             const pageReader = document.getElementById('page-reader');
             const mainContent = document.getElementById('mainContent');
-            const readerEmptyState = document.getElementById('readerEmptyState');
             
             // 모든 페이지 숨기기
             document.querySelectorAll('.page-section').forEach(page => {
@@ -5714,10 +6159,6 @@
             
             // 파일이 있으면 mainContent 표시
             if (files.length > 0) {
-                if (readerEmptyState) {
-                    readerEmptyState.classList.add('hidden');
-                    readerEmptyState.style.setProperty('display', 'none', 'important');
-                }
                 if (mainContent) {
                     mainContent.classList.remove('hidden');
                     mainContent.style.setProperty('display', 'block', 'important');
@@ -5729,10 +6170,6 @@
                 if (mainContent) {
                     mainContent.classList.add('hidden');
                     mainContent.style.setProperty('display', 'none', 'important');
-                }
-                if (readerEmptyState) {
-                    readerEmptyState.classList.remove('hidden');
-                    readerEmptyState.style.setProperty('display', 'block', 'important');
                 }
             }
             
