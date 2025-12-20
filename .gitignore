@@ -1,0 +1,9 @@
+# 로그 파일
+*.log
+
+# Cursor 설정 폴더
+.cursor/
+
+# 임시 파일
+HTTP_Server_Log.txt
+
