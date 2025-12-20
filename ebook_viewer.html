@@ -658,6 +658,75 @@
                                     </div>
                                 </div>
 
+                                <!-- Custom Color Theme -->
+                                <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-purple-200">
+                                    <h4 class="text-md font-bold text-purple-800 mb-3">🎨 커스텀 컬러</h4>
+                                    <p class="text-xs text-gray-600 mb-4">원하는 배경색과 텍스트 색상을 직접 설정할 수 있습니다</p>
+                                    
+                                    <!-- Background Color -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">배경 색상</label>
+                                        <div class="flex items-center gap-3">
+                                            <input 
+                                                type="color" 
+                                                id="customBgColor" 
+                                                value="#ffffff" 
+                                                oninput="updateCustomTheme()"
+                                                class="w-16 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                                            >
+                                            <input 
+                                                type="text" 
+                                                id="customBgColorText" 
+                                                value="#ffffff" 
+                                                placeholder="#ffffff"
+                                                onchange="updateCustomThemeFromText('bg')"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm font-mono"
+                                            >
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Text Color -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">텍스트 색상</label>
+                                        <div class="flex items-center gap-3">
+                                            <input 
+                                                type="color" 
+                                                id="customTextColor" 
+                                                value="#1f2937" 
+                                                oninput="updateCustomTheme()"
+                                                class="w-16 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                                            >
+                                            <input 
+                                                type="text" 
+                                                id="customTextColorText" 
+                                                value="#1f2937" 
+                                                placeholder="#1f2937"
+                                                onchange="updateCustomThemeFromText('text')"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm font-mono"
+                                            >
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="flex gap-2 mt-4">
+                                        <button 
+                                            onclick="applyCustomTheme()" 
+                                            class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                                        >
+                                            ✓ 적용
+                                        </button>
+                                        <button 
+                                            onclick="resetCustomTheme()" 
+                                            class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                                        >
+                                            ↺ 리셋
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        💡 커스텀 컬러 적용 시 기본 테마는 비활성화됩니다
+                                    </p>
+                                </div>
+
                                 <!-- Font Family -->
                                 <div class="mb-6">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">글씨체</label>
@@ -1036,6 +1105,75 @@
                                             <div class="h-8 rounded bg-gradient-to-r from-green-50 to-green-100"></div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <!-- Custom Color Theme -->
+                                <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-purple-200">
+                                    <h4 class="text-md font-bold text-purple-800 mb-3">🎨 커스텀 컬러</h4>
+                                    <p class="text-xs text-gray-600 mb-4">원하는 배경색과 텍스트 색상을 직접 설정할 수 있습니다</p>
+                                    
+                                    <!-- Background Color -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">배경 색상</label>
+                                        <div class="flex items-center gap-3">
+                                            <input 
+                                                type="color" 
+                                                id="customBgColor" 
+                                                value="#ffffff" 
+                                                oninput="updateCustomTheme()"
+                                                class="w-16 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                                            >
+                                            <input 
+                                                type="text" 
+                                                id="customBgColorText" 
+                                                value="#ffffff" 
+                                                placeholder="#ffffff"
+                                                onchange="updateCustomThemeFromText('bg')"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm font-mono"
+                                            >
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Text Color -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">텍스트 색상</label>
+                                        <div class="flex items-center gap-3">
+                                            <input 
+                                                type="color" 
+                                                id="customTextColor" 
+                                                value="#1f2937" 
+                                                oninput="updateCustomTheme()"
+                                                class="w-16 h-10 rounded border-2 border-gray-300 cursor-pointer"
+                                            >
+                                            <input 
+                                                type="text" 
+                                                id="customTextColorText" 
+                                                value="#1f2937" 
+                                                placeholder="#1f2937"
+                                                onchange="updateCustomThemeFromText('text')"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm font-mono"
+                                            >
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="flex gap-2 mt-4">
+                                        <button 
+                                            onclick="applyCustomTheme()" 
+                                            class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                                        >
+                                            ✓ 적용
+                                        </button>
+                                        <button 
+                                            onclick="resetCustomTheme()" 
+                                            class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                                        >
+                                            ↺ 리셋
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        💡 커스텀 컬러 적용 시 기본 테마는 비활성화됩니다
+                                    </p>
                                 </div>
 
                                 <!-- Font Family -->
@@ -2721,6 +2859,12 @@
             // Add selected theme
             content.classList.add(`theme-${theme}`);
             
+            // Apply theme to body (외곽 배경)
+            document.body.classList.remove('theme-light', 'theme-dark', 'theme-sepia', 'theme-green');
+            document.body.classList.add(`theme-${theme}`);
+            document.body.style.backgroundColor = '';
+            document.body.style.color = '';
+            
             // Apply theme to page-reader and mainContent for background colors
             const pageReader = document.getElementById('page-reader');
             const mainContent = document.getElementById('mainContent');
@@ -2843,12 +2987,44 @@
             
             const content = document.getElementById('viewerContent');
             const mainContent = document.getElementById('mainContent');
+            const pageReader = document.getElementById('page-reader');
             
+            // Remove ALL background-related classes from body (not just theme classes)
+            const bodyClasses = Array.from(document.body.classList);
+            bodyClasses.forEach(className => {
+                if (className.startsWith('bg-') || 
+                    className.startsWith('from-') || 
+                    className.startsWith('via-') || 
+                    className.startsWith('to-') ||
+                    className.startsWith('theme-')) {
+                    document.body.classList.remove(className);
+                }
+            });
+            
+            // Apply to body (외곽 배경) using setProperty for !important
+            document.body.style.setProperty('background-color', customTheme.backgroundColor, 'important');
+            document.body.style.setProperty('color', customTheme.textColor, 'important');
+            
+            // Remove background classes from all major elements
+            [content, mainContent, pageReader].forEach(element => {
+                if (element) {
+                    const classes = Array.from(element.classList);
+                    classes.forEach(className => {
+                        if (className.startsWith('bg-') || 
+                            className.startsWith('from-') || 
+                            className.startsWith('via-') || 
+                            className.startsWith('to-') ||
+                            className.startsWith('theme-')) {
+                            element.classList.remove(className);
+                        }
+                    });
+                    element.style.setProperty('background-color', customTheme.backgroundColor, 'important');
+                    element.style.setProperty('color', customTheme.textColor, 'important');
+                }
+            });
+            
+            // Apply to all text elements in content
             if (content) {
-                content.style.backgroundColor = customTheme.backgroundColor;
-                content.style.color = customTheme.textColor;
-                
-                // Apply to all text elements
                 const allTextElements = content.querySelectorAll('div');
                 allTextElements.forEach(el => {
                     if (!el.classList.contains('chapter-title')) {
@@ -2857,18 +3033,85 @@
                 });
             }
             
-            if (mainContent) {
-                mainContent.style.backgroundColor = customTheme.backgroundColor;
+            // Apply to all background elements (Hypothesis D)
+            const bgElements = document.querySelectorAll('.bg-white, .bg-gray-50, .bg-gradient-to-r, header, nav, .sidebar');
+            let bgElementsCount = 0;
+            bgElements.forEach(el => {
+                el.style.setProperty('background-color', customTheme.backgroundColor, 'important');
+                el.style.setProperty('color', customTheme.textColor, 'important');
+                bgElementsCount++;
+            });
+            
+            // Create dynamic style override for all Tailwind background classes
+            let customStyleTag = document.getElementById('custom-theme-override');
+            if (customStyleTag) {
+                customStyleTag.remove();
             }
             
-            // Apply to bg-white and bg-gray-50 elements
-            const whiteElements = document.querySelectorAll('.bg-white, .bg-gray-50');
-            whiteElements.forEach(el => {
-                if (el.closest('#mainContent') || el.closest('#viewerContent')) {
-                    el.style.backgroundColor = customTheme.backgroundColor;
-                    el.style.color = customTheme.textColor;
+            customStyleTag = document.createElement('style');
+            customStyleTag.id = 'custom-theme-override';
+            customStyleTag.textContent = `
+                /* Custom Theme Override - Maximum Priority */
+                body.min-h-screen,
+                body,
+                html,
+                #root,
+                [class*="bg-"],
+                [class*="from-"],
+                [class*="via-"],
+                [class*="to-"] {
+                    background: ${customTheme.backgroundColor} !important;
+                    background-color: ${customTheme.backgroundColor} !important;
+                    background-image: none !important;
+                    background-clip: border-box !important;
                 }
-            });
+                
+                /* Force all container elements */
+                .viewer-container,
+                .container,
+                main,
+                header,
+                nav,
+                section,
+                article,
+                aside,
+                .sidebar {
+                    background: ${customTheme.backgroundColor} !important;
+                    background-color: ${customTheme.backgroundColor} !important;
+                    background-image: none !important;
+                }
+                
+                /* Override all Tailwind bg classes */
+                .bg-white,
+                .bg-gray-50,
+                .bg-gray-100,
+                .bg-gray-200,
+                .bg-gray-300,
+                .bg-gray-700,
+                .bg-gray-800,
+                .bg-gray-900,
+                .bg-gradient-to-r,
+                .bg-gradient-to-br,
+                .bg-gradient-to-l,
+                .bg-gradient-to-tr {
+                    background: ${customTheme.backgroundColor} !important;
+                    background-color: ${customTheme.backgroundColor} !important;
+                    background-image: none !important;
+                }
+                
+                /* Apply text color everywhere */
+                body,
+                body *:not(button.bg-purple-600):not(button.bg-green-500):not(button.bg-blue-500):not(.bg-red-500):not(.bg-yellow-500) {
+                    color: ${customTheme.textColor} !important;
+                }
+                
+                /* Chapter titles */
+                .chapter-title {
+                    color: ${customTheme.textColor} !important;
+                    opacity: 0.9;
+                }
+            `;
+            document.head.appendChild(customStyleTag);
         }
 
         function resetCustomTheme() {
@@ -2877,6 +3120,23 @@
             document.getElementById('customBgColorText').value = '#ffffff';
             document.getElementById('customTextColor').value = '#1f2937';
             document.getElementById('customTextColorText').value = '#1f2937';
+            
+            // Remove inline styles from body and other elements
+            document.body.style.removeProperty('background-color');
+            document.body.style.removeProperty('color');
+            
+            // Remove inline styles from all background elements
+            const bgElements = document.querySelectorAll('.bg-white, .bg-gray-50, .bg-gradient-to-r, header, nav, .sidebar');
+            bgElements.forEach(el => {
+                el.style.removeProperty('background-color');
+                el.style.removeProperty('color');
+            });
+            
+            // Remove custom theme override style tag
+            const customStyleTag = document.getElementById('custom-theme-override');
+            if (customStyleTag) {
+                customStyleTag.remove();
+            }
             
             // Reapply default theme
             applyTheme(currentTheme);
