@@ -445,7 +445,7 @@
 
                 <div class="p-6">
                     <!-- Content Viewer (Full Width) -->
-                    <div class="max-w-5xl mx-auto">
+                    <div class="w-full px-4">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <div id="viewerHeader" class="mb-4 pb-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
@@ -854,7 +854,7 @@
 
                 <div class="p-6">
                     <!-- Content Viewer (Full Width) -->
-                    <div class="max-w-5xl mx-auto">
+                    <div class="w-full px-4">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <div id="viewerHeader" class="mb-4 pb-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
@@ -3014,6 +3014,42 @@
                 .chapter-title {
                     color: ${customTheme.textColor} !important;
                     opacity: 0.9;
+                }
+                
+                /* Scrollbar styling with custom colors */
+                .ebook-content::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .ebook-content::-webkit-scrollbar-track {
+                    background: ${customTheme.backgroundColor} !important;
+                    border-radius: 10px;
+                }
+                .ebook-content::-webkit-scrollbar-thumb {
+                    background: ${customTheme.textColor} !important;
+                    opacity: 0.5;
+                    border-radius: 10px;
+                }
+                .ebook-content::-webkit-scrollbar-thumb:hover {
+                    background: ${customTheme.textColor} !important;
+                    opacity: 0.8;
+                }
+                
+                /* General scrollbar for other elements */
+                ::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+                ::-webkit-scrollbar-track {
+                    background: ${customTheme.backgroundColor} !important;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background: ${customTheme.textColor} !important;
+                    opacity: 0.3;
+                    border-radius: 4px;
+                }
+                ::-webkit-scrollbar-thumb:hover {
+                    background: ${customTheme.textColor} !important;
+                    opacity: 0.5;
                 }
             `;
             document.head.appendChild(customStyleTag);
