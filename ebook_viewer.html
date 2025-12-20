@@ -358,19 +358,6 @@
                 <p class="text-center text-gray-600">로컬 텍스트 파일을 업로드하여 정리하고 읽어보세요</p>
             </div>
 
-            <!-- Navigation Tabs -->
-            <div class="bg-white px-6 border-b-2 border-gray-200">
-                <div class="flex gap-1">
-                    <button 
-                        onclick="switchPage('upload')"
-                        id="nav-upload"
-                        class="nav-tab active px-6 py-3 font-semibold hover:bg-gray-100 rounded-t-lg"
-                    >
-                        📁 파일 업로드
-                    </button>
-                </div>
-            </div>
-
             <!-- Upload Page -->
             <div id="page-upload" class="page-section active">
                 <!-- Upload Area -->
@@ -3335,9 +3322,8 @@
             const content = document.getElementById('uploadSectionContent');
             const container = document.getElementById('uploadAreaContainer');
             const toggleBtn = document.getElementById('uploadToggleBtn');
-            const toggleIcon = document.getElementById('uploadToggleIcon');
             
-            if (!content || !container || !toggleBtn || !toggleIcon) {
+            if (!content || !container || !toggleBtn) {
                 console.error('업로드 섹션 요소를 찾을 수 없습니다.');
                 return;
             }
@@ -3347,12 +3333,10 @@
             if (uploadSectionCollapsed) {
                 content.classList.add('collapsed');
                 container.classList.add('collapsed');
-                toggleIcon.textContent = '▼';
                 toggleBtn.innerHTML = '<span id="uploadToggleIcon">▼</span> 펼치기';
             } else {
                 content.classList.remove('collapsed');
                 container.classList.remove('collapsed');
-                toggleIcon.textContent = '▲';
                 toggleBtn.innerHTML = '<span id="uploadToggleIcon">▲</span> 접기';
             }
             
