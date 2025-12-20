@@ -443,59 +443,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="stats"></div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-                    <!-- File List -->
-                    <div id="sidebarContainer" class="lg:col-span-1 relative transition-all duration-300">
-                        <!-- Sidebar Toggle Button -->
-                        <button 
-                            id="sidebarToggle" 
-                            onclick="toggleSidebar()"
-                            class="absolute -right-4 top-4 z-10 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center"
-                            style="width: 32px; height: 32px;"
-                            title="사이드바 접기/펼치기"
-                        >
-                            <span id="sidebarToggleIcon" style="font-size: 14px;">◀</span>
-                        </button>
-                        <div id="sidebarContent" class="bg-white rounded-lg shadow-md p-4 transition-all duration-300">
-                            <!-- Tabs -->
-                            <div class="flex border-b border-gray-200 mb-4">
-                                <button 
-                                    id="tabFiles" 
-                                    onclick="switchTab('files')"
-                                    class="flex-1 px-4 py-2 text-center font-semibold text-gray-900 border-b-2 border-gray-900 transition-colors"
-                                >
-                                    📖 파일
-                                </button>
-                                <button 
-                                    id="tabHistory" 
-                                    onclick="switchTab('history')"
-                                    class="flex-1 px-4 py-2 text-center font-semibold text-gray-500 hover:text-gray-900 transition-colors"
-                                >
-                                    🕐 히스토리
-                                </button>
-                                <button 
-                                    id="tabBookmarks" 
-                                    onclick="switchTab('bookmarks')"
-                                    class="flex-1 px-4 py-2 text-center font-semibold text-gray-500 hover:text-gray-900 transition-colors"
-                                >
-                                    ⭐ 북마크
-                                </button>
-                            </div>
-                            
-                            <!-- Search (only for files tab) -->
-                            <div id="searchContainer" class="mb-4">
-                                <input type="text" id="searchInput" placeholder="파일 검색..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
-                            </div>
-                            
-                            <!-- Content Area -->
-                            <div id="fileList" class="space-y-2 max-h-[70vh] overflow-y-auto">
-                                <!-- Files will be inserted here -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Content Viewer -->
-                    <div class="lg:col-span-2">
+                <div class="p-6">
+                    <!-- Content Viewer (Full Width) -->
+                    <div class="max-w-5xl mx-auto">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <div id="viewerHeader" class="mb-4 pb-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between mb-2">
