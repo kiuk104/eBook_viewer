@@ -8,6 +8,8 @@
     <meta http-equiv="Expires" content="0">
     <title>이북 텍스트 뷰어 v2.0 (Everything URL Protocol)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;500;700&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
@@ -498,9 +500,17 @@
                             <div class="text-6xl mb-4">📁</div>
                             <h2 class="text-2xl font-semibold text-gray-700 mb-2">파일 선택 또는 드래그 앤 드롭</h2>
                             <p class="text-gray-500 mb-6">텍스트 파일(.txt)을 여러 개 선택할 수 있습니다</p>
-                            <button onclick="selectFiles()" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-all duration-200">
-                                파일 선택
-                            </button>
+                            <div class="flex gap-4 justify-center">
+                                <button onclick="selectFiles()" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-all duration-200">
+                                    파일 선택
+                                </button>
+                                <button onclick="loadGoogleDriveFiles()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 flex items-center gap-2">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M7.71 10.07c-.53.53-.71 1.16-.71 1.71s.18 1.18.71 1.71c.53.53 1.16.71 1.71.71s1.18-.18 1.71-.71c.53-.53.71-1.16.71-1.71s-.18-1.18-.71-1.71c-.53-.53-1.16-.71-1.71-.71s-1.18.18-1.71.71zm5.66-1.07c-1.41 0-2.83.59-3.83 1.59-1 1-1.59 2.42-1.59 3.83s.59 2.83 1.59 3.83c1 1 2.42 1.59 3.83 1.59s2.83-.59 3.83-1.59c1-1 1.59-2.42 1.59-3.83s-.59-2.83-1.59-3.83c-1-1-2.42-1.59-3.83-1.59zm-5.66 5.66c-.35.35-.35.92 0 1.27.35.35.92.35 1.27 0 .35-.35.35-.92 0-1.27-.35-.35-.92-.35-1.27 0zm5.66-5.66c-.35.35-.35.92 0 1.27.35.35.92.35 1.27 0 .35-.35.35-.92 0-1.27-.35-.35-.92-.35-1.27 0z"/>
+                                    </svg>
+                                    Google Drive
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -600,7 +610,7 @@
                                         <button 
                                             id="settingsBtn" 
                                             onclick="toggleSettings()"
-                                            class="hidden bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold"
+                                            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold"
                                         >
                                             ⚙️ 설정
                                         </button>
@@ -896,6 +906,53 @@
                                     </p>
                                 </div>
 
+                                <!-- Google Drive API Settings -->
+                                <div class="mb-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                                    <h4 class="text-md font-bold text-blue-800 mb-3">☁️ Google Drive 연동</h4>
+                                    <p class="text-xs text-gray-600 mb-4">
+                                        Google Drive에서 파일을 불러오려면 Google Cloud Console에서 발급받은 클라이언트 ID와 API 키가 필요합니다.
+                                    </p>
+                                    
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">클라이언트 ID</label>
+                                        <input 
+                                            type="text" 
+                                            id="googleClientId" 
+                                            placeholder="YOUR_CLIENT_ID_HERE"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                        >
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">API 키</label>
+                                        <input 
+                                            type="text" 
+                                            id="googleApiKey" 
+                                            placeholder="YOUR_API_KEY_HERE"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                        >
+                                    </div>
+                                    
+                                    <div class="flex gap-2">
+                                        <button 
+                                            onclick="saveGoogleDriveSettings()" 
+                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                                        >
+                                            ✓ 저장
+                                        </button>
+                                        <button 
+                                            onclick="loadGoogleDriveSettings()" 
+                                            class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                                        >
+                                            ↺ 불러오기
+                                        </button>
+                                    </div>
+                                    
+                                    <p class="text-xs text-gray-500 mt-3">
+                                        💡 <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Google Cloud Console</a>에서 OAuth 2.0 클라이언트 ID와 API 키를 발급받으세요.
+                                    </p>
+                                </div>
+
                                 <!-- Version Info -->
                                 <div class="mt-6 pt-4 border-t border-gray-300">
                                 <div class="flex items-center justify-between">
@@ -1050,7 +1107,7 @@
                                         <button 
                                             id="settingsBtn" 
                                             onclick="toggleSettings()"
-                                            class="hidden bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold"
+                                            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold"
                                         >
                                             ⚙️ 설정
                                         </button>
@@ -1295,8 +1352,8 @@
                                             class="flex-1"
                                         >
                                         <button onclick="adjustFontSize(2)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-lg font-bold">+</button>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
 
                                 <!-- Chapter/Title Size -->
                                 <div class="mb-4">
@@ -1316,11 +1373,11 @@
                                             class="flex-1"
                                         >
                                         <button onclick="adjustChapterSize(2)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-lg font-bold">+</button>
-                                    </div>
+                    </div>
                                     <p class="text-xs text-gray-500 mt-2">
                                         제목과 챕터는 자동으로 인식되어 표시됩니다
                                     </p>
-                                </div>
+                </div>
 
                                 <!-- Page Width -->
                                 <div class="mb-4">
@@ -1497,6 +1554,15 @@
             
             initializeVersion();
             loadSettings();
+            loadGoogleDriveSettings(); // Google Drive 설정 불러오기
+            
+            // 설정 버튼 항상 표시
+            const settingsBtns = document.querySelectorAll('#settingsBtn');
+            settingsBtns.forEach(btn => {
+                if (btn) {
+                    btn.classList.remove('hidden');
+                }
+            });
             
             // Load history and bookmarks with logging
             console.log('[DOMContentLoaded] loadHistory() 호출 전, history 배열:', history);
@@ -2155,7 +2221,7 @@
                 processFiles(droppedFiles);
             }
         });
-        
+
         // Add drag and drop handlers for viewerEmptyState
         const viewerEmptyState = document.getElementById('viewerEmptyState');
         const viewerEmptyState2 = document.getElementById('viewerEmptyState2');
@@ -2393,6 +2459,699 @@
                 
                 console.log('[processFiles] 파일 처리 완료, 총 파일 수:', files.length);
             });
+        }
+
+        // Google Drive API 관련 변수
+        let gapiInitialized = false;
+        let googleAuth = null;
+        const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
+        const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
+
+        // Google Drive 설정 가져오기
+        function getGoogleDriveSettings() {
+            const clientId = localStorage.getItem('googleClientId') || '';
+            const apiKey = localStorage.getItem('googleApiKey') || '';
+            return { clientId, apiKey };
+        }
+
+        // Google Drive 설정 저장
+        function saveGoogleDriveSettings() {
+            const clientId = document.getElementById('googleClientId').value.trim();
+            const apiKey = document.getElementById('googleApiKey').value.trim();
+            
+            if (!clientId || !apiKey) {
+                alert('클라이언트 ID와 API 키를 모두 입력해주세요.');
+                return;
+            }
+            
+            localStorage.setItem('googleClientId', clientId);
+            localStorage.setItem('googleApiKey', apiKey);
+            
+            // API 재초기화
+            gapiInitialized = false;
+            googleAuth = null;
+            
+            alert('Google Drive 설정이 저장되었습니다.');
+        }
+
+        // Google Drive 설정 불러오기
+        function loadGoogleDriveSettings() {
+            const settings = getGoogleDriveSettings();
+            document.getElementById('googleClientId').value = settings.clientId;
+            document.getElementById('googleApiKey').value = settings.apiKey;
+        }
+
+        // Google API 초기화
+        async function initGoogleAPI() {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2505',message:'initGoogleAPI entry',data:{gapiInitialized},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            if (gapiInitialized) {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2507',message:'initGoogleAPI already initialized',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                return true;
+            }
+
+            const settings = getGoogleDriveSettings();
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2511',message:'Checking Google Drive settings',data:{hasClientId:!!settings.clientId,hasApiKey:!!settings.apiKey},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            if (!settings.clientId || !settings.apiKey) {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2512',message:'Settings missing, throwing error',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                throw new Error('Google Drive 설정이 필요합니다. 설정 패널에서 클라이언트 ID와 API 키를 입력해주세요.');
+            }
+
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2515',message:'Before gapi.load',data:{hasGapi:typeof gapi !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            return new Promise((resolve, reject) => {
+                try {
+                    gapi.load('client:auth2', async () => {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2532',message:'gapi.load callback executed',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                        // #endregion
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2536',message:'Entering try block',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                        // #endregion
+                        try {
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2518',message:'Before gapi.client.init',data:{hasGapiClient:typeof gapi.client !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2543',message:'Calling gapi.client.init',data:{apiKeyLength:settings.apiKey.length,clientIdLength:settings.clientId.length,discoveryDocs:DISCOVERY_DOCS,scopes:SCOPES},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                            const initPromise = gapi.client.init({
+                                apiKey: settings.apiKey,
+                                clientId: settings.clientId,
+                                discoveryDocs: DISCOVERY_DOCS,
+                                scope: SCOPES
+                            });
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2551',message:'After gapi.client.init call',data:{hasInitPromise:!!initPromise,initPromiseType:typeof initPromise},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2548',message:'gapi.client.init return value',data:{isPromise:initPromise instanceof Promise,isUndefined:typeof initPromise === 'undefined',type:typeof initPromise,hasThen:typeof initPromise?.then === 'function'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                            // gapi.client.init이 Promise 또는 Promise-like 객체를 반환할 수 있음
+                            // .then() 메서드가 있으면 Promise로 처리
+                            const isPromiseLike = initPromise && typeof initPromise.then === 'function';
+                            if (isPromiseLike) {
+                                // #region agent log
+                                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2557',message:'gapi.client.init is Promise-like, adding direct handlers',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                // #endregion
+                                // Promise-like 객체에 직접 핸들러 추가하여 실제 상태 확인
+                                initPromise.then((result) => {
+                                    // #region agent log
+                                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2560',message:'Direct initPromise.then called',data:{hasResult:!!result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                    // #endregion
+                                }).catch((error) => {
+                                    // #region agent log
+                                    const errorData = {
+                                        errorMessage: error?.message || String(error),
+                                        errorName: error?.name,
+                                        errorCode: error?.error,
+                                        errorDetails: error?.details,
+                                        errorString: JSON.stringify(error, Object.getOwnPropertyNames(error))
+                                    };
+                                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2563',message:'Direct initPromise.catch called',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                    // #endregion
+                                });
+                                // Promise-like 객체를 확실한 Promise로 변환하고 에러 핸들링 추가
+                                const initPromiseResolved = Promise.resolve(initPromise)
+                                    .then((result) => {
+                                        // #region agent log
+                                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2569',message:'gapi.client.init promise resolved',data:{hasResult:!!result},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                        // #endregion
+                                        return result;
+                                    })
+                                    .catch((error) => {
+                                        // #region agent log
+                                        const errorData = {
+                                            errorMessage: error?.message || String(error),
+                                            errorName: error?.name,
+                                            errorCode: error?.error,
+                                            errorDetails: error?.details,
+                                            errorString: JSON.stringify(error, Object.getOwnPropertyNames(error))
+                                        };
+                                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2572',message:'gapi.client.init promise rejected',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                        // #endregion
+                                        throw error;
+                                    });
+                                
+                                // 타임아웃 전에 주기적으로 gapi.client.drive가 생성되었는지 확인
+                                let checkInterval;
+                                const checkDriveReady = new Promise((resolve) => {
+                                    checkInterval = setInterval(() => {
+                                        // #region agent log
+                                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2571',message:'Polling gapi.client.drive',data:{hasGapiClient:!!gapi.client,hasDrive:!!(gapi.client && gapi.client.drive)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                        // #endregion
+                                        if (gapi.client && gapi.client.drive) {
+                                            clearInterval(checkInterval);
+                                            resolve(true);
+                                        }
+                                    }, 200); // 200ms마다 확인
+                                });
+                                
+                                const clientInitTimeout = new Promise((_, reject) => 
+                                    setTimeout(() => {
+                                        if (checkInterval) clearInterval(checkInterval);
+                                        reject(new Error('gapi.client.init 타임아웃 (10초)'));
+                                    }, 10000)
+                                );
+                                
+                                // initPromise, checkDriveReady, timeout 중 하나가 먼저 완료되면 진행
+                                try {
+                                    await Promise.race([initPromiseResolved, checkDriveReady, clientInitTimeout]);
+                                    if (checkInterval) clearInterval(checkInterval);
+                                    // #region agent log
+                                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2592',message:'gapi.client.init completed or drive ready',data:{hasDrive:!!(gapi.client && gapi.client.drive)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                    // #endregion
+                                } catch (error) {
+                                    if (checkInterval) clearInterval(checkInterval);
+                                    // #region agent log
+                                    const errorData = {
+                                        errorType: typeof error,
+                                        errorIsNull: error === null,
+                                        errorIsUndefined: error === undefined,
+                                        errorMessage: error?.message,
+                                        errorName: error?.name,
+                                        errorCode: error?.error,
+                                        errorDetails: error?.details,
+                                        errorReason: error?.reason,
+                                        errorString: String(error),
+                                        errorKeys: error && typeof error === 'object' ? Object.keys(error) : null,
+                                        errorStringified: (() => {
+                                            try {
+                                                return JSON.stringify(error, Object.getOwnPropertyNames(error));
+                                            } catch (e) {
+                                                return 'Cannot stringify: ' + String(e);
+                                            }
+                                        })()
+                                    };
+                                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2632',message:'Promise.race error - full error analysis',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                                    // #endregion
+                                    // 에러가 메시지가 없는 경우 Error 객체로 변환하여 throw
+                                    if (!error || (typeof error === 'object' && !error.message && !error.error && !error.details)) {
+                                        throw new Error('Promise.race 실패: ' + (error ? String(error) : '알 수 없는 오류'));
+                                    } else {
+                                        throw error;
+                                    }
+                                }
+                            } else {
+                                // #region agent log
+                                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2565',message:'gapi.client.init not Promise-like, checking if already initialized',data:{hasGapiClient:!!gapi.client,hasDrive:!!(gapi.client && gapi.client.drive)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                // #endregion
+                                // Promise가 아닌 경우, 이미 완료된 것으로 간주
+                                // gapi.client가 이미 초기화되었는지 확인
+                                if (gapi.client && gapi.client.drive) {
+                                    // #region agent log
+                                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2570',message:'gapi.client already initialized',data:{hasDrive:!!gapi.client.drive},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                    // #endregion
+                                    // 이미 초기화된 경우 바로 진행
+                                } else {
+                                    // Promise가 아니고 아직 초기화되지 않은 경우, 짧은 대기 후 재시도
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                    // #region agent log
+                                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2575',message:'After 500ms wait, checking gapi.client',data:{hasGapiClient:!!gapi.client,hasDrive:!!(gapi.client && gapi.client.drive)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                    // #endregion
+                                    if (!gapi.client || !gapi.client.drive) {
+                                        throw new Error('gapi.client.init이 완료되지 않았습니다. Google API가 제대로 로드되지 않았을 수 있습니다.');
+                                    }
+                                }
+                            }
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2583',message:'gapi.client.init success',data:{hasInitResult:!!initResult},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                            googleAuth = gapi.auth2.getAuthInstance();
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2525',message:'Got auth instance',data:{hasGoogleAuth:!!googleAuth},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                            gapiInitialized = true;
+                            resolve(true);
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2527',message:'initGoogleAPI resolve called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                            // #endregion
+                        } catch (error) {
+                            // #region agent log
+                            const errorData = {
+                                errorType: typeof error,
+                                errorIsNull: error === null,
+                                errorIsUndefined: error === undefined,
+                                errorMessage: error?.message,
+                                errorName: error?.name,
+                                errorCode: error?.error,
+                                errorDetails: error?.details,
+                                errorReason: error?.reason,
+                                errorStack: error?.stack,
+                                errorString: String(error),
+                                errorKeys: error && typeof error === 'object' ? Object.keys(error) : null,
+                                errorStringified: (() => {
+                                    try {
+                                        return JSON.stringify(error, Object.getOwnPropertyNames(error));
+                                    } catch (e) {
+                                        return 'Cannot stringify: ' + String(e);
+                                    }
+                                })()
+                            };
+                            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2680',message:'gapi.client.init error - full error analysis',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                            // #endregion
+                            console.error('Google API 초기화 실패:', error);
+                            // 에러 객체의 error와 details 속성을 명확하게 표시
+                            if (error?.error) {
+                                console.error('에러 코드:', error.error);
+                            }
+                            if (error?.details) {
+                                console.error('에러 상세:', error.details);
+                                // idpiframe_initialization_failed 에러인 경우 사용자에게 명확한 안내
+                                if (error.error === 'idpiframe_initialization_failed') {
+                                    console.error('\n⚠️ Google OAuth 설정 오류가 발생했습니다.');
+                                    console.error('해결 방법:');
+                                    console.error('1. https://console.cloud.google.com/apis/credentials 로 이동');
+                                    console.error('2. OAuth 2.0 클라이언트 ID를 선택');
+                                    console.error('3. "승인된 JavaScript 원본"에 http://localhost:8000 추가');
+                                    console.error('4. 저장 후 브라우저를 새로고침 (Ctrl+Shift+R)');
+                                    console.error('5. 설정 변경이 적용될 때까지 몇 분 대기');
+                                }
+                            }
+                            // 에러가 메시지가 없는 경우 Error 객체로 변환하여 전달
+                            if (!error || (typeof error === 'object' && !error.message && !error.error && !error.details)) {
+                                const errorMsg = error?.error ? `에러 코드: ${error.error}${error.details ? ', 상세: ' + error.details : ''}` : (error ? String(error) : '알 수 없는 오류');
+                                reject(new Error('gapi.client.init 실패: ' + errorMsg));
+                            } else {
+                                reject(error);
+                            }
+                        }
+                    });
+                } catch (error) {
+                    // #region agent log
+                    const errorData = {
+                        errorType: typeof error,
+                        errorIsNull: error === null,
+                        errorIsUndefined: error === undefined,
+                        errorMessage: error?.message,
+                        errorName: error?.name,
+                        errorCode: error?.error,
+                        errorDetails: error?.details,
+                        errorString: String(error),
+                        errorStringified: (() => {
+                            try {
+                                return JSON.stringify(error, Object.getOwnPropertyNames(error));
+                            } catch (e) {
+                                return 'Cannot stringify: ' + String(e);
+                            }
+                        })()
+                    };
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2712',message:'gapi.load error - full error analysis',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                    // #endregion
+                    // 에러가 메시지가 없는 경우 Error 객체로 변환
+                    if (!error || (typeof error === 'object' && !error.message && !error.error)) {
+                        reject(new Error('gapi.load 실패: ' + (error ? String(error) : '알 수 없는 오류')));
+                    } else {
+                        reject(error);
+                    }
+                }
+            });
+        }
+
+        // Google Drive 인증
+        async function signInToGoogle() {
+            try {
+                if (!gapiInitialized) {
+                    await initGoogleAPI();
+                }
+
+                if (!googleAuth.isSignedIn.get()) {
+                    await googleAuth.signIn();
+                }
+                return true;
+            } catch (error) {
+                console.error('Google 인증 실패:', error);
+                alert('Google 인증에 실패했습니다. 클라이언트 ID와 API 키를 확인해주세요.');
+                return false;
+            }
+        }
+
+        // Google Drive에서 파일 목록 가져오기
+        async function listGoogleDriveFiles() {
+            try {
+                if (!googleAuth || !googleAuth.isSignedIn.get()) {
+                    const signedIn = await signInToGoogle();
+                    if (!signedIn) {
+                        return [];
+                    }
+                }
+
+                const response = await gapi.client.drive.files.list({
+                    q: "mimeType='text/plain' and trashed=false",
+                    fields: 'files(id, name, size, modifiedTime)',
+                    orderBy: 'modifiedTime desc',
+                    pageSize: 100
+                });
+
+                return response.result.files || [];
+            } catch (error) {
+                console.error('Google Drive 파일 목록 가져오기 실패:', error);
+                alert('Google Drive 파일 목록을 가져오는데 실패했습니다: ' + error.message);
+                return [];
+            }
+        }
+
+        // Google Drive 파일 다운로드
+        async function downloadGoogleDriveFile(fileId) {
+            try {
+                const response = await gapi.client.drive.files.get({
+                    fileId: fileId,
+                    alt: 'media'
+                });
+
+                return response.body;
+            } catch (error) {
+                console.error('Google Drive 파일 다운로드 실패:', error);
+                throw error;
+            }
+        }
+
+        // Google Drive 파일을 File 객체로 변환
+        function createFileFromGoogleDrive(fileData, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const file = new File([blob], fileData.name, {
+                type: 'text/plain',
+                lastModified: new Date(fileData.modifiedTime).getTime()
+            });
+            return file;
+        }
+
+        // Google Drive 파일 로드 및 처리
+        async function loadGoogleDriveFiles(event) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2604',message:'loadGoogleDriveFiles called',data:{hasEvent:!!event},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            try {
+                // 로딩 표시
+                let button;
+                if (event && event.target) {
+                    button = event.target.closest('button');
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2610',message:'Button found via event',data:{found:!!button},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                } else {
+                    // onclick에서 호출된 경우 버튼을 직접 찾기
+                    button = document.querySelector('button[onclick*="loadGoogleDriveFiles"]');
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2613',message:'Button found via querySelector',data:{found:!!button},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                }
+                
+                if (!button) {
+                    console.error('Google Drive 버튼을 찾을 수 없습니다.');
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2617',message:'Button not found, returning',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    return;
+                }
+                
+                const originalText = button.innerHTML;
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2620',message:'Original text saved',data:{originalTextLength:originalText.length,buttonDisabled:button.disabled},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                // #endregion
+                button.disabled = true;
+                button.innerHTML = '<span class="animate-spin">⏳</span> 로딩 중...';
+
+                // Google API 초기화
+                if (!gapiInitialized) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2625',message:'Before initGoogleAPI',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    try {
+                        // 타임아웃 추가 (30초)
+                        const initPromise = initGoogleAPI();
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Google API 초기화 타임아웃 (30초)')), 30000)
+                        );
+                        await Promise.race([initPromise, timeoutPromise]);
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2630',message:'After initGoogleAPI',data:{gapiInitialized},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                        // #endregion
+                    } catch (initError) {
+                        // #region agent log
+                        const errorData = {
+                            errorType: typeof initError,
+                            errorIsNull: initError === null,
+                            errorIsUndefined: initError === undefined,
+                            errorMessage: initError?.message,
+                            errorName: initError?.name,
+                            errorCode: initError?.error,
+                            errorDetails: initError?.details,
+                            errorReason: initError?.reason,
+                            errorStack: initError?.stack,
+                            errorString: String(initError),
+                            errorKeys: initError && typeof initError === 'object' ? Object.keys(initError) : null,
+                            errorStringified: (() => {
+                                try {
+                                    return JSON.stringify(initError, Object.getOwnPropertyNames(initError));
+                                } catch (e) {
+                                    return 'Cannot stringify: ' + String(e);
+                                }
+                            })()
+                        };
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2840',message:'initGoogleAPI error caught - full error analysis',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                        // #endregion
+                        // 에러 발생 시 버튼 복원
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2848',message:'Button restored after initGoogleAPI error',data:{buttonDisabled:button.disabled,buttonTextLength:button.innerHTML.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                        // #endregion
+                        // 에러 메시지 구성 (여러 소스에서 시도)
+                        let errorMessage = '알 수 없는 오류';
+                        if (initError) {
+                            if (typeof initError === 'string') {
+                                errorMessage = initError;
+                            } else if (initError.message) {
+                                errorMessage = initError.message;
+                            } else if (initError.error) {
+                                errorMessage = `에러 코드: ${initError.error}${initError.details ? ', 상세: ' + initError.details : ''}`;
+                            } else if (initError.details) {
+                                errorMessage = initError.details;
+                            } else if (initError.reason) {
+                                errorMessage = initError.reason;
+                            } else {
+                                errorMessage = String(initError);
+                            }
+                        }
+                        alert('Google API 초기화에 실패했습니다: ' + errorMessage);
+                        return;
+                    }
+                }
+
+                // 인증 확인
+                if (!googleAuth || !googleAuth.isSignedIn.get()) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2630',message:'Before signInToGoogle',data:{hasGoogleAuth:!!googleAuth},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    const signedIn = await signInToGoogle();
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2632',message:'After signInToGoogle',data:{signedIn},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    if (!signedIn) {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2633',message:'Sign in failed, restoring button',data:{buttonDisabled:button.disabled},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                        // #endregion
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        return;
+                    }
+                }
+
+                // 파일 목록 가져오기
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2640',message:'Before listGoogleDriveFiles',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                const driveFiles = await listGoogleDriveFiles();
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2641',message:'After listGoogleDriveFiles',data:{fileCount:driveFiles.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+
+                if (driveFiles.length === 0) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2642',message:'No files found, restoring button',data:{buttonDisabled:button.disabled},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    alert('Google Drive에서 텍스트 파일을 찾을 수 없습니다.');
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    return;
+                }
+
+                // 파일 선택 다이얼로그 표시
+                const fileListHtml = driveFiles.map((file, index) => 
+                    `<div class="p-3 border-b hover:bg-gray-50 cursor-pointer" data-file-id="${file.id}" data-file-name="${file.name}">
+                        <div class="font-semibold">${file.name}</div>
+                        <div class="text-sm text-gray-500">${formatFileSize(file.size || 0)} • ${new Date(file.modifiedTime).toLocaleDateString('ko-KR')}</div>
+                    </div>`
+                ).join('');
+
+                // 버튼 복원 함수
+                const restoreButton = () => {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2658',message:'restoreButton called',data:{hasButton:!!button,buttonDisabled:button?.disabled,hasOriginalText:!!originalText},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                    // #endregion
+                    if (button) {
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2661',message:'Button restored',data:{buttonDisabled:button.disabled,innerHTMLLength:button.innerHTML.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                        // #endregion
+                    }
+                };
+                
+                const dialog = document.createElement('div');
+                dialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                dialog.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="text-xl font-bold">Google Drive 파일 선택</h3>
+                            <button class="text-gray-500 hover:text-gray-700 text-2xl" id="closeDialogBtn">×</button>
+                        </div>
+                        <div class="overflow-y-auto flex-1 p-4">
+                            ${fileListHtml}
+                        </div>
+                        <div class="p-4 border-t">
+                            <button class="w-full bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded" id="cancelDialogBtn">취소</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(dialog);
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2682',message:'Dialog appended to body',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                // #endregion
+                
+                // 다이얼로그 닫기 이벤트
+                const closeDialog = () => {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2685',message:'closeDialog called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                    // #endregion
+                    restoreButton();
+                    dialog.remove();
+                };
+                
+                // 닫기 버튼 이벤트
+                const closeBtn = dialog.querySelector('#closeDialogBtn');
+                const cancelBtn = dialog.querySelector('#cancelDialogBtn');
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2691',message:'Binding dialog close events',data:{hasCloseBtn:!!closeBtn,hasCancelBtn:!!cancelBtn},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                // #endregion
+                if (closeBtn) closeBtn.addEventListener('click', closeDialog);
+                if (cancelBtn) cancelBtn.addEventListener('click', closeDialog);
+                
+                // 다이얼로그 외부 클릭 시 닫기
+                dialog.addEventListener('click', (e) => {
+                    if (e.target === dialog) {
+                        closeDialog();
+                    }
+                });
+
+                // 파일 클릭 이벤트
+                dialog.querySelectorAll('[data-file-id]').forEach(item => {
+                    item.addEventListener('click', async () => {
+                        const fileId = item.dataset.fileId;
+                        const fileName = item.dataset.fileName;
+                        
+                        try {
+                            // 다운로드 중 표시
+                            item.innerHTML = '<div class="text-center">⏳ 다운로드 중...</div>';
+                            
+                            // 파일 다운로드
+                            const content = await downloadGoogleDriveFile(fileId);
+                            
+                            // File 객체로 변환
+                            const file = createFileFromGoogleDrive(
+                                driveFiles.find(f => f.id === fileId),
+                                content
+                            );
+                            
+                            // 파일 처리
+                            await processFiles([file]);
+                            
+                            // 다이얼로그 닫기 및 버튼 복원
+                            restoreButton();
+                            dialog.remove();
+                        } catch (error) {
+                            console.error('파일 처리 실패:', error);
+                            alert('파일을 불러오는데 실패했습니다: ' + error.message);
+                            item.innerHTML = `
+                                <div class="font-semibold">${fileName}</div>
+                                <div class="text-sm text-gray-500">오류 발생</div>
+                            `;
+                            // 에러 발생 시에도 버튼 복원
+                            restoreButton();
+                        }
+                    });
+                });
+            } catch (error) {
+                // #region agent log
+                const errorData = {
+                    errorMessage: error?.message || String(error),
+                    errorName: error?.name,
+                    errorCode: error?.error,
+                    errorDetails: error?.details
+                };
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2738',message:'Error caught in loadGoogleDriveFiles',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                // #endregion
+                console.error('Google Drive 파일 로드 실패:', error);
+                let errorMessage = 'Google Drive 파일을 불러오는데 실패했습니다.';
+                
+                // 에러 객체의 error와 details 속성을 확인하여 더 명확한 메시지 표시
+                if (error?.error === 'idpiframe_initialization_failed' && error?.details) {
+                    errorMessage = 'Google OAuth 설정 오류:\n\n' + error.details + '\n\nGoogle Cloud Console에서 OAuth 클라이언트 ID의 "승인된 JavaScript 원본"에 http://localhost:8000을 추가해주세요.';
+                } else if (error?.message && error.message.includes('설정이 필요')) {
+                    errorMessage = 'Google Drive 설정이 필요합니다. 설정 패널에서 클라이언트 ID와 API 키를 입력해주세요.';
+                } else if (error?.details) {
+                    errorMessage = 'Google Drive 오류:\n\n' + error.details;
+                } else if (error?.message) {
+                    errorMessage += '\n' + error.message;
+                }
+                
+                alert(errorMessage);
+                
+                // 버튼 복원
+                let button;
+                if (event && event.target) {
+                    button = event.target.closest('button');
+                } else {
+                    button = document.querySelector('button[onclick*="loadGoogleDriveFiles"]');
+                }
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2751',message:'Button lookup in catch block',data:{found:!!button,buttonDisabled:button?.disabled},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                // #endregion
+                
+                if (button) {
+                    button.disabled = false;
+                    const originalText = button.innerHTML.includes('Google Drive') 
+                        ? button.innerHTML.replace(/<span[^>]*>.*?<\/span>\s*로딩 중\.\.\./, 'Google Drive')
+                        : '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7.71 10.07c-.53.53-.71 1.16-.71 1.71s.18 1.18.71 1.71c.53.53 1.16.71 1.71.71s1.18-.18 1.71-.71c.53-.53.71-1.16.71-1.71s-.18-1.18-.71-1.71c-.53-.53-1.16-.71-1.71-.71s-1.18.18-1.71.71zm5.66-1.07c-1.41 0-2.83.59-3.83 1.59-1 1-1.59 2.42-1.59 3.83s.59 2.83 1.59 3.83c1 1 2.42 1.59 3.83 1.59s2.83-.59 3.83-1.59c1-1 1.59-2.42 1.59-3.83s-.59-2.83-1.59-3.83c-1-1-2.42-1.59-3.83-1.59zm-5.66 5.66c-.35.35-.35.92 0 1.27.35.35.92.35 1.27 0 .35-.35.35-.92 0-1.27-.35-.35-.92-.35-1.27 0zm5.66-5.66c-.35.35-.35.92 0 1.27.35.35.92.35 1.27 0 .35-.35.35-.92 0-1.27-.35-.35-.92-.35-1.27 0z"/></svg> Google Drive';
+                    button.innerHTML = originalText;
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2758',message:'Button restored in catch block',data:{buttonDisabled:button.disabled,innerHTMLLength:button.innerHTML.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                    // #endregion
+                } else {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ebook_viewer.html:2760',message:'Button not found in catch block',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                    // #endregion
+                }
+            }
+        }
+
+        // 파일 크기 포맷팅
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
         function displayFiles() {
@@ -2773,12 +3532,26 @@
         // Settings functions
         function toggleSettings() {
             settingsVisible = !settingsVisible;
-            const panel = document.getElementById('settingsPanel');
+            // 모든 설정 패널 찾기 (ID가 중복될 수 있으므로 querySelectorAll 사용)
+            const panels = document.querySelectorAll('#settingsPanel');
+            if (panels.length === 0) {
+                console.error('설정 패널을 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 모든 설정 패널에 동일하게 적용
+            panels.forEach(panel => {
+                if (settingsVisible) {
+                    panel.classList.remove('hidden');
+                } else {
+                    panel.classList.add('hidden');
+                }
+            });
+            
             if (settingsVisible) {
-                panel.classList.remove('hidden');
                 updateVersionInfoInSettings();
-            } else {
-                panel.classList.add('hidden');
+                // Google Drive 설정 불러오기
+                loadGoogleDriveSettings();
             }
         }
 
@@ -2797,22 +3570,146 @@
                 localStorage.setItem('firstUsedDate', firstUsed);
             }
             
-            const details = `
-애플리케이션: ${versionInfo.name}
-버전: ${versionInfo.version}
-업데이트 날짜: ${versionInfo.updateDate}
-최초 사용일: ${firstUsed}
-마지막 업데이트: ${lastUsed}
-
-기능:
-- 텍스트 파일 읽기 및 정리
-- 챕터/제목 자동 인식
-- 색상 테마 및 폰트 설정
-- 히스토리 및 북마크
-- PDF 출력 및 파일 저장
-            `.trim();
+            // 통계 정보
+            const historyCount = history.length;
+            const bookmarksCount = bookmarks.length;
+            const pageBookmarksCount = Object.keys(pageBookmarks).reduce((sum, key) => sum + pageBookmarks[key].length, 0);
+            const filesCount = files.length;
             
-            alert(details);
+            // 모달 다이얼로그 생성
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            };
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+                    <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 flex items-center justify-between">
+                        <h3 class="text-2xl font-bold">📱 앱 정보</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-white hover:text-gray-200 text-3xl font-bold">&times;</button>
+                </div>
+                    <div class="p-6 overflow-y-auto flex-1">
+                        <!-- 기본 정보 -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">기본 정보</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">애플리케이션:</span>
+                                    <span class="font-semibold text-gray-800">${versionInfo.name}</span>
+                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">버전:</span>
+                                    <span class="font-semibold text-purple-600">${versionInfo.version}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">업데이트 날짜:</span>
+                                    <span class="font-semibold text-gray-800">${versionInfo.updateDate}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">최초 사용일:</span>
+                                    <span class="font-semibold text-gray-800">${firstUsed}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">마지막 업데이트:</span>
+                                    <span class="font-semibold text-gray-800">${lastUsed}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 통계 정보 -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">사용 통계</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold text-blue-600">${filesCount}</div>
+                                    <div class="text-sm text-gray-600">현재 로드된 파일</div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold text-green-600">${historyCount}</div>
+                                    <div class="text-sm text-gray-600">최근 읽은 파일</div>
+                                </div>
+                                <div class="bg-yellow-50 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold text-yellow-600">${bookmarksCount}</div>
+                                    <div class="text-sm text-gray-600">파일 북마크</div>
+                                </div>
+                                <div class="bg-purple-50 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold text-purple-600">${pageBookmarksCount}</div>
+                                    <div class="text-sm text-gray-600">페이지 북마크</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 주요 기능 -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">주요 기능</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">📁</span>
+                                    <span><strong>파일 관리:</strong> 로컬 파일 업로드, 드래그 앤 드롭, Google Drive 연동</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">📖</span>
+                                    <span><strong>텍스트 읽기:</strong> 다양한 인코딩 지원 (UTF-8, EUC-KR, Windows-949 등)</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">📑</span>
+                                    <span><strong>챕터/제목 인식:</strong> 자동 인식 및 강조 표시</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">🎨</span>
+                                    <span><strong>테마 설정:</strong> 라이트, 다크, 세피아, 그린, 커스텀 컬러</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">🔤</span>
+                                    <span><strong>폰트 설정:</strong> 다양한 한글 폰트 지원, 크기 조절</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">⭐</span>
+                                    <span><strong>북마크:</strong> 파일 북마크 및 페이지 북마크</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">🕐</span>
+                                    <span><strong>히스토리:</strong> 최근 읽은 파일 자동 기록</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">✏️</span>
+                                    <span><strong>텍스트 편집:</strong> 제목 설정, 빈칸 제거, 저장 기능</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">📄</span>
+                                    <span><strong>페이지뷰:</strong> 본문만 보기 모드</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="text-purple-600 mr-2">☁️</span>
+                                    <span><strong>Google Drive:</strong> 클라우드 파일 직접 불러오기</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 기술 정보 -->
+                        <div class="mb-4">
+                            <h4 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">기술 정보</h4>
+                            <div class="space-y-2 text-xs text-gray-600">
+                                <div>• HTML5, CSS3, JavaScript (Vanilla)</div>
+                                <div>• Tailwind CSS 프레임워크</div>
+                                <div>• Google Drive API v3</div>
+                                <div>• File System Access API 지원</div>
+                                <div>• LocalStorage 기반 데이터 저장</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t bg-gray-50 flex justify-end">
+                        <button onclick="this.closest('.fixed').remove()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
         }
 
         // Content-only mode (페이지뷰만 보기)
