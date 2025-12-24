@@ -1,0 +1,74 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.viewer-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+.ebook-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    line-height: 1.8;
+    font-size: 16px;
+    width: 100%;
+    white-space: pre-wrap; /* 줄바꿈 보존 */
+}
+.font-system { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.font-nanum { font-family: 'Nanum Gothic', sans-serif; }
+.font-nanum-myeongjo { font-family: 'Nanum Myeongjo', serif; }
+.font-noto-sans { font-family: 'Noto Sans KR', sans-serif; }
+.font-noto-serif { font-family: 'Noto Serif KR', serif; }
+.font-malgun { font-family: 'Malgun Gothic', sans-serif; }
+.font-gulim { font-family: 'Gulim', sans-serif; }
+.font-dotum { font-family: 'Dotum', sans-serif; }
+
+.theme-light { background-color: #ffffff; color: #1f2937; }
+.theme-dark { background-color: #1f2937; color: #f3f4f6; }
+.theme-sepia { background-color: #fef9e7; color: #78350f; }
+.theme-green { background-color: #f0fdf4; color: #14532d; }
+
+/* 테마별 배경 통일 */
+.theme-light .bg-white, .theme-light .bg-gray-50 { background: #ffffff !important; }
+.theme-dark .bg-white, .theme-dark .bg-gray-50 { background: #1f2937 !important; }
+.theme-sepia .bg-white, .theme-sepia .bg-gray-50 { background: #fef9e7 !important; }
+.theme-green .bg-white, .theme-green .bg-gray-50 { background: #f0fdf4 !important; }
+
+/* 테마별 텍스트 색상 */
+.theme-light .text-white { color: #1f2937 !important; }
+.theme-dark .text-white { color: #f3f4f6 !important; }
+.theme-sepia .text-white { color: #78350f !important; }
+.theme-green .text-white { color: #14532d !important; }
+
+.settings-panel { transition: all 0.3s ease; }
+.theme-option { cursor: pointer; transition: all 0.2s; }
+.theme-option:hover { transform: scale(1.05); }
+.theme-option.active { border-width: 3px; border-color: #6366f1; }
+
+/* Upload section collapse */
+#uploadSectionContent {
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+    opacity: 1;
+}
+#uploadSectionContent.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 !important;
+}
+
+.page-section { display: none; }
+.page-section.active { display: block; }
+
