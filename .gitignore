@@ -1,9 +1,12 @@
-# 로그 파일
+# 로그 파일 무시
 *.log
+*.txt
+logs/
 
-# Cursor 설정 폴더
+# 시스템 파일 무시
+.DS_Store
+Thumbs.db
+
+# 에디터 설정 무시 (선택)
+.vscode/
 .cursor/
-
-# 임시 파일
-HTTP_Server_Log.txt
-
