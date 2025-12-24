@@ -3,7 +3,7 @@
  * Google API 인증, Picker, 파일 다운로드 관련 기능
  */
 
-import { getGoogleDriveSettings } from './settings.js';
+import { getGoogleDriveSettings, loadLastReadFile } from './settings.js';
 
 // Google Drive 상태
 let gapiInitialized = false;
@@ -151,7 +151,9 @@ async function pickerCallback(data) {
                     name: fileName,
                     size: content.length,
                     content: content,
-                    lastModified: Date.now()
+                    lastModified: Date.now(),
+                    id: fileId,      // Google Drive 파일 ID (generateFileKey에서 우선 사용)
+                    fileId: fileId   // 하위 호환성을 위해 유지
                 });
             } catch (error) {
                 console.error('파일 다운로드 실패:', error);
@@ -245,4 +247,66 @@ export async function loadGoogleDriveFiles(event) {
         alert('Google Drive 오류: ' + (error.message || '설정을 확인하세요.'));
     }
 }
+
+/**
+ * 마지막 읽은 Google Drive 파일 자동 로드
+ * @param {string} fileId - Google Drive 파일 ID
+ */
+export async function loadLastReadGoogleDriveFile(fileId) {
+    try {
+        // API 초기화 확인
+        await initGoogleAPI();
+        
+        // 로그인 확인 및 토큰 획득
+        if (!accessToken) {
+            await signInToGoogle();
+        }
+        
+        // 파일 다운로드
+        const content = await downloadGoogleDriveFile(fileId);
+        
+        // 파일 정보 가져오기
+        const fileInfo = await gapi.client.drive.files.get({
+            fileId: fileId,
+            fields: 'name, modifiedTime'
+        });
+        
+        const fileName = fileInfo.result.name;
+        const lastModified = new Date(fileInfo.result.modifiedTime).getTime();
+        
+        // viewer.js의 함수들을 동적으로 import
+        const { setFiles, setCurrentFileIndex, displayFileContent, toggleUploadSection } = await import('./viewer.js');
+        
+        // 파일 객체 생성
+        const fileObj = {
+            name: fileName,
+            size: content.length,
+            content: content,
+            lastModified: lastModified,
+            id: fileId,      // Google Drive 파일 ID (generateFileKey에서 우선 사용)
+            fileId: fileId   // 하위 호환성을 위해 유지
+        };
+        
+        // 파일 배열 설정 및 표시
+        setFiles([fileObj]);
+        setCurrentFileIndex(0);
+        
+        document.getElementById('mainContent').classList.remove('hidden');
+        displayFileContent(fileObj);
+        
+        // Auto collapse upload section
+        const uploadContent = document.getElementById('uploadSectionContent');
+        if (uploadContent && !uploadContent.classList.contains('collapsed')) {
+            toggleUploadSection();
+        }
+        
+        console.log('마지막 읽은 Google Drive 파일 복원 완료:', fileName);
+    } catch (error) {
+        console.error('마지막 읽은 Google Drive 파일 복원 실패:', error);
+        // 실패해도 앱은 정상 작동하도록 함
+    }
+}
+
+// 전역으로 노출하여 main.js에서 호출 가능하게
+window.restoreGoogleDriveFile = loadLastReadGoogleDriveFile;
 

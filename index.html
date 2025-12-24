@@ -3,269 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Drive Ebook Viewer</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Web eBook Viewer - 텍스트 파일 뷰어</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/styles.css">
     <style>
-        :root {
-            --bg-color: #f4f4f9;
-            --text-color: #333;
-            --viewer-bg: #fff;
-            --accent-color: #4285f4;
-        }
-
-        /* 다크 모드 */
-        body.dark-mode {
-            --bg-color: #1e1e1e;
-            --text-color: #e0e0e0;
-            --viewer-bg: #2d2d2d;
-            --accent-color: #8ab4f8;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
+        .landing-container {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        header {
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            background-color: var(--viewer-bg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            background-color: var(--accent-color);
-            color: white;
-            transition: opacity 0.2s;
-        }
-        .btn:hover { opacity: 0.9; }
-        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        #main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* 사이드바 (파일 목록) */
-        #sidebar {
-            width: 300px;
-            background-color: var(--viewer-bg);
-            border-right: 1px solid #ddd;
-            overflow-y: auto;
-            display: none; /* 로그인 전에는 숨김 */
-            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
         }
         
-        .file-item {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
+        .landing-content {
+            max-width: 800px;
+            text-align: center;
+            color: white;
+            animation: fadeInUp 0.8s ease-out;
         }
-        .file-item:hover { background-color: rgba(0,0,0,0.05); }
-
-        /* 뷰어 영역 */
-        #viewer-area {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            line-height: 1.8;
-            font-size: 18px;
-            white-space: pre-wrap; /* 텍스트 줄바꿈 유지 */
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        #content-display {
-            outline: none;
-            min-height: 80vh;
-        }
-
-        /* 모바일 대응 */
-        @media (max-width: 768px) {
-            #sidebar { 
-                position: absolute; 
-                z-index: 100; 
-                height: 100%; 
-                display: none; /* 모바일 초기엔 숨김 */
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-            #sidebar.active { display: block; }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .landing-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .landing-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .start-button {
+            display: inline-block;
+            padding: 1.25rem 3rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-button:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .features {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-desc {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            margin-top: 4rem;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .landing-title {
+                font-size: 2.5rem;
+            }
+            
+            .landing-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .start-button {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-
-<header>
-    <div style="font-weight: bold; font-size: 1.2rem;">📚 Cloud Reader</div>
-    <div id="auth_status" style="display:none; margin-right: 10px;">로그인됨</div>
-    <div>
-        <button id="theme_btn" class="btn" onclick="toggleTheme()">Dark Mode</button>
-        <button id="authorize_btn" class="btn" onclick="handleAuthClick()">Google 로그인</button>
-        <button id="signout_btn" class="btn" onclick="handleSignoutClick()" style="display: none;">로그아웃</button>
-    </div>
-</header>
-
-<div id="main-container">
-    <div id="sidebar">
-        <h3>📂 내 드라이브 파일</h3>
-        <button class="btn" onclick="listFiles()" style="width:100%; margin-bottom:10px;">파일 목록 새로고침</button>
-        <div id="file_list">불러오는 중...</div>
-    </div>
-    <div id="viewer-area">
-        <div id="content-display">왼쪽 목록에서 텍스트 파일을 선택하세요.</div>
-    </div>
-</div>
-
-<script src="https://apis.google.com/js/api.js"></script>
-<script src="https://accounts.google.com/gsi/client"></script>
-
-<script>
-    // ▼▼▼ 여기에 본인의 키를 입력하세요 ▼▼▼
-    const CLIENT_ID = '여기에_클라이언트_ID_입력'; 
-    const API_KEY = '여기에_API_키_입력';
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
-    // 사용할 권한 (일단 읽기 전용으로 설정, 나중에 쓰기 필요시 수정)
-    // 로컬 파일을 직접 올린 게 아니라면 https://www.googleapis.com/auth/drive.readonly 사용
-    const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
-
-    let tokenClient;
-    let gapiInited = false;
-    let gisInited = false;
-
-    // 1. GAPI 로드 (API 호출용)
-    function gapiLoaded() {
-        gapi.load('client', initializeGapiClient);
-    }
-
-    async function initializeGapiClient() {
-        await gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-        });
-        gapiInited = true;
-        maybeEnableButtons();
-    }
-
-    // 2. GIS 로드 (로그인/인증용 - 여기가 핵심 변경점)
-    function gisLoaded() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID,
-            scope: SCOPES,
-            callback: '', // 나중에 클릭 시 정의
-        });
-        gisInited = true;
-        maybeEnableButtons();
-    }
-
-    function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-            document.getElementById('authorize_btn').style.visibility = 'visible';
-        }
-    }
-
-    // 3. 로그인 버튼 클릭 시
-    function handleAuthClick() {
-        tokenClient.callback = async (resp) => {
-            if (resp.error) {
-                throw (resp);
-            }
-            // 로그인 성공! UI 변경
-            document.getElementById('authorize_btn').style.display = 'none';
-            document.getElementById('signout_btn').style.display = 'inline-block';
-            document.getElementById('sidebar').style.display = 'block';
-            await listFiles();
-        };
-
-        // 토큰 요청 (이미 있으면 스킵, 없으면 팝업)
-        if (gapi.client.getToken() === null) {
-            tokenClient.requestAccessToken({prompt: 'consent'});
-        } else {
-            tokenClient.requestAccessToken({prompt: ''});
-        }
-    }
-
-    // 4. 로그아웃
-    function handleSignoutClick() {
-        const token = gapi.client.getToken();
-        if (token !== null) {
-            google.accounts.oauth2.revoke(token.access_token);
-            gapi.client.setToken('');
-            document.getElementById('content-display').innerText = '로그아웃 되었습니다.';
-            document.getElementById('authorize_btn').style.display = 'inline-block';
-            document.getElementById('signout_btn').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'none';
-        }
-    }
-
-    // 5. 파일 목록 가져오기 (텍스트 파일만)
-    async function listFiles() {
-        try {
-            // 텍스트 계열 파일만 검색 (txt, html, md 등)
-            const response = await gapi.client.drive.files.list({
-                'pageSize': 20,
-                'fields': 'files(id, name)',
-                'q': "mimeType = 'text/plain' and trashed = false" 
-            });
+    <div class="landing-container">
+        <div class="landing-content">
+            <h1 class="landing-title">📚 Web eBook Viewer</h1>
+            <p class="landing-subtitle">
+                간편하게 텍스트 파일을 읽고 관리하세요<br>
+                로컬 파일과 Google Drive를 모두 지원합니다
+            </p>
             
-            const files = response.result.files;
-            const listDiv = document.getElementById('file_list');
-            listDiv.innerHTML = '';
+            <a href="ebook_viewer.html" class="start-button">
+                🚀 뷰어 실행하기
+            </a>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <div class="feature-title">Google Drive 연동</div>
+                    <div class="feature-desc">
+                        Google Drive의 텍스트 파일을 직접 불러와 읽을 수 있습니다. 폴더 탐색도 지원합니다.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <div class="feature-title">편리한 텍스트 뷰어</div>
+                    <div class="feature-desc">
+                        깔끔한 인터페이스로 텍스트를 읽을 수 있습니다. 테마 변경과 폰트 크기 조절이 가능합니다.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <div class="feature-title">히스토리 & 북마크</div>
+                    <div class="feature-desc">
+                        읽던 위치를 자동으로 저장하고, 북마크로 중요한 부분을 표시할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p id="app-info"></p>
+            </div>
+        </div>
+    </div>
 
-            if (!files || files.length === 0) {
-                listDiv.innerText = '텍스트 파일을 찾을 수 없습니다.';
-                return;
-            }
-
-            files.forEach(file => {
-                const div = document.createElement('div');
-                div.className = 'file-item';
-                div.innerText = file.name;
-                div.onclick = () => loadFileContent(file.id, file.name);
-                listDiv.appendChild(div);
-            });
-        } catch (err) {
-            document.getElementById('content-display').innerText = '에러 발생: ' + err.message;
+    <!-- 버전 정보 자동 주입 -->
+    <script type="module">
+        import { APP_NAME, APP_VERSION } from './src/js/config.js';
+        const appInfo = document.getElementById('app-info');
+        if (appInfo) {
+            appInfo.textContent = `${APP_NAME} | Version ${APP_VERSION}`;
         }
-    }
-
-    // 6. 파일 내용 읽어서 뷰어에 표시
-    async function loadFileContent(fileId, fileName) {
-        document.getElementById('content-display').innerText = '로딩 중...';
-        try {
-            const response = await gapi.client.drive.files.get({
-                fileId: fileId,
-                alt: 'media' // 내용을 다운로드 받겠다는 옵션
-            });
-            document.getElementById('content-display').innerText = response.body;
-            // 모바일이면 메뉴 닫기 (선택사항)
-        } catch (err) {
-            console.error(err);
-            document.getElementById('content-display').innerText = '파일을 읽을 수 없습니다.\n권한 문제일 수 있습니다.';
-        }
-    }
-
-    // 테마 토글
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-    }
-
-    // 라이브러리 로드 트리거
-    gapiLoaded();
-    gisLoaded();
-
-</script>
+    </script>
 </body>
 </html>

@@ -67,6 +67,7 @@
                                     <div class="flex items-center justify-between mb-2">
                                         <h2 class="text-2xl font-bold text-gray-800" id="currentFileName">파일을 선택하세요</h2>
                                         <div class="flex gap-2">
+                                            <button id="bookmarkBtn" onclick="toggleBookmark()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-semibold">⭐ 북마크</button>
                                             <button id="settingsBtn" onclick="toggleSettings()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold">⚙️ 설정</button>
                                         </div>
                                     </div>
@@ -121,7 +122,7 @@
         </div>
         
         <div class="mt-4 text-center text-gray-500 text-sm opacity-80 pb-4">
-            <p id="versionInfo">이북 텍스트 뷰어 | Version <span id="versionNumber">1.0.0</span></p>
+            <p id="app-info"></p>
         </div>
     </div>
 
