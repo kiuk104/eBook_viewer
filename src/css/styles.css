@@ -16,14 +16,87 @@ body {
     flex-direction: column;
     overflow-x: hidden;
 }
-.ebook-content {
+/* 1. 기본 상태: 자동 줄바꿈 (창 너비에 맞춤) */
+.ebook-content:not(.markdown-mode) {
     max-height: 70vh;
-    overflow-y: auto;
-    overflow-x: hidden;
     line-height: 1.8;
     font-size: 16px;
-    width: 100%;
-    white-space: pre-wrap; /* 줄바꿈 보존 */
+    
+    /* 텍스트 줄바꿈 관련 */
+    white-space: pre-wrap !important;       /* 공간 부족하면 줄바꿈 */
+    word-break: break-word !important;      /* 긴 단어도 끊어서 줄바꿈 */
+    overflow-wrap: break-word !important;   
+    
+    /* 스크롤 관련 */
+    overflow-x: hidden !important;          /* 가로 스크롤 숨김 */
+    overflow-y: auto !important;            /* 세로 스크롤 허용 */
+    
+    /* 크기 제한 */
+    width: 100% !important;                 /* 부모 너비에 딱 맞춤 */
+    max-width: 100% !important;
+}
+
+/* 텍스트 정리 모드일 때는 기본 line-height가 자식에 영향을 주지 않도록 */
+.ebook-content p,
+.ebook-content h3 {
+    line-height: inherit !important; /* 부모의 line-height를 상속하지 않도록 */
+}
+
+/* 2. 원본 보기 모드: 줄바꿈 금지 (가로 스크롤 발생) */
+.ebook-content.nowrap-mode:not(.markdown-mode) {
+    /* 텍스트 줄바꿈 관련 */
+    white-space: pre !important;            /* 절대 줄바꿈 하지 않음 (엔터만 인정) */
+    word-break: keep-all !important;        /* 단어 중간에 끊기 금지 */
+    overflow-wrap: normal !important;
+    
+    /* 스크롤 관련 */
+    overflow-x: auto !important;            /* 가로 스크롤 허용 (필수) */
+    
+    /* 크기 제한 해제 (핵심: 이게 없으면 가로 스크롤이 안 생김) */
+    width: auto !important;                 /* 너비 자동 확장 */
+    max-width: none !important;             /* 최대 너비 제한 해제 */
+    display: inline-block !important;       /* 콘텐츠만큼 늘어나도록 변경 */
+    min-width: 100% !important;             /* 최소한 화면 너비만큼은 차지 */
+}
+
+/* 텍스트 정리 기능으로 생성된 HTML 요소 스타일 */
+.ebook-content h3 {
+    font-weight: bold !important;
+    font-size: 1.25em !important;
+    margin-top: 1.5em !important;
+    margin-bottom: 0.75em !important;
+    color: #2563eb !important; /* blue-600 */
+    white-space: normal !important;
+}
+
+.ebook-content p {
+    margin-bottom: 0.15em !important; /* 최소한의 문단 간격 (0.15rem) */
+    margin-top: 0 !important; /* 위쪽 마진 제거 */
+    line-height: 1.35 !important; /* 매우 타이트한 줄 간격 (1.35) */
+    text-align: justify !important;
+    white-space: normal !important;
+    color: #374151 !important; /* text-gray-700 강제 적용 */
+    padding: 0 !important; /* 패딩 제거 */
+}
+
+/* 다크 모드 지원 */
+.theme-dark .ebook-content p,
+.theme-dark .ebook-content h3 {
+    color: #d1d5db !important; /* text-gray-300 */
+}
+
+.theme-sepia .ebook-content p {
+    color: #78350f !important;
+}
+
+.theme-green .ebook-content p {
+    color: #14532d !important;
+}
+
+.ebook-content br {
+    display: block;
+    margin-bottom: 0.5em;
+    content: "";
 }
 .font-system { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 .font-nanum { font-family: 'Nanum Gothic', sans-serif; }
@@ -38,6 +111,25 @@ body {
 .theme-dark { background-color: #1f2937; color: #f3f4f6; }
 .theme-sepia { background-color: #fef9e7; color: #78350f; }
 .theme-green { background-color: #f0fdf4; color: #14532d; }
+.theme-custom {
+    /* 커스텀 테마는 JavaScript로 동적 적용 */
+    color: inherit; /* 플레이스홀더 - 실제 스타일은 JavaScript로 동적 적용 */
+}
+
+/* 커스텀 테마에서 내부 컨테이너 배경색 조정 */
+.theme-custom .bg-white,
+.theme-custom .bg-gray-50,
+.theme-custom .bg-blue-50,
+.theme-custom .bg-purple-50 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* 커스텀 테마에서 설정 패널 배경 */
+.theme-custom .settings-panel {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
 
 /* 테마별 배경 통일 */
 .theme-light .bg-white, .theme-light .bg-gray-50 { background: #ffffff !important; }
@@ -72,3 +164,379 @@ body {
 .page-section { display: none; }
 .page-section.active { display: block; }
 
+/* === 커스텀 스크롤바 디자인 === */
+
+/* 1. 스크롤바 크기 */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+/* 2. 스크롤바 배경 (트랙) */
+::-webkit-scrollbar-track {
+    background: transparent; /* 배경 투명하게 하여 테마색 유지 */
+}
+
+/* 3. 스크롤바 손잡이 (기본: 회색) */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5); /* 반투명 회색 */
+    border-radius: 6px;
+    border: 3px solid transparent; /* 여백 효과 */
+    background-clip: content-box;
+}
+
+/* 4. 스크롤바 호버 효과 */
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(107, 114, 128, 0.8);
+}
+
+/* === 테마별 스크롤바 색상 === */
+
+/* 다크 모드 */
+body.theme-dark ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+body.theme-dark ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 세피아 모드 */
+body.theme-sepia ::-webkit-scrollbar-thumb {
+    background-color: rgba(139, 69, 19, 0.3);
+}
+
+/* 그린 모드 */
+body.theme-green ::-webkit-scrollbar-thumb {
+    background-color: rgba(20, 83, 45, 0.3);
+}
+
+/* src/css/styles.css 추가 */
+
+/* 마크다운 뷰어 스타일 */
+.ebook-content h1, .ebook-content h2, .ebook-content h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    color: #2563eb; /* 파란색 포인트 */
+}
+.ebook-content p {
+    margin-bottom: 1.2em;
+    line-height: 1.8;
+}
+.ebook-content strong {
+    color: #d97706; /* 강조색 */
+}
+.ebook-content ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+}
+
+/* 마크다운 본문 스타일 (.markdown-body 클래스) */
+.markdown-body {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.markdown-body h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 1em 0 0.5em;
+    color: #2563eb;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.3em;
+}
+
+.markdown-body h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 1em 0 0.5em;
+    color: #3b82f6;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.2em;
+}
+
+.markdown-body h3 {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 1em 0 0.5em;
+    color: #2563eb;
+}
+
+.markdown-body h4 {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0.8em 0 0.4em;
+}
+
+.markdown-body p {
+    margin-bottom: 1.2em;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+    margin-bottom: 1.2em;
+    padding-left: 1.5em;
+    line-height: 1.8;
+}
+
+.markdown-body ul {
+    list-style-type: disc;
+}
+
+.markdown-body ol {
+    list-style-type: decimal;
+}
+
+.markdown-body li {
+    margin-bottom: 0.5em;
+}
+
+.markdown-body blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.markdown-body code {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.markdown-body pre {
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+}
+
+.markdown-body pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+.markdown-body strong {
+    font-weight: bold;
+    color: #d97706;
+}
+
+.markdown-body em {
+    font-style: italic;
+}
+
+.markdown-body a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.markdown-body a:hover {
+    color: #1d4ed8;
+}
+
+.markdown-body hr {
+    border: none;
+    border-top: 2px solid #e5e7eb;
+    margin: 2em 0;
+}
+
+/* 다크 모드 지원 */
+.theme-dark .markdown-body h1,
+.theme-dark .markdown-body h2,
+.theme-dark .markdown-body h3 {
+    color: #60a5fa;
+}
+
+.theme-dark .markdown-body blockquote {
+    border-left-color: #4b5563;
+    color: #9ca3af;
+}
+
+.theme-dark .markdown-body code,
+.theme-dark .markdown-body pre {
+    background-color: #374151;
+    color: #f3f4f6;
+}
+
+.theme-dark .markdown-body a {
+    color: #60a5fa;
+}
+
+.theme-dark .markdown-body hr {
+    border-top-color: #4b5563;
+}
+
+/* 마크다운 모드 전용 스타일 */
+.ebook-content.markdown-mode {
+    white-space: normal !important; /* 텍스트가 화면 끝에서 자동 줄바꿈 */
+    overflow-x: hidden !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    text-align: left;
+    max-width: 900px; /* 너무 넓게 퍼지지 않도록 중앙 정렬 느낌 */
+    margin: 0 auto;
+    padding: 1em;
+}
+
+/* 마크다운 모드에서 pre, code 요소 스타일 오버라이드 */
+.ebook-content.markdown-mode pre {
+    white-space: pre-wrap !important; /* 코드 블록은 줄바꿈 유지하되 자동 줄바꿈도 허용 */
+    overflow-x: auto !important;
+}
+
+.ebook-content.markdown-mode code {
+    white-space: pre-wrap !important; /* 인라인 코드도 줄바꿈 허용 */
+}
+
+/* 마크다운 모드의 모든 자식 요소에 white-space normal 적용 (pre, code 제외) */
+.ebook-content.markdown-mode > *:not(pre):not(code) {
+    white-space: normal !important;
+}
+
+.ebook-content.markdown-mode h1,
+.ebook-content.markdown-mode h2,
+.ebook-content.markdown-mode h3,
+.ebook-content.markdown-mode h4,
+.ebook-content.markdown-mode h5,
+.ebook-content.markdown-mode h6 {
+    color: #2563eb; /* Cursor 스타일 파란색 */
+    font-weight: 700;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    line-height: 1.3;
+    border-bottom: 1px solid #e5e7eb; /* 제목 아래 옅은 줄 */
+    padding-bottom: 0.5rem;
+}
+
+.ebook-content.markdown-mode h1 {
+    font-size: 2em;
+    border-bottom-width: 2px;
+}
+
+.ebook-content.markdown-mode h2 {
+    font-size: 1.5em;
+}
+
+.ebook-content.markdown-mode h3 {
+    font-size: 1.25em;
+}
+
+.ebook-content.markdown-mode p {
+    margin-bottom: 1.2em;
+    line-height: 1.8;
+    color: inherit;
+    white-space: normal !important;
+}
+
+.ebook-content.markdown-mode ul,
+.ebook-content.markdown-mode ol {
+    margin-bottom: 1.2em;
+    padding-left: 1.5em;
+    line-height: 1.8;
+}
+
+.ebook-content.markdown-mode ul {
+    list-style-type: disc;
+}
+
+.ebook-content.markdown-mode ol {
+    list-style-type: decimal;
+}
+
+.ebook-content.markdown-mode li {
+    margin-bottom: 0.5em;
+    white-space: normal !important;
+}
+
+.ebook-content.markdown-mode blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #6b7280;
+    font-style: italic;
+    white-space: normal !important;
+}
+
+.ebook-content.markdown-mode code {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    white-space: pre-wrap !important; /* 코드는 줄바꿈 유지 */
+}
+
+.ebook-content.markdown-mode pre {
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    white-space: pre !important; /* 코드 블록은 줄바꿈 유지 */
+}
+
+.ebook-content.markdown-mode pre code {
+    background-color: transparent;
+    padding: 0;
+    white-space: pre !important;
+}
+
+.ebook-content.markdown-mode strong {
+    font-weight: bold;
+    color: #d97706;
+}
+
+.ebook-content.markdown-mode em {
+    font-style: italic;
+}
+
+.ebook-content.markdown-mode a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.ebook-content.markdown-mode a:hover {
+    color: #1d4ed8;
+}
+
+.ebook-content.markdown-mode hr {
+    border: none;
+    border-top: 2px solid #e5e7eb;
+    margin: 2em 0;
+}
+
+/* 다크 모드 지원 */
+.theme-dark .ebook-content.markdown-mode h1,
+.theme-dark .ebook-content.markdown-mode h2,
+.theme-dark .ebook-content.markdown-mode h3,
+.theme-dark .ebook-content.markdown-mode h4,
+.theme-dark .ebook-content.markdown-mode h5,
+.theme-dark .ebook-content.markdown-mode h6 {
+    color: #60a5fa;
+    border-bottom-color: #4b5563;
+}
+
+.theme-dark .ebook-content.markdown-mode blockquote {
+    border-left-color: #4b5563;
+    color: #9ca3af;
+}
+
+.theme-dark .ebook-content.markdown-mode code,
+.theme-dark .ebook-content.markdown-mode pre {
+    background-color: #374151;
+    color: #f3f4f6;
+}
+
+.theme-dark .ebook-content.markdown-mode a {
+    color: #60a5fa;
+}
+
+.theme-dark .ebook-content.markdown-mode hr {
+    border-top-color: #4b5563;
+}

@@ -3,14 +3,16 @@
  * 파일 처리 및 UI 조작 관련 기능
  */
 
-import { formatFileSize, formatTimestamp, generateFileKey } from './utils.js';
+import { formatFileSize, formatTimestamp, generateFileKey, downloadAsMarkdown as downloadMarkdown } from './utils.js';
 import { getHistory, setHistory, saveReadingProgress, loadReadingProgress, getBookmarks, getBookmarksByFileKey, setBookmarks, saveLastReadFile, loadLastReadFile } from './settings.js';
+import { cleanTextWithAI } from './ai_service.js';
 
 // 파일 배열 관리 (전역 상태)
 let files = [];
 let currentFileIndex = -1;
 let currentFileKey = null; // 현재 열린 파일의 고유 키
 let scrollSaveTimer = null; // 스크롤 저장 디바운스 타이머
+let originalFileContent = null; // 원본 텍스트 내용
 
 /**
  * 파일 배열 가져오기
@@ -156,9 +158,60 @@ export function displayFileContent(file) {
     currentFileKey = generateFileKey(file);
     console.log(`📂 현재 파일 키 설정: ${currentFileKey}`);
     
-    viewer.textContent = file.content;
+    // 원본 텍스트 저장
+    originalFileContent = file.content;
+    
+    // 파일 확장자 확인
+    const isMarkdown = file.name.toLowerCase().endsWith('.md');
+    
     title.textContent = file.name;
     info.textContent = `${formatFileSize(file.size)} | ${formatTimestamp(file.lastModified)}`;
+    
+    // 마크다운 파일인 경우 HTML로 렌더링
+    if (isMarkdown) {
+        if (typeof marked !== 'undefined') {
+            // markdown-mode 클래스 추가 (기존 클래스 제거 후 추가)
+            viewer.classList.remove('nowrap-mode', 'markdown-body');
+            viewer.classList.add('markdown-mode');
+            
+            // 마크다운을 HTML로 변환하여 표시
+            // 파일 내용이 코드 블록으로 감싸져 있는지 확인하고 제거
+            let contentToParse = file.content.trim();
+            
+            // 코드 블록으로 시작하고 끝나는 경우 제거 (```markdown ... ``` 또는 ``` ... ```)
+            if (contentToParse.startsWith('```')) {
+                const lines = contentToParse.split('\n');
+                // 첫 줄이 ```로 시작하는 경우
+                if (lines[0].startsWith('```')) {
+                    // 마지막 줄이 ```로 끝나는지 확인
+                    const lastLine = lines[lines.length - 1].trim();
+                    if (lastLine === '```' || lastLine.startsWith('```')) {
+                        // 첫 줄과 마지막 줄 제거
+                        contentToParse = lines.slice(1, -1).join('\n');
+                        console.log('✅ 코드 블록 래퍼 제거됨');
+                    }
+                }
+            }
+            
+            // marked 옵션 설정: 코드 블록 자동 감지 비활성화, GFM 활성화
+            const markedOptions = {
+                breaks: true, // 줄바꿈을 <br>로 변환
+                gfm: true // GitHub Flavored Markdown 활성화
+            };
+            const htmlContent = marked.parse(contentToParse, markedOptions);
+            viewer.innerHTML = htmlContent;
+            console.log('✅ 마크다운 파일 렌더링 완료');
+        } else {
+            // marked.js가 없으면 텍스트로 표시
+            console.warn('⚠️ marked.js가 로드되지 않았습니다. 텍스트로 표시합니다.');
+            viewer.classList.remove('markdown-mode', 'markdown-body');
+            viewer.textContent = file.content;
+        }
+    } else {
+        // .txt 파일인 경우 기존 로직 유지
+        viewer.classList.remove('markdown-mode', 'markdown-body');
+        viewer.textContent = file.content;
+    }
     
     // 마지막 읽은 파일 정보 저장
     saveLastReadFile({
@@ -176,6 +229,16 @@ export function displayFileContent(file) {
     
     // 북마크 목록 업데이트
     displayUploadBookmarks();
+    
+    // 마크다운 렌더링 후 스크롤 위치 복원 (비동기로 약간 지연)
+    if (isMarkdown) {
+        // 마크다운 렌더링이 완료될 때까지 대기
+        setTimeout(() => {
+            restoreReadingPosition();
+        }, 100);
+    } else {
+        restoreReadingPosition();
+    }
     
     // 저장된 읽기 위치로 복원
     restoreReadingPosition();
@@ -662,10 +725,174 @@ export function showLocalFileResumeMessage(fileName) {
     viewer.appendChild(messageDiv);
 }
 
+/**
+ * 줄바꿈 모드 토글 (자동/원본)
+ */
+export function toggleWrapMode() {
+    const viewer = document.getElementById('viewerContent');
+    const btn = document.getElementById('wrapModeBtn');
+    
+    if (!viewer || !btn) {
+        console.error('❌ toggleWrapMode: viewer 또는 btn을 찾을 수 없습니다');
+        return;
+    }
+    
+    // 디버깅: 현재 클래스 상태 확인
+    console.log('🔄 토글 실행됨. 현재 클래스:', viewer.className);
+    
+    // nowrap-mode 클래스 토글
+    const isOriginal = viewer.classList.contains('nowrap-mode');
+    
+    if (isOriginal) {
+        // 자동 줄바꿈 모드로 전환
+        viewer.classList.remove('nowrap-mode');
+        btn.textContent = '줄바꿈: 자동';
+        btn.classList.remove('bg-purple-600');
+        btn.classList.add('bg-purple-500');
+        console.log('✅ 자동 줄바꿈 모드로 전환');
+    } else {
+        // 원본 보기 모드로 전환
+        viewer.classList.add('nowrap-mode');
+        btn.textContent = '줄바꿈: 원본(가로스크롤)';
+        btn.classList.remove('bg-purple-500');
+        btn.classList.add('bg-purple-600');
+        console.log('✅ 원본 보기 모드로 전환 (가로 스크롤 활성화)');
+    }
+    
+    // 디버깅: 변경 후 클래스 상태 확인
+    console.log('🔄 토글 완료. 변경 후 클래스:', viewer.className);
+    
+    // 설정 저장
+    localStorage.setItem('wrapMode', isOriginal ? 'auto' : 'original');
+}
+
+
+/**
+ * 마크다운 파일로 다운로드
+ */
+export function downloadAsMarkdown() {
+    const viewer = document.getElementById('viewerContent');
+    const titleElement = document.getElementById('currentFileName');
+    
+    if (!viewer || !titleElement) {
+        console.error('❌ 다운로드 실패: 뷰어 또는 파일명 요소가 없습니다');
+        alert('다운로드할 파일이 없습니다.');
+        return;
+    }
+    
+    const fileName = titleElement.textContent.trim();
+    if (!fileName || fileName === '파일을 선택하세요') {
+        console.error('❌ 다운로드 실패: 파일이 선택되지 않았습니다');
+        alert('먼저 파일을 선택해주세요.');
+        return;
+    }
+    
+    // 원본 텍스트 다운로드
+    const content = originalFileContent || viewer.textContent;
+    if (!content || content.trim() === '') {
+        console.error('❌ 다운로드 실패: 내용이 없습니다');
+        alert('다운로드할 내용이 없습니다.');
+        return;
+    }
+    
+    downloadMarkdown(content, fileName, false);
+    console.log('💾 마크다운 다운로드 요청 완료');
+}
+
 // 전역으로 노출 (HTML의 onclick에서 사용)
 window.selectFiles = selectFiles;
 window.toggleSettings = toggleSettings;
 window.toggleUploadSection = toggleUploadSection;
 window.displayFileContent = displayFileContent;
 window.toggleBookmark = toggleBookmark;
+window.toggleWrapMode = toggleWrapMode;
+window.downloadAsMarkdown = downloadAsMarkdown;
 
+/**
+ * 현재 파일의 원본 텍스트 내용 가져오기
+ * @returns {string|null} 현재 파일의 텍스트 내용 또는 null
+ */
+function getCurrentFileContent() {
+    if (currentFileIndex < 0 || !files || files.length === 0) {
+        console.warn('현재 열린 파일이 없습니다.');
+        return null;
+    }
+    
+    const currentFile = files[currentFileIndex];
+    if (!currentFile || !currentFile.content) {
+        console.warn('현재 파일의 내용을 가져올 수 없습니다.');
+        return null;
+    }
+    
+    // 원본 텍스트 반환 (originalFileContent가 있으면 우선 사용)
+    return originalFileContent || currentFile.content;
+}
+
+/**
+ * AI 변환 및 저장 처리
+ */
+export async function handleAIClean() {
+    const content = getCurrentFileContent();
+    if (!content) {
+        alert('변환할 파일이 없습니다. 먼저 파일을 선택해주세요.');
+        return;
+    }
+
+    const btn = document.getElementById('aiCleanBtn');
+    if (!btn) {
+        console.error('AI 변환 버튼을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 로딩 표시
+    const originalText = btn.textContent;
+    btn.textContent = "⏳ 변환 중...";
+    btn.disabled = true;
+
+    try {
+        // AI 호출
+        const markdown = await cleanTextWithAI(content);
+        
+        if (markdown) {
+            // 화면 즉시 갱신 (Marked 라이브러리 사용)
+            const viewerContent = document.getElementById('viewerContent');
+            if (!viewerContent) {
+                console.error('뷰어 컨텐츠 영역을 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 마크다운을 HTML로 변환하여 표시
+            if (typeof marked !== 'undefined') {
+                viewerContent.innerHTML = marked.parse(markdown);
+            } else {
+                // marked가 없으면 텍스트로 표시
+                viewerContent.textContent = markdown;
+                console.warn('marked.js가 로드되지 않았습니다. 텍스트로 표시합니다.');
+            }
+            
+            // 파일 다운로드 (자동) - 원본 파일명 기반으로 저장
+            const currentFile = files[currentFileIndex];
+            if (currentFile && currentFile.name) {
+                // 원본 파일명에서 확장자 제거 후 .md 추가
+                const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
+                const mdFileName = `${baseName}.md`;
+                downloadMarkdown(markdown, mdFileName, false);
+            } else {
+                // 파일 정보가 없으면 기본 이름 사용
+                downloadMarkdown(markdown, 'converted.md', false);
+            }
+            
+            alert("변환이 완료되었습니다! 파일이 저장되었고 화면이 갱신되었습니다.");
+        }
+    } catch (error) {
+        console.error('AI 변환 중 오류:', error);
+        alert('AI 변환 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'));
+    } finally {
+        // 버튼 복구
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
+
+// 전역으로 노출 (HTML의 onclick에서 사용)
+window.handleAIClean = handleAIClean;

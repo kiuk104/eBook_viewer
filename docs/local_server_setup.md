@@ -128,7 +128,16 @@ python -m http.server 8000
 
 사용 방법:
 
+프로젝트 루트 디렉토리에서:
+
 ```powershell
+.\scripts\start_server.ps1
+```
+
+또는 scripts 폴더에서:
+
+```powershell
+cd scripts
 .\start_server.ps1
 ```
 
@@ -144,7 +153,16 @@ pause
 
 사용 방법:
 
+프로젝트 루트 디렉토리에서:
+
 ```cmd
+scripts\start_server.bat
+```
+
+또는 scripts 폴더에서:
+
+```cmd
+cd scripts
 start_server.bat
 ```
 

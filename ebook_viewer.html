@@ -8,6 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>이북 텍스트 뷰어 v2.0 (Everything URL Protocol)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +31,7 @@
                     </button>
                     <div class="max-w-2xl mx-auto" id="uploadSectionContent">
                         <div id="uploadBox" class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center bg-white cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all duration-300">
-                            <input type="file" id="fileInput" accept=".txt,.text" multiple class="hidden">
+                            <input type="file" id="fileInput" accept=".txt,.text,.md,text/plain,text/markdown" multiple class="hidden">
                             <div class="text-6xl mb-4">📁</div>
                             <h2 class="text-2xl font-semibold text-gray-700 mb-2">파일 선택 또는 드래그 앤 드롭</h2>
                             <p class="text-gray-500 mb-6">텍스트 파일(.txt)을 여러 개 선택할 수 있습니다</p>
@@ -67,6 +68,9 @@
                                     <div class="flex items-center justify-between mb-2">
                                         <h2 class="text-2xl font-bold text-gray-800" id="currentFileName">파일을 선택하세요</h2>
                                         <div class="flex gap-2">
+                                            <button id="wrapModeBtn" onclick="toggleWrapMode()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm font-semibold">줄바꿈: 자동</button>
+                                            <button id="aiCleanBtn" onclick="handleAIClean()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold">🤖 AI 변환 & 저장</button>
+                                            <button id="downloadMdBtn" onclick="downloadAsMarkdown()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-semibold">💾 MD 저장</button>
                                             <button id="bookmarkBtn" onclick="toggleBookmark()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-semibold">⭐ 북마크</button>
                                             <button id="settingsBtn" onclick="toggleSettings()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-semibold">⚙️ 설정</button>
                                         </div>
@@ -80,11 +84,23 @@
                                     <h3 class="text-lg font-bold text-gray-800 mb-4">📝 읽기 설정</h3>
                                     <div class="mb-6">
                                         <label class="block text-sm font-medium text-gray-700 mb-3">색상 테마</label>
-                                        <div class="grid grid-cols-4 gap-3">
-                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-white text-gray-800 active" onclick="setTheme('light')">☀️ 라이트</div>
-                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-gray-800 text-white" onclick="setTheme('dark')">🌙 다크</div>
-                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-amber-50 text-amber-900" onclick="setTheme('sepia')">📜 세피아</div>
-                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-green-50 text-green-900" onclick="setTheme('green')">🌿 그린</div>
+                                        <div class="grid grid-cols-5 gap-3">
+                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-white text-gray-800 active" data-theme="light" onclick="setTheme('light')">☀️ 라이트</div>
+                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-gray-800 text-white" data-theme="dark" onclick="setTheme('dark')">🌙 다크</div>
+                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-amber-50 text-amber-900" data-theme="sepia" onclick="setTheme('sepia')">📜 세피아</div>
+                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-green-50 text-green-900" data-theme="green" onclick="setTheme('green')">🌿 그린</div>
+                                            <div class="theme-option p-3 rounded-lg border-2 border-gray-300 bg-gradient-to-br from-purple-400 to-pink-400 text-white" data-theme="custom" onclick="setTheme('custom')">🎨 사용자 지정</div>
+                                        </div>
+                                    </div>
+                                    <div id="customThemeSection" class="mb-6 p-4 bg-purple-50 rounded-lg border-2 border-purple-200 hidden">
+                                        <h4 class="text-md font-bold text-purple-800 mb-3">🎨 사용자 지정 테마</h4>
+                                        <div class="mb-3">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">배경색</label>
+                                            <input type="color" id="customBgColor" value="#ffffff" class="w-full h-10 rounded-lg border border-gray-300 cursor-pointer" onchange="updateCustomTheme()">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">글자색</label>
+                                            <input type="color" id="customTextColor" value="#1f2937" class="w-full h-10 rounded-lg border border-gray-300 cursor-pointer" onchange="updateCustomTheme()">
                                         </div>
                                     </div>
                                     <div class="mb-6">
@@ -104,6 +120,21 @@
                                         </div>
                                         <div class="flex gap-2">
                                             <button onclick="saveGoogleDriveSettings()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">✓ 저장</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-6 p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+                                        <h4 class="text-md font-bold text-purple-800 mb-3">🤖 AI 설정 (Google Gemini)</h4>
+                                        <div class="mb-3">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Google Gemini API Key</label>
+                                            <input type="password" id="geminiApiKey" placeholder="AI Studio에서 발급받은 키 입력" 
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">키 발급받기 (무료)</a>
+                                            </p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button onclick="saveGeminiApiKey()" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm">✓ 저장</button>
                                         </div>
                                     </div>
                                 </div>

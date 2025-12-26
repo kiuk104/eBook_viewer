@@ -4,8 +4,8 @@
  */
 
 import { APP_NAME, APP_VERSION } from './config.js';
-import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile } from './settings.js';
-import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage } from './viewer.js';
+import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
+import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage, toggleWrapMode, selectFiles } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -75,6 +75,9 @@ function initApp() {
     applySettings();
     displayUploadHistory();
     displayUploadBookmarks();
+    
+    // 줄바꿈 모드 복원
+    restoreWrapMode();
 
     // 마지막 읽은 파일 복원 시도
     restoreLastReadFile();
@@ -102,7 +105,7 @@ function initApp() {
         uploadBox.addEventListener('drop', async (e) => {
             e.preventDefault();
             uploadBox.classList.remove('bg-gray-100');
-            const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.txt'));
+            const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.txt') || f.name.endsWith('.md'));
             if (droppedFiles.length) {
                 const { processFilesWithResume } = await import('./viewer.js');
                 await processFilesWithResume(droppedFiles);
@@ -120,6 +123,41 @@ function initApp() {
     }
 
     console.log('[DOMContentLoaded] Complete');
+}
+
+/**
+ * 줄바꿈 모드 복원
+ */
+function restoreWrapMode() {
+    try {
+        const savedMode = localStorage.getItem('wrapMode');
+        if (savedMode === 'original') {
+            const viewer = document.getElementById('viewerContent');
+            const btn = document.getElementById('wrapModeBtn');
+            if (viewer && btn) {
+                // 기존 클래스 제거 후 새로운 클래스 추가
+                viewer.classList.remove('wrap-original', 'force-original-break');
+                viewer.classList.add('nowrap-mode');
+                btn.textContent = '줄바꿈: 원본(가로스크롤)';
+                btn.classList.remove('bg-purple-500');
+                btn.classList.add('bg-purple-600');
+                console.log('✅ 줄바꿈 모드 복원: 원본 보기 모드');
+            }
+        } else {
+            // 자동 모드인 경우 클래스 제거
+            const viewer = document.getElementById('viewerContent');
+            const btn = document.getElementById('wrapModeBtn');
+            if (viewer && btn) {
+                viewer.classList.remove('nowrap-mode', 'wrap-original', 'force-original-break');
+                btn.textContent = '줄바꿈: 자동';
+                btn.classList.remove('bg-purple-600');
+                btn.classList.add('bg-purple-500');
+                console.log('✅ 줄바꿈 모드 복원: 자동 줄바꿈 모드');
+            }
+        }
+    } catch (e) {
+        console.error('❌ 줄바꿈 모드 복원 실패:', e);
+    }
 }
 
 /**
@@ -151,10 +189,15 @@ async function restoreLastReadFile() {
 }
 
 // 전역 함수 노출 (HTML의 onclick에서 사용)
+// 모듈 로드 즉시 할당하여 HTML의 onclick이 작동하도록 보장
 window.setTheme = setTheme;
 window.setFontSize = setFontSize;
 window.saveGoogleDriveSettings = saveGoogleDriveSettings;
 window.loadGoogleDriveFiles = loadGoogleDriveFiles;
+window.updateCustomTheme = updateCustomTheme;
+window.toggleWrapMode = toggleWrapMode; // 줄바꿈 모드 토글 함수 노출
+window.selectFiles = selectFiles; // 파일 선택 함수 노출
+window.saveGeminiApiKey = saveGeminiApiKey; // Gemini API 키 저장 함수 노출
 
 // DOM 로드 완료 시 초기화
 window.addEventListener('DOMContentLoaded', initApp);

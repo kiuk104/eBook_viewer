@@ -20,6 +20,13 @@ export function loadSettings() {
         const savedFontSize = localStorage.getItem('readerFontSize');
         if (savedFontSize) currentFontSize = parseInt(savedFontSize);
 
+        // API 키 로드
+        const apiKey = localStorage.getItem('geminiApiKey');
+        const apiKeyInput = document.getElementById('geminiApiKey');
+        if (apiKey && apiKeyInput) {
+            apiKeyInput.value = apiKey;
+        }
+
         console.log('Settings loaded:', { currentTheme, currentFontSize });
     } catch (e) {
         console.error('Failed to load settings:', e);
@@ -38,6 +45,17 @@ export function applySettings() {
     // 슬라이더 UI 업데이트
     const fontSlider = document.getElementById('fontSizeSlider');
     if (fontSlider) fontSlider.value = currentFontSize;
+    
+    // 커스텀 테마 색상 피커 UI 업데이트
+    if (currentTheme === 'custom') {
+        const customTheme = getCustomTheme();
+        if (customTheme) {
+            const bgColorPicker = document.getElementById('customBgColor');
+            const textColorPicker = document.getElementById('customTextColor');
+            if (bgColorPicker) bgColorPicker.value = customTheme.backgroundColor;
+            if (textColorPicker) textColorPicker.value = customTheme.textColor;
+        }
+    }
 }
 
 /**
@@ -122,7 +140,7 @@ export function loadBookmarks() {
 
 /**
  * 테마 설정
- * @param {string} themeName - 테마 이름 ('light', 'dark', 'sepia', 'green')
+ * @param {string} themeName - 테마 이름 ('light', 'dark', 'sepia', 'green', 'custom')
  * @param {boolean} save - localStorage에 저장할지 여부
  */
 export function setTheme(themeName, save = true) {
@@ -130,22 +148,95 @@ export function setTheme(themeName, save = true) {
     const body = document.getElementById('bodyElement');
     const content = document.getElementById('mainContent');
     
-    // Remove old themes
-    ['theme-light', 'theme-dark', 'theme-sepia', 'theme-green'].forEach(t => {
+    // 모든 테마 클래스 제거 (body, content, viewer-container 등 모든 요소에서)
+    const allThemeClasses = ['theme-light', 'theme-dark', 'theme-sepia', 'theme-green', 'theme-custom'];
+    allThemeClasses.forEach(t => {
         body.classList.remove(t);
         if (content) content.classList.remove(t);
+        // viewer-container도 확인
+        const viewerContainer = document.querySelector('.viewer-container');
+        if (viewerContainer) viewerContainer.classList.remove(t);
     });
 
-    // Add new theme
-    const themeClass = `theme-${themeName}`;
-    body.classList.add(themeClass);
-    if (content) content.classList.add(themeClass);
+    // 커스텀 테마 섹션 표시/숨김
+    const customThemeSection = document.getElementById('customThemeSection');
+    if (customThemeSection) {
+        if (themeName === 'custom') {
+            customThemeSection.classList.remove('hidden');
+        } else {
+            customThemeSection.classList.add('hidden');
+        }
+    }
+
+    // 커스텀 테마인 경우
+    if (themeName === 'custom') {
+        const customTheme = getCustomTheme();
+        if (customTheme) {
+            // body에 직접 색상 적용 (인라인 스타일)
+            document.body.style.backgroundColor = customTheme.backgroundColor;
+            document.body.style.color = customTheme.textColor;
+            if (content) {
+                content.style.backgroundColor = customTheme.backgroundColor;
+                content.style.color = customTheme.textColor;
+            }
+        } else {
+            // 기본값 설정
+            const defaultBg = '#ffffff';
+            const defaultText = '#1f2937';
+            document.body.style.backgroundColor = defaultBg;
+            document.body.style.color = defaultText;
+            if (content) {
+                content.style.backgroundColor = defaultBg;
+                content.style.color = defaultText;
+            }
+            saveCustomTheme(defaultBg, defaultText);
+        }
+        body.classList.add('theme-custom');
+        if (content) content.classList.add('theme-custom');
+    } else {
+        // 기본 테마인 경우 - 인라인 스타일 초기화
+        document.body.style.backgroundColor = '';
+        document.body.style.color = '';
+        if (content) {
+            content.style.backgroundColor = '';
+            content.style.color = '';
+        }
+        
+        // 기본 테마 클래스 추가
+        const themeClass = `theme-${themeName}`;
+        body.classList.add(themeClass);
+        if (content) content.classList.add(themeClass);
+        
+        // body 배경색과 텍스트 색상도 적용
+        applyThemeColors(themeName);
+    }
 
     // Update Active UI
     document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+    const activeOption = document.querySelector(`.theme-option[data-theme="${themeName}"]`);
+    if (activeOption) activeOption.classList.add('active');
     
     if (save) {
         localStorage.setItem('readerTheme', themeName);
+    }
+}
+
+/**
+ * 테마 색상 적용 (body 배경색 포함)
+ * @param {string} themeName - 테마 이름
+ */
+function applyThemeColors(themeName) {
+    const themeColors = {
+        'light': { bg: '#ffffff', text: '#1f2937' },
+        'dark': { bg: '#1f2937', text: '#f3f4f6' },
+        'sepia': { bg: '#fef9e7', text: '#78350f' },
+        'green': { bg: '#f0fdf4', text: '#14532d' }
+    };
+    
+    const colors = themeColors[themeName];
+    if (colors) {
+        document.body.style.backgroundColor = colors.bg;
+        document.body.style.color = colors.text;
     }
 }
 
@@ -357,3 +448,95 @@ export function loadLastReadFile() {
     }
 }
 
+/**
+ * 커스텀 테마 색상 가져오기
+ * @returns {Object|null} {backgroundColor, textColor} 또는 null
+ */
+export function getCustomTheme() {
+    try {
+        const saved = localStorage.getItem('customTheme');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        return null;
+    } catch (e) {
+        console.error('Failed to load custom theme:', e);
+        return null;
+    }
+}
+
+/**
+ * 커스텀 테마 색상 저장
+ * @param {string} backgroundColor - 배경색 (hex)
+ * @param {string} textColor - 텍스트 색상 (hex)
+ */
+export function saveCustomTheme(backgroundColor, textColor) {
+    try {
+        const customTheme = { backgroundColor, textColor };
+        localStorage.setItem('customTheme', JSON.stringify(customTheme));
+        console.log('Custom theme saved:', customTheme);
+        
+        // 현재 테마가 커스텀인 경우에만 즉시 적용
+        if (currentTheme === 'custom') {
+            document.body.style.backgroundColor = backgroundColor;
+            document.body.style.color = textColor;
+            const content = document.getElementById('mainContent');
+            if (content) {
+                content.style.backgroundColor = backgroundColor;
+                content.style.color = textColor;
+            }
+        }
+    } catch (e) {
+        console.error('Failed to save custom theme:', e);
+    }
+}
+
+/**
+ * 커스텀 테마 업데이트 (컬러 피커 변경 시 호출)
+ */
+export function updateCustomTheme() {
+    const bgColorPicker = document.getElementById('customBgColor');
+    const textColorPicker = document.getElementById('customTextColor');
+    
+    if (bgColorPicker && textColorPicker) {
+        const bgColor = bgColorPicker.value;
+        const textColor = textColorPicker.value;
+        saveCustomTheme(bgColor, textColor);
+        // 커스텀 테마로 즉시 전환하여 색상 적용
+        setTheme('custom', true);
+    }
+    
+}
+
+/**
+ * Gemini API 키 저장
+ */
+export function saveGeminiApiKey() {
+    try {
+        const apiKeyInput = document.getElementById('geminiApiKey');
+        if (!apiKeyInput) {
+            console.error('API 키 입력 필드를 찾을 수 없습니다.');
+            return;
+        }
+        
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            alert('API 키를 입력해주세요.');
+            return;
+        }
+        
+        localStorage.setItem('geminiApiKey', apiKey);
+        alert('API 키가 저장되었습니다.');
+        console.log('Gemini API 키 저장 완료');
+    } catch (e) {
+        console.error('API 키 저장 실패:', e);
+        alert('API 키 저장에 실패했습니다.');
+    }
+}
+
+/**
+ * Gemini API 키 가져오기
+ */
+export function getGeminiKey() {
+    return localStorage.getItem('geminiApiKey');
+}
