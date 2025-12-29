@@ -5,7 +5,8 @@
 
 import { APP_NAME, APP_VERSION } from './config.js';
 import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
-import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage, toggleWrapMode, selectFiles } from './viewer.js';
+// toggleUploadSection, toggleHistorySection, toggleBookmarksSection 추가
+import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -51,7 +52,17 @@ function migrateOldStorageData() {
 /**
  * 앱 초기화
  */
+// initApp 중복 호출 방지 플래그
+let initAppCalled = false;
+
 function initApp() {
+    // 중복 호출 방지
+    if (initAppCalled) {
+        console.warn('[initApp] 이미 호출되었습니다. 중복 호출을 방지합니다.');
+        return;
+    }
+    initAppCalled = true;
+    
     console.log('[DOMContentLoaded] Start');
     
     // 구형 데이터 마이그레이션 (가장 먼저 실행)
@@ -78,17 +89,97 @@ function initApp() {
     
     // 줄바꿈 모드 복원
     restoreWrapMode();
+    
+    // 뷰어 넓이 복원
+    restoreViewerWidth();
+    
+    // 본문 스타일 복원
+    restoreBodyStyles();
+    
+    // 마크다운 스타일 복원
+    restoreMarkdownStyles();
+    
+    // 마크다운 스타일 이벤트 리스너 연결 (HTML의 onchange 속성과 함께 작동)
+    const headingSelect = document.getElementById('markdownHeadingFont');
+    const headingSizeSlider = document.getElementById('headingSizeSlider');
+    const headingColor = document.getElementById('headingColor');
+    const tocColor = document.getElementById('tocColor');
+    
+    if (headingSelect) {
+        headingSelect.addEventListener('change', updateMarkdownStyles);
+    }
+    if (headingSizeSlider) {
+        headingSizeSlider.addEventListener('input', updateMarkdownStyles);
+    }
+    if (headingColor) {
+        headingColor.addEventListener('change', updateMarkdownStyles);
+    }
+    if (tocColor) {
+        tocColor.addEventListener('change', updateMarkdownStyles);
+    }
+    
+    // 텍스트 스트로크 이벤트 리스너 연결 (HTML의 oninput 속성과 함께 작동)
+    const strokeSlider = document.getElementById('textStrokeSlider');
+    if (strokeSlider) {
+        strokeSlider.addEventListener('input', updateTextStroke);
+    }
+    
+    // 컨텍스트 메뉴 설정 복원
+    restoreContextMenuSetting();
 
     // 마지막 읽은 파일 복원 시도
     restoreLastReadFile();
 
-    // 파일 입력 이벤트 리스너
-    const fileInput = document.getElementById('fileInput');
+    // 파일 입력 이벤트 리스너 (중복 등록 방지)
+    const fileInput = document.getElementById('file-input');
     if (fileInput) {
-        fileInput.addEventListener('change', async (e) => {
+        // 중복 등록 방지: 기존 리스너 제거 후 재등록
+        const existingListener = fileInput._changeListener;
+        if (existingListener) {
+            fileInput.removeEventListener('change', existingListener);
+        }
+        
+        // 새로운 리스너 생성 및 저장
+        const changeListener = async (e) => {
             const { processFilesWithResume } = await import('./viewer.js');
             await processFilesWithResume(Array.from(e.target.files));
-        });
+        };
+        fileInput._changeListener = changeListener; // 참조 저장
+        fileInput.addEventListener('change', changeListener);
+    }
+
+    // Google Drive 버튼 클릭 이벤트 리스너 추가
+    const loadGoogleDriveBtn = document.getElementById('loadGoogleDriveBtn');
+    if (loadGoogleDriveBtn) {
+        // 중복 등록 방지: 기존 리스너 제거 후 재등록
+        const existingListener = loadGoogleDriveBtn._clickListener;
+        if (existingListener) {
+            loadGoogleDriveBtn.removeEventListener('click', existingListener);
+        }
+        
+        // onclick 속성이 있으므로 이벤트 리스너는 보조로만 작동
+        // onclick이 실행되지 않았을 경우를 대비하여 이벤트 리스너도 등록
+        const clickListener = async (e) => {
+            console.log('🔵 Google Drive 버튼 클릭 이벤트 리스너 실행 (onclick 보조)');
+            
+            // onclick이 이미 실행되었을 수 있으므로, 중복 실행 방지
+            // 하지만 onclick이 실행되지 않았을 경우를 대비하여 실행
+            if (typeof window.loadGoogleDriveFiles === 'function') {
+                try {
+                    await window.loadGoogleDriveFiles();
+                } catch (error) {
+                    console.error('❌ loadGoogleDriveFiles 실행 중 오류:', error);
+                }
+            } else {
+                console.warn('⚠️ window.loadGoogleDriveFiles 함수를 찾을 수 없습니다. onclick 속성이 실행되지 않았을 수 있습니다.');
+            }
+        };
+        
+        loadGoogleDriveBtn._clickListener = clickListener; // 참조 저장
+        loadGoogleDriveBtn.addEventListener('click', clickListener, { capture: false, passive: false });
+        console.log('✅ Google Drive 버튼 이벤트 리스너 등록 완료');
+    } else {
+        console.warn('⚠️ loadGoogleDriveBtn 요소를 찾을 수 없습니다.');
     }
 
     // 드래그 앤 드롭 이벤트 리스너
@@ -198,6 +289,36 @@ window.updateCustomTheme = updateCustomTheme;
 window.toggleWrapMode = toggleWrapMode; // 줄바꿈 모드 토글 함수 노출
 window.selectFiles = selectFiles; // 파일 선택 함수 노출
 window.saveGeminiApiKey = saveGeminiApiKey; // Gemini API 키 저장 함수 노출
+window.toggleSettings = toggleSettings;
+window.toggleFavorite = toggleFavorite;
+
+// [추가] 접기/펼치기 함수 노출
+window.toggleUploadSection = toggleUploadSection;
+window.toggleHistorySection = toggleHistorySection;
+window.toggleBookmarksSection = toggleBookmarksSection;
+
+// [추가] AI 변환 및 다운로드 함수 노출
+window.handleAIClean = handleAIClean;
+window.downloadAsMarkdown = downloadAsMarkdown;
+
+// [추가] 뷰어 너비 조절 함수 노출
+window.updateViewerWidth = updateViewerWidth;
+window.toggleFullWidth = toggleFullWidth;
+
+// [추가] 본문 스타일 함수 노출
+window.updateBodyStyles = updateBodyStyles;
+
+// [추가] 마크다운 스타일 함수 노출
+window.updateMarkdownStyles = updateMarkdownStyles;
+
+// [추가] 텍스트 스트로크 함수 노출
+window.updateTextStroke = updateTextStroke;
+
+// [추가] 설정 초기화 함수 노출
+window.resetAllSettings = resetAllSettings;
+
+// [추가] 컨텍스트 메뉴 설정 함수 노출
+window.toggleContextMenuSetting = toggleContextMenuSetting;
 
 // DOM 로드 완료 시 초기화
 window.addEventListener('DOMContentLoaded', initApp);

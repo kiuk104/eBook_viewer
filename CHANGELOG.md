@@ -6,6 +6,124 @@
 
 ---
 
+## [v0.2.2] - 2025-12-26
+
+### ✨ 추가됨 (Added)
+- **북마크 및 히스토리 개별 삭제 기능**
+  - 각 히스토리 항목에 삭제 버튼 추가 (호버 시 표시)
+  - 각 북마크 항목에 삭제 버튼 추가 (호버 시 표시)
+  - 삭제 확인 다이얼로그로 실수 방지
+  - 삭제 후 목록 즉시 갱신
+
+- **텍스트 스트로크(외곽선 두께) 조절 기능**
+  - 본문 스타일 섹션에 스트로크 조절 슬라이더 추가
+  - 0px ~ 1.5px 범위에서 조절 가능 (0.05px 단위)
+  - 얇은 폰트를 진하게 만드는 효과
+  - `-webkit-text-stroke-width` 및 `currentColor` 사용
+
+### ♻️ 변경됨 (Changed)
+- **북마크 목록 개선**
+  - 모든 파일의 북마크를 통합하여 최신순 정렬
+  - 현재 열린 파일의 북마크만 표시하도록 변경
+  - 북마크 클릭 시 파일 열기 대신 현재 파일 내 위치로 이동
+
+- **히스토리 목록 개선**
+  - 최신순 정렬 (timestamp 기준 내림차순)
+  - 최근에 읽은 파일이 목록 상단에 표시
+
+- **마크다운 헤더 폰트 스타일 개선**
+  - 동적 스타일 태그 주입 방식으로 변경
+  - `!important`를 사용하여 Tailwind `.prose` 클래스 우선순위 우회
+  - 제목 폰트가 확실하게 적용되도록 개선
+
+### 🐛 수정됨 (Fixed)
+- **북마크 저장 시 파일 인식 개선**
+  - `currentFileKey`가 없어도 본문 내용이 있으면 임시 파일 정보 생성
+  - Google Drive 파일 등 다양한 상황에서 북마크 저장 안정성 향상
+
+---
+
+## [v0.2.1] - 2025-12-26
+
+### ✨ 추가됨 (Added)
+- 뷰어 너비 조절 기능 (슬라이더, 꽉 찬 화면 모드)
+- 본문 스타일 커스터마이징 (줄간격, 글씨체, 색상)
+- 설정 초기화 기능
+- 한글 웹폰트 추가 (고운 바탕, 고운 도움, IBM Plex Sans KR, 리디바탕)
+- 커스텀 컨텍스트 메뉴 (우클릭 메뉴)
+- 히스토리 및 북마크 목록 압축 (높이 및 간격 축소)
+
+### 🐛 수정됨 (Fixed)
+- 뷰어 너비 조절 버그 (CSS 우선순위 문제 해결)
+- 줄간격 적용 버그 (`updateBodyStyles()` 함수 구현)
+- 레이아웃 개선 (너비 제한 제거)
+
+### ♻️ 변경됨 (Changed)
+- UI 개선 (기능 버튼 그룹을 상단 패널 헤더로 이동)
+- 설정 패널 레이아웃 통합 (단일 회색 패널로 변경)
+- 상단 패널을 드로어 형태로 변경
+
+---
+
+## [v0.2.0] - 2025-12-26
+
+### 🐛 수정됨 (Fixed)
+- **파일 선택 버튼 동작 문제 해결**
+  - `main.js`: DOM 요소 ID 불일치 수정 (`getElementById` 타겟을 `fileInput`에서 `file-input`으로 변경)
+  - `viewer.js`: DOM 요소 ID 불일치 수정 (`getElementById` 타겟을 `fileInput`에서 `file-input`으로 변경)
+  - `ebook_viewer.html`: 파일 입력 요소 ID를 `fileInput`에서 `file-input`으로 변경
+  - `ebook_viewer.html`: 파일 선택 버튼(`#selectFilesBtn`)에 `onclick="document.getElementById('file-input').click()"` 속성 추가
+  - `ebook_viewer.html`: Google Drive 버튼(`#loadGoogleDriveBtn`)에 `onclick="loadGoogleDriveFiles()"` 속성 추가
+  - 이벤트 리스너 중복 등록 방지 로직 개선 (함수 참조 저장 방식으로 변경)
+
+### ✨ 추가됨 (Added)
+- **AI 변환 기능**
+  - Google Gemini API를 통한 텍스트 마크다운 변환
+  - AI 변환 버튼 추가 (🤖 AI 변환 & 저장)
+  - 변환된 마크다운 파일 자동 다운로드
+  - Gemini 1.5 Flash 및 2.0 Flash 모델 지원
+
+- **마크다운 파일 지원**
+  - `.md` 파일 읽기 및 렌더링 기능
+  - marked.js를 통한 마크다운 HTML 변환
+  - 마크다운 전용 스타일링 (`.markdown-mode`)
+  - 코드 블록 래퍼 자동 제거 기능
+  - 마크다운 파일 북마크 및 읽기 위치 저장 지원
+
+- **API 키 관리**
+  - Google Gemini API 키 저장 기능
+  - 설정 패널에 API 키 입력 및 저장 버튼 추가
+
+### ♻️ 변경됨 (Changed)
+- **기능 개선**
+  - 텍스트 정리 기능 제거 (AI 변환으로 대체)
+  - 마크다운 렌더링 시 자동 줄바꿈 적용
+  - 파일 선택 다이얼로그에 `.md` 확장자 추가
+
+- **스타일링**
+  - 마크다운 모드 전용 CSS 스타일 추가
+  - 제목, 본문, 리스트 등 마크다운 요소 스타일링
+  - 다크 모드에서의 마크다운 스타일 지원
+
+### 🐛 수정됨 (Fixed)
+- **Google Drive 통합**
+  - `loadGoogleDriveFiles` 함수 전역 노출 문제 수정
+  - Google Drive 불러오기 기능 정상 작동
+  - Google Drive 피커에서 마크다운(.md) 파일 인식 문제 해결
+    - `createPicker` 함수의 `view.setMimeTypes` 설정에서 MIME 타입 문자열 오류 수정
+    - 오타 수정: `application/octet-stream.folder` -> `application/octet-stream,application/vnd.google-apps.folder` (콤마 누락 수정 및 폴더 MIME 타입 명시)
+    - 이제 구글 드라이브에서 .md 파일 인식 및 폴더 탐색이 정상적으로 작동함
+
+- **파일 처리**
+  - 드래그 앤 드롭 시 `.md` 파일 필터링 추가
+  - 마크다운 파일 렌더링 후 스크롤 위치 복원 개선
+
+### 🗑️ 제거됨 (Removed)
+- 텍스트 정리 기능 및 관련 버튼 제거
+- `cleanUpText` 함수 사용 중단
+
+---
+
 ## [v0.1.0] - 2025-12-24
 
 ### ✨ 추가됨 (Added)
