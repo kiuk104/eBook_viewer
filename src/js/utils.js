@@ -71,10 +71,6 @@ export function generateFileKey(file) {
  * @returns {string} 정리된 HTML 텍스트
  */
 export function cleanUpText(text) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'utils.js:73',message:'cleanUpText entry',data:{textLength:text?.length,textType:typeof text},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    
     if (!text || typeof text !== 'string') {
         return '';
     }
@@ -96,10 +92,6 @@ export function cleanUpText(text) {
     // 5. 줄 단위 분리
     const lines = processed.split('\n');
     
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'utils.js:95',message:'Before HTML conversion',data:{lineCount:lines.length,firstLines:lines.slice(0,3)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
-    
     // 6. HTML 변환 (빈 줄은 필터링하여 여백 중복 방지)
     const htmlLines = lines
         .map(line => line.trim())
@@ -116,24 +108,15 @@ export function cleanUpText(text) {
             if (isHeader) {
                 // 소제목: 위쪽 여백 줄임(mt-6), 아래 구분선
                 const html = `<h3 class="text-xl font-bold text-blue-500 dark:text-blue-400 mt-6 mb-4 pb-2 border-b border-gray-200 dark:border-gray-600">${line}</h3>`;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'utils.js:108',message:'Header detected',data:{line:line.substring(0,30),html:html.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
                 return html;
             } else {
                 // 본문: 문단 간격 줄임(mb-3), 줄 간격 적절히(leading-relaxed)
                 const html = `<p class="mb-3 leading-relaxed text-justify">${line}</p>`;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'utils.js:113',message:'Paragraph created',data:{lineLength:line.length,htmlClasses:'mb-3 leading-relaxed text-justify'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix-2',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
                 return html;
             }
         });
 
     const result = htmlLines.join('\n');
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'utils.js:117',message:'cleanUpText exit',data:{resultLength:result.length,htmlLineCount:htmlLines.length,firstHtml:result.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     return result;
 }
 

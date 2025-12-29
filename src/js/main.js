@@ -6,7 +6,7 @@
 import { APP_NAME, APP_VERSION } from './config.js';
 import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
 // toggleUploadSection, toggleHistorySection, toggleBookmarksSection 추가
-import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting } from './viewer.js';
+import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -213,6 +213,33 @@ function initApp() {
         });
     }
 
+    // 데이터 백업/복원 버튼 이벤트 리스너
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', () => {
+            exportData();
+        });
+    }
+
+    const importDataBtn = document.getElementById('importDataBtn');
+    if (importDataBtn) {
+        importDataBtn.addEventListener('click', () => {
+            importData();
+        });
+    }
+
+    // 파일 선택 후 실제 복원 로직
+    const importDataInput = document.getElementById('importDataInput');
+    if (importDataInput) {
+        importDataInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleImportDataFile(file);
+            }
+            e.target.value = ''; // 입력 초기화 (같은 파일 다시 선택 가능하게)
+        });
+    }
+
     console.log('[DOMContentLoaded] Complete');
 }
 
@@ -319,6 +346,10 @@ window.resetAllSettings = resetAllSettings;
 
 // [추가] 컨텍스트 메뉴 설정 함수 노출
 window.toggleContextMenuSetting = toggleContextMenuSetting;
+
+// [추가] 데이터 백업/복원 함수 노출
+window.exportData = exportData;
+window.importData = importData;
 
 // DOM 로드 완료 시 초기화
 window.addEventListener('DOMContentLoaded', initApp);

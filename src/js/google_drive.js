@@ -175,7 +175,7 @@ async function pickerCallback(data) {
             
             // Auto collapse upload section
             const uploadContent = document.getElementById('uploadSectionContent');
-            if (uploadContent && !uploadContent.classList.contains('collapsed')) {
+            if (uploadContent && !uploadContent.classList.contains('hidden')) {
                 toggleUploadSection();
             }
         }
@@ -209,7 +209,8 @@ async function createPicker() {
 
         // [핵심 1] 이동 활성화: 텍스트 파일과 '폴더'를 모두 허용
         // 이렇게 해야 폴더가 활성화되어 더블클릭 이동이 가능함
-        view.setMimeTypes('text/plain,application/vnd.google-apps.folder');
+        // 폴더(application/vnd.google-apps.folder)를 명시적으로 추가하고 오타 수정
+        view.setMimeTypes('text/plain,text/markdown,text/x-markdown,application/octet-stream,application/vnd.google-apps.folder');
         view.setIncludeFolders(true);
 
         // [핵심 2] 기본 시작 위치 지정
@@ -240,6 +241,7 @@ async function createPicker() {
  * Load Google Drive files using Picker
  */
 export async function loadGoogleDriveFiles(event) {
+    console.log('🔵 loadGoogleDriveFiles 호출됨');
     try {
         await createPicker();
     } catch (error) {
@@ -296,7 +298,7 @@ export async function loadLastReadGoogleDriveFile(fileId) {
         
         // Auto collapse upload section
         const uploadContent = document.getElementById('uploadSectionContent');
-        if (uploadContent && !uploadContent.classList.contains('collapsed')) {
+        if (uploadContent && !uploadContent.classList.contains('hidden')) {
             toggleUploadSection();
         }
         
@@ -309,4 +311,5 @@ export async function loadLastReadGoogleDriveFile(fileId) {
 
 // 전역으로 노출하여 main.js에서 호출 가능하게
 window.restoreGoogleDriveFile = loadLastReadGoogleDriveFile;
+window.loadLastReadGoogleDriveFile = loadLastReadGoogleDriveFile; // 북마크 클릭에서 사용
 

@@ -71,18 +71,44 @@ export async function cleanTextWithAI(text, onProgress) {
         } catch (error) {
             console.warn(`gemini-1.5-flash-002 모델 호출 실패: ${error.message}`);
             
+            // 404 또는 "not found" 오류인 경우 문서 참조 메시지 출력
+            const errorMessage = error.message?.toLowerCase() || '';
+            const errorString = String(error).toLowerCase();
+            if (errorMessage.includes('404') || errorMessage.includes('not found') || 
+                errorString.includes('404') || errorString.includes('not found')) {
+                console.error('🚨 Gemini API 모델 오류가 의심됩니다. `docs/03_troubleshooting/2025-12-26_Gemini_API_404_오류.md` 문서를 참고하여 해결하세요.');
+            }
+            
             // 실패 시 gemini-2.0-flash-exp로 재시도
             if(onProgress) onProgress("대체 모델로 재시도 중...");
             try {
                 return await tryModel('gemini-2.0-flash-exp');
             } catch (retryError) {
                 console.error(`gemini-2.0-flash-exp 모델 호출도 실패: ${retryError.message}`);
+                
+                // 404 또는 "not found" 오류인 경우 문서 참조 메시지 출력
+                const retryErrorMessage = retryError.message?.toLowerCase() || '';
+                const retryErrorString = String(retryError).toLowerCase();
+                if (retryErrorMessage.includes('404') || retryErrorMessage.includes('not found') || 
+                    retryErrorString.includes('404') || retryErrorString.includes('not found')) {
+                    console.error('🚨 Gemini API 모델 오류가 의심됩니다. `docs/03_troubleshooting/2025-12-26_Gemini_API_404_오류.md` 문서를 참고하여 해결하세요.');
+                }
+                
                 throw new Error(`모든 모델 호출 실패. 마지막 오류: ${retryError.message}`);
             }
         }
 
     } catch (error) {
         console.error("AI Error:", error);
+        
+        // 404 또는 "not found" 오류인 경우 문서 참조 메시지 출력
+        const errorMessage = error.message?.toLowerCase() || '';
+        const errorString = String(error).toLowerCase();
+        if (errorMessage.includes('404') || errorMessage.includes('not found') || 
+            errorString.includes('404') || errorString.includes('not found')) {
+            console.error('🚨 Gemini API 모델 오류가 의심됩니다. `docs/03_troubleshooting/2025-12-26_Gemini_API_404_오류.md` 문서를 참고하여 해결하세요.');
+        }
+        
         alert("AI 변환 중 오류가 발생했습니다: " + error.message);
         return null;
     }
