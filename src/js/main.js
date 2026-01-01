@@ -130,26 +130,30 @@ function initApp() {
     // 마지막 읽은 파일 복원 시도
     restoreLastReadFile();
 
-    // 파일 입력 이벤트 리스너 (중복 등록 방지)
+    // 파일 입력 이벤트 리스너
     const fileInput = document.getElementById('file-input');
     if (fileInput) {
-        // 중복 등록 방지: 기존 리스너 제거 후 재등록
-        const existingListener = fileInput._changeListener;
-        if (existingListener) {
-            fileInput.removeEventListener('change', existingListener);
-        }
-        
-        // 새로운 리스너 생성 및 저장
-        const changeListener = async (e) => {
-            const { processFilesWithResume } = await import('./viewer.js');
-            await processFilesWithResume(Array.from(e.target.files));
-        };
-        fileInput._changeListener = changeListener; // 참조 저장
-        fileInput.addEventListener('change', changeListener);
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                processFiles(e.target.files);
+                // ★ 핵심: 파일을 처리한 후 input 값을 비워줘야 
+                // 다음에 같은 파일을 다시 선택해도 'change' 이벤트가 발생합니다.
+                e.target.value = ''; 
+            }
+        });
     }
 
     // Google Drive 버튼 클릭 이벤트 리스너 추가
     const loadGoogleDriveBtn = document.getElementById('loadGoogleDriveBtn');
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:152',message:'Looking for loadGoogleDriveBtn',data:{buttonFound:!!loadGoogleDriveBtn,windowLoadGoogleDriveFiles:typeof window.loadGoogleDriveFiles,loadGoogleDriveFilesType:typeof loadGoogleDriveFiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    console.log('🔍 Google Drive 버튼 찾기:', { 
+        buttonFound: !!loadGoogleDriveBtn,
+        windowLoadGoogleDriveFiles: typeof window.loadGoogleDriveFiles,
+        loadGoogleDriveFilesType: typeof loadGoogleDriveFiles
+    });
+    
     if (loadGoogleDriveBtn) {
         // 중복 등록 방지: 기존 리스너 제거 후 재등록
         const existingListener = loadGoogleDriveBtn._clickListener;
@@ -157,28 +161,64 @@ function initApp() {
             loadGoogleDriveBtn.removeEventListener('click', existingListener);
         }
         
-        // onclick 속성이 있으므로 이벤트 리스너는 보조로만 작동
-        // onclick이 실행되지 않았을 경우를 대비하여 이벤트 리스너도 등록
+        // 이벤트 리스너로 직접 처리 (onclick 속성 제거됨)
         const clickListener = async (e) => {
-            console.log('🔵 Google Drive 버튼 클릭 이벤트 리스너 실행 (onclick 보조)');
+            e.preventDefault();
+            e.stopPropagation();
             
-            // onclick이 이미 실행되었을 수 있으므로, 중복 실행 방지
-            // 하지만 onclick이 실행되지 않았을 경우를 대비하여 실행
-            if (typeof window.loadGoogleDriveFiles === 'function') {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:163',message:'Google Drive button clicked',data:{windowLoadGoogleDriveFiles:typeof window.loadGoogleDriveFiles,loadGoogleDriveFilesType:typeof loadGoogleDriveFiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            console.log('🔵 Google Drive 버튼 클릭 이벤트 리스너 실행');
+            console.log('🔍 함수 상태:', { 
+                windowLoadGoogleDriveFiles: typeof window.loadGoogleDriveFiles,
+                loadGoogleDriveFilesType: typeof loadGoogleDriveFiles,
+                directLoadGoogleDriveFiles: typeof loadGoogleDriveFiles
+            });
+            
+            // 직접 import한 함수 사용 (가장 안전)
+            if (typeof loadGoogleDriveFiles === 'function') {
                 try {
+                    console.log('✅ loadGoogleDriveFiles 직접 호출');
+                    await loadGoogleDriveFiles();
+                } catch (error) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:171',message:'loadGoogleDriveFiles error in listener',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    console.error('❌ loadGoogleDriveFiles 실행 중 오류:', error);
+                    console.error('❌ 오류 상세:', { message: error.message, stack: error.stack, name: error.name });
+                }
+            } else if (typeof window.loadGoogleDriveFiles === 'function') {
+                // 폴백: window 객체를 통해 호출
+                try {
+                    console.log('✅ window.loadGoogleDriveFiles 호출 (폴백)');
                     await window.loadGoogleDriveFiles();
                 } catch (error) {
-                    console.error('❌ loadGoogleDriveFiles 실행 중 오류:', error);
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:171',message:'window.loadGoogleDriveFiles error in listener',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                    console.error('❌ window.loadGoogleDriveFiles 실행 중 오류:', error);
+                    console.error('❌ 오류 상세:', { message: error.message, stack: error.stack, name: error.name });
                 }
             } else {
-                console.warn('⚠️ window.loadGoogleDriveFiles 함수를 찾을 수 없습니다. onclick 속성이 실행되지 않았을 수 있습니다.');
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:174',message:'loadGoogleDriveFiles not found anywhere',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                console.error('❌ loadGoogleDriveFiles 함수를 찾을 수 없습니다.');
+                alert('Google Drive 기능을 사용할 수 없습니다. 페이지를 새로고침해주세요.');
             }
         };
         
         loadGoogleDriveBtn._clickListener = clickListener; // 참조 저장
         loadGoogleDriveBtn.addEventListener('click', clickListener, { capture: false, passive: false });
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:180',message:'Google Drive button listener registered',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         console.log('✅ Google Drive 버튼 이벤트 리스너 등록 완료');
     } else {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:182',message:'loadGoogleDriveBtn not found',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         console.warn('⚠️ loadGoogleDriveBtn 요소를 찾을 수 없습니다.');
     }
 
@@ -312,6 +352,14 @@ window.setTheme = setTheme;
 window.setFontSize = setFontSize;
 window.saveGoogleDriveSettings = saveGoogleDriveSettings;
 window.loadGoogleDriveFiles = loadGoogleDriveFiles;
+// #region agent log
+fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:314',message:'window.loadGoogleDriveFiles assigned',data:{isFunction:typeof loadGoogleDriveFiles === 'function',functionName:loadGoogleDriveFiles?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
+console.log('✅ window.loadGoogleDriveFiles 할당 완료', { 
+    isFunction: typeof loadGoogleDriveFiles === 'function',
+    functionName: loadGoogleDriveFiles?.name,
+    windowLoadGoogleDriveFiles: typeof window.loadGoogleDriveFiles === 'function'
+});
 window.updateCustomTheme = updateCustomTheme;
 window.toggleWrapMode = toggleWrapMode; // 줄바꿈 모드 토글 함수 노출
 window.selectFiles = selectFiles; // 파일 선택 함수 노출

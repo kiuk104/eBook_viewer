@@ -16,6 +16,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@300;400;500;700&family=Nanum+Gothic&family=Nanum+Myeongjo&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ridibatang-font@1.0.0/dist/ridibatang.css">
     <link rel="stylesheet" href="src/css/styles.css">
+          <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          }
+        }
+      </script>
+            <script type="module" src="src/js/main.js"></script>
 </head>
 <body id="bodyElement" class="theme-light min-h-screen">
     <div class="fixed top-3 left-4 z-50">
@@ -60,7 +68,7 @@
                                         <button id="selectFilesBtn" onclick="document.getElementById('file-input').click()" class="bg-gray-800 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-all duration-200 text-sm shadow-md border-none">
                                             내 컴퓨터 파일
                                         </button>                               
-                                        <button id="loadGoogleDriveBtn" onclick="loadGoogleDriveFiles()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 text-sm shadow-md flex items-center justify-center gap-2 border-none">
+                                        <button id="loadGoogleDriveBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 text-sm shadow-md flex items-center justify-center gap-2 border-none">
                                             Google Drive
                                         </button>
                                     </div>
@@ -361,7 +369,5 @@
         </div>
     </div>
 
-    <!-- ES6 모듈 스크립트 -->
-    <script type="module" src="src/js/main.js"></script>
 </body>
 </html>
