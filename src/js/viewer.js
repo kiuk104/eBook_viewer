@@ -764,11 +764,33 @@ export function displayUploadHistory() {
     document.getElementById('uploadHistoryEmpty').style.display = 'none';
 
     history.forEach((item, index) => {
+        // 파일 출처 확인
+        const isGoogleDrive = item.fileKey.startsWith('gdrive_');
+        const isMdFile = item.name.endsWith('.md');
+        
+        // 아이콘과 색상 설정
+        let icon, iconColor, borderColor;
+        if (isGoogleDrive) {
+            icon = isMdFile ? '📝' : '📄';
+            iconColor = 'text-blue-600'; // Google Drive 파일은 파란색
+            borderColor = 'border-l-4 border-blue-500';
+        } else {
+            icon = isMdFile ? '📝' : '📄';
+            iconColor = 'text-gray-600'; // 로컬 파일은 회색
+            borderColor = 'border-l-4 border-gray-400';
+        }
+        
         const div = document.createElement('div');
-        div.className = 'flex items-center justify-between py-1 px-2 rounded cursor-pointer transition-colors leading-tight theme-item-bg group';
+        div.className = `flex items-center justify-between py-1 px-2 rounded cursor-pointer transition-colors leading-tight theme-item-bg group ${borderColor}`;
         const infoDiv = document.createElement('div');
         infoDiv.className = 'flex items-center gap-2 overflow-hidden flex-1 pr-2';
-        infoDiv.innerHTML = `<span class="text-lg">${item.name.endsWith('.md') ? '📝' : '📄'}</span><div class="flex flex-col overflow-hidden leading-tight"><span class="font-medium truncate text-sm theme-text-body">${item.name}</span><span class="text-[10px] theme-text-body opacity-70">${formatTimestamp(item.timestamp)}</span></div>`;
+        
+        // Google Drive 뱃지 추가
+        const badge = isGoogleDrive 
+            ? '<span class="text-[8px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-semibold">Drive</span>' 
+            : '<span class="text-[8px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-semibold">Local</span>';
+        
+        infoDiv.innerHTML = `<span class="text-lg ${iconColor}">${icon}</span><div class="flex flex-col overflow-hidden leading-tight flex-1"><div class="flex items-center gap-1.5"><span class="font-medium truncate text-sm theme-text-body">${item.name}</span>${badge}</div><span class="text-[10px] theme-text-body opacity-70">${formatTimestamp(item.timestamp)}</span></div>`;
         infoDiv.onclick = () => {
             if(item.fileKey.startsWith('gdrive_')) {
                 if(window.loadLastReadGoogleDriveFile) window.loadLastReadGoogleDriveFile(item.fileKey.replace('gdrive_', ''));
@@ -806,12 +828,18 @@ export function displayUploadBookmarks() {
     }
     document.getElementById('uploadBookmarksEmpty').style.display = 'none';
 
+    // 현재 파일이 Google Drive 파일인지 확인
+    const isGoogleDrive = currentFileKey.startsWith('gdrive_');
+    const borderColor = isGoogleDrive ? 'border-l-4 border-blue-500' : 'border-l-4 border-gray-400';
+    const bookmarkIcon = isGoogleDrive ? '🔖' : '📌';
+    const iconColor = isGoogleDrive ? 'text-blue-600' : 'text-gray-600';
+
     current.forEach(bm => {
         const div = document.createElement('div');
-        div.className = 'flex items-center justify-between py-1 px-2 rounded cursor-pointer transition-colors leading-tight theme-item-bg group';
+        div.className = `flex items-center justify-between py-1 px-2 rounded cursor-pointer transition-colors leading-tight theme-item-bg group ${borderColor}`;
         const infoDiv = document.createElement('div');
         infoDiv.className = 'flex flex-col overflow-hidden flex-1 pr-2';
-        infoDiv.innerHTML = `<div class="font-medium text-sm truncate leading-tight theme-text-body">🔖 ${bm.preview || '북마크'}</div><div class="text-[10px] theme-text-body opacity-70 leading-tight">위치: ${bm.position.toFixed(1)}%</div>`;
+        infoDiv.innerHTML = `<div class="font-medium text-sm truncate leading-tight theme-text-body ${iconColor}"><span class="mr-1">${bookmarkIcon}</span>${bm.preview || '북마크'}</div><div class="text-[10px] theme-text-body opacity-70 leading-tight">위치: ${bm.position.toFixed(1)}%</div>`;
         infoDiv.onclick = () => {
             const h = document.documentElement.scrollHeight - window.innerHeight;
             window.scrollTo({ top: (bm.position / 100) * h, behavior: 'smooth' });
