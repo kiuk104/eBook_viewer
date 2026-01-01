@@ -73,6 +73,26 @@ function handleHighlightClick(e) {
     activeHighlightSpan = targetSpan; 
     const selectedText = Array.from(relatedSpans).map(s => s.innerText || s.textContent || '').join('');
     
+    // 하이라이트된 영역을 자동으로 선택
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    
+    if (relatedSpans.length > 0) {
+        const range = document.createRange();
+        const firstSpan = relatedSpans[0];
+        const lastSpan = relatedSpans[relatedSpans.length - 1];
+        
+        try {
+            range.setStartBefore(firstSpan);
+            range.setEndAfter(lastSpan);
+            selection.addRange(range);
+            lastSelectionRange = range.cloneRange(); // 선택 영역 저장
+            console.log('✅ 하이라이트 클릭: 영역 자동 선택됨 (' + selectedText.length + '자)');
+        } catch (err) {
+            console.error('하이라이트 영역 선택 실패:', err);
+        }
+    }
+    
     const contextMenu = document.getElementById('contextMenu');
     if (contextMenu) {
         contextMenu.dataset.selectedText = selectedText;
@@ -321,19 +341,28 @@ function setupContextMenuListener() {
     const contextMenu = document.getElementById('contextMenu');
     if (!viewerContent || !contextMenu) return;
     
-    viewerContent.removeEventListener('contextmenu', handleContextMenu);
-    document.removeEventListener('click', hideContextMenu);
-    viewerContent.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('click', hideContextMenu);
+    // 먼저 설정 복원 (중요: 리스너 등록 전에 실행)
+    restoreContextMenuSetting();
     
-    // 텍스트 선택 시 자동으로 lastSelectionRange 저장
-    viewerContent.addEventListener('mouseup', () => {
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
-            lastSelectionRange = selection.getRangeAt(0).cloneRange();
-            console.log('✅ mouseup: 선택 영역 자동 저장됨 (' + selection.toString().trim().length + '자)');
-        }
-    });
+    // 기존 리스너 제거
+    viewerContent.removeEventListener('contextmenu', handleContextMenu);
+    viewerContent.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener('click', hideContextMenu);
+    
+    // 커스텀 메뉴가 활성화되어 있을 때만 리스너 등록
+    const isEnabled = localStorage.getItem('contextMenuEnabled') !== 'false';
+    
+    if (isEnabled) {
+        viewerContent.addEventListener('contextmenu', handleContextMenu);
+        document.addEventListener('click', hideContextMenu);
+        
+        // 텍스트 선택 시 자동으로 lastSelectionRange 저장 (커스텀 메뉴 활성화 시에만)
+        viewerContent.addEventListener('mouseup', handleMouseUp);
+        
+        console.log('✅ 커스텀 컨텍스트 메뉴 활성화됨');
+    } else {
+        console.log('⚠️ 커스텀 컨텍스트 메뉴 비활성화됨 - 브라우저 기본 메뉴 사용');
+    }
     
     const highlightPalette = document.getElementById('highlightPalette');
     if (highlightPalette) {
@@ -389,7 +418,15 @@ function setupContextMenuListener() {
         hideContextMenu();
         toggleUploadSection();
     });
-    restoreContextMenuSetting();
+}
+
+// mouseup 핸들러를 별도 함수로 분리
+function handleMouseUp() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
+        lastSelectionRange = selection.getRangeAt(0).cloneRange();
+        console.log('✅ mouseup: 선택 영역 자동 저장됨 (' + selection.toString().trim().length + '자)');
+    }
 }
 
 function handleContextMenu(e) {
@@ -401,7 +438,13 @@ function handleContextMenu(e) {
         hideContextMenu();
         return;
     }
-    if (localStorage.getItem('contextMenuEnabled') === 'false') return;
+
+    // Ctrl 키(Windows/Linux) 또는 Cmd 키(Mac)를 누르고 우클릭하면 브라우저 기본 메뉴 표시
+    if (e.ctrlKey || e.metaKey) {
+        console.log('🌐 Ctrl + 우클릭: 브라우저 기본 메뉴 표시');
+        hideContextMenu();
+        return; // 기본 동작 허용
+    }
 
     const clickedElement = e.target.closest('.highlight-text');
     if (clickedElement) {
@@ -675,17 +718,37 @@ export function selectFiles() {
 
 export function restoreContextMenuSetting() {
     const enabled = localStorage.getItem('contextMenuEnabled') !== 'false';
-    const toggle = document.getElementById('ctxMenuInternalToggle');
-    if (toggle) toggle.checked = enabled;
+    
+    // 두 토글 모두 동기화
+    const toggleSettings = document.getElementById('ctxMenuSettingsToggle');
+    const toggleInternal = document.getElementById('ctxMenuInternalToggle');
+    
+    if (toggleSettings) toggleSettings.checked = enabled;
+    if (toggleInternal) toggleInternal.checked = enabled;
+    
+    console.log(`🔄 컨텍스트 메뉴 설정 복원: ${enabled ? '활성화' : '비활성화'}`);
 }
 
-export function toggleContextMenuSetting() {
-    const toggle = document.getElementById('ctxMenuSettingsToggle');
-    if (!toggle) return;
-    const enabled = toggle.checked;
+export function toggleContextMenuSetting(toggleId) {
+    const toggleSettings = document.getElementById('ctxMenuSettingsToggle');
+    const toggleInternal = document.getElementById('ctxMenuInternalToggle');
+    
+    // 클릭된 토글의 상태를 가져옴
+    const clickedToggle = document.getElementById(toggleId);
+    const enabled = clickedToggle ? clickedToggle.checked : true;
+    
+    console.log(`🔄 토글 클릭: ${toggleId}, 새 값: ${enabled}`);
+    
+    // localStorage에 저장
     localStorage.setItem('contextMenuEnabled', enabled.toString());
-    const internal = document.getElementById('ctxMenuInternalToggle');
-    if (internal) internal.checked = enabled;
+    
+    // 두 토글 모두 동기화
+    if (toggleSettings) toggleSettings.checked = enabled;
+    if (toggleInternal) toggleInternal.checked = enabled;
+    
+    // 설정 변경 시 컨텍스트 메뉴 리스너 재등록
+    setupContextMenuListener();
+    console.log(`✅ 컨텍스트 메뉴 설정 완료: ${enabled ? '활성화' : '비활성화'}`);
 }
 
 export function displayUploadHistory() { 
