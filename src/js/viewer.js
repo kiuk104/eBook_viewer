@@ -106,14 +106,31 @@ function applyHighlight(color) {
                 }
             }
         }
+        hideContextMenu();
         return;
     }
 
     // 2. 신규 생성
     if (!lastSelectionRange) {
-        alert("선택된 영역이 없습니다.");
+        console.error('❌ lastSelectionRange가 null입니다.');
+        alert("선택된 영역이 없습니다.\n\n텍스트를 먼저 선택한 후 우클릭하여 하이라이트 색상을 선택해주세요.");
         return;
     }
+    
+    // lastSelectionRange의 내용 확인
+    const selectionText = lastSelectionRange.toString().trim();
+    if (!selectionText || selectionText.length === 0) {
+        console.error('❌ lastSelectionRange에 텍스트가 없습니다.');
+        alert("선택된 텍스트가 없습니다.\n\n텍스트를 먼저 선택한 후 우클릭하여 하이라이트 색상을 선택해주세요.");
+        lastSelectionRange = null; // 초기화
+        return;
+    }
+    
+    console.log('✅ 하이라이트 적용 시작:', {
+        color: color,
+        textLength: selectionText.length,
+        preview: selectionText.substring(0, 50)
+    });
 
     const viewer = document.getElementById('viewerContent');
     if (!viewer) return;
@@ -200,7 +217,7 @@ function applyHighlight(color) {
 
         window.getSelection().removeAllRanges();
         lastSelectionRange = null;
-        document.getElementById('contextMenu').classList.add('hidden');
+        hideContextMenu(); // 메뉴 닫기 (activeHighlightSpan도 함께 초기화됨)
 
     } catch (e) {
         console.error('하이라이트 적용 중 예외:', e);
@@ -309,6 +326,15 @@ function setupContextMenuListener() {
     viewerContent.addEventListener('contextmenu', handleContextMenu);
     document.addEventListener('click', hideContextMenu);
     
+    // 텍스트 선택 시 자동으로 lastSelectionRange 저장
+    viewerContent.addEventListener('mouseup', () => {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
+            lastSelectionRange = selection.getRangeAt(0).cloneRange();
+            console.log('✅ mouseup: 선택 영역 자동 저장됨 (' + selection.toString().trim().length + '자)');
+        }
+    });
+    
     const highlightPalette = document.getElementById('highlightPalette');
     if (highlightPalette) {
         highlightPalette.addEventListener('click', (e) => {
@@ -412,6 +438,7 @@ function showMenuAt(x, y) {
 
 function hideContextMenu() {
     document.getElementById('contextMenu').classList.add('hidden');
+    activeHighlightSpan = null; // 메뉴를 닫을 때 activeHighlightSpan 초기화
 }
 
 function toggleMenuMode(isEditMode) {

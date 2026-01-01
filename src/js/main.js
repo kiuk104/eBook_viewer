@@ -6,7 +6,7 @@
 import { APP_NAME, APP_VERSION } from './config.js';
 import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
 // toggleUploadSection, toggleHistorySection, toggleBookmarksSection 추가
-import { displayUploadHistory, displayUploadBookmarks, processFiles, showLocalFileResumeMessage, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile } from './viewer.js';
+import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -342,7 +342,9 @@ async function restoreLastReadFile() {
     } else {
         // Case B: 로컬 파일 - 안내 메시지 표시
         console.log('마지막 읽은 로컬 파일:', lastReadFile.fileName);
-        showLocalFileResumeMessage(lastReadFile.fileName);
+        // showLocalFileResumeMessage 함수가 viewer.js에 없으므로 주석 처리
+        // showLocalFileResumeMessage(lastReadFile.fileName);
+        console.log('로컬 파일을 다시 열려면 파일을 업로드해주세요:', lastReadFile.fileName);
     }
 }
 
