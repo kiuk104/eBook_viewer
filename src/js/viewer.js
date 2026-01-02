@@ -1037,43 +1037,87 @@ export function restoreViewerWidth() {
 export function toggleFavorite() { alert('즐겨찾기 기능은 준비 중입니다.'); }
 
 // [AI 변환 기능]
-export async function handleAIClean() { 
+export async function handleAIClean() {
     const files = getFiles();
     const currentFileIndex = getCurrentFileIndex();
-    if (!files || !files[currentFileIndex]) return alert('파일 없음');
-    
+
+    if (!files || !files[currentFileIndex]) {
+        alert('변환할 파일이 없습니다.');
+        return;
+    }
+
     const btn = document.getElementById('aiCleanBtn');
     const originalText = btn.innerText;
+    
+    // 로딩 UI 시작
     btn.innerText = "⏳ 변환 중...";
     btn.disabled = true;
-    
+    document.body.style.cursor = 'wait';
+
     try {
-        let cleanedText = await cleanTextWithAI(files[currentFileIndex].content, (msg) => btn.innerText = msg);
-        if (!cleanedText) throw new Error("변환 내용 없음");
+        // 1. AI 변환 요청
+        let cleanedText = await cleanTextWithAI(files[currentFileIndex].content);
         
-        // 찌꺼기 제거 및 마크다운 렌더링
-        cleanedText = cleanedText.replace(/^\s*\\\s*$/gm, "").replace(/^\s*\|\s*$/gm, "").replace(/\n{3,}/g, "\n\n");
+        if (!cleanedText) throw new Error("변환된 내용이 비어있습니다.");
+
+        // 2. [핵심] 강력한 코드 블록 제거 로직
+        // 정규식: 백틱 3개로 감싸진 내용을 찾음 (markdown 언어 지정 여부 상관없음)
+        // [\s\S]*? : 줄바꿈을 포함한 모든 문자
+        const codeBlockMatch = cleanedText.match(/```(?:markdown)?\s*([\s\S]*?)\s*```/i);
+        
+        if (codeBlockMatch) {
+            // 매칭된 경우: 코드 블록 내부의 알맹이만 추출
+            cleanedText = codeBlockMatch[1].trim();
+        } else {
+            // 매칭되지 않은 경우 (혹은 닫는 백틱이 없는 경우):
+            // 시작 부분에 백틱이 있다면 첫 줄을 강제로 제거
+            if (cleanedText.trim().startsWith('```')) {
+                cleanedText = cleanedText.replace(/^```[^\n]*\n?/, '').trim();
+                // 끝 부분에 백틱이 있다면 제거
+                cleanedText = cleanedText.replace(/```\s*$/, '').trim();
+            }
+        }
+
+        // 3. 뷰어 업데이트 (테마 적용)
         const viewer = document.getElementById('viewerContent');
-        viewer.innerHTML = marked.parse(cleanedText);
-        viewer.classList.add('markdown-mode');
-        window.scrollTo(0, 0);
         
-        // 다운로드
+        // 중요: CSS 테마 적용을 위해 white-space 초기화 및 클래스 추가
+        viewer.style.whiteSpace = 'normal'; 
+        viewer.classList.add('markdown-mode');
+
+        if (typeof marked !== 'undefined') {
+            viewer.innerHTML = marked.parse(cleanedText);
+        } else {
+            viewer.textContent = cleanedText;
+        }
+
+        // 스크롤 맨 위로 이동
+        window.scrollTo(0, 0);
+
+        // 4. 파일 다운로드 (정제된 텍스트 사용)
+        const originalName = files[currentFileIndex].name;
+        const newName = originalName.replace(/\.[^/.]+$/, "") + "_cleaned.md";
+        
         const blob = new Blob([cleanedText], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = files[currentFileIndex].name.replace(/\.[^/.]+$/, "") + "_cleaned.md";
+        a.download = newName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        alert("✅ 변환 완료 & 다운로드");
+        URL.revokeObjectURL(url);
+
+        alert(`✅ 변환 완료! '${newName}' 파일이 다운로드되었습니다.`);
+
     } catch (e) {
         console.error(e);
-        alert("변환 실패: " + e.message);
+        alert("❌ AI 변환 실패: " + (e.message || "알 수 없는 오류"));
     } finally {
+        // UI 복구
         btn.innerText = originalText;
         btn.disabled = false;
+        document.body.style.cursor = 'default';
     }
 }
 
