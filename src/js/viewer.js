@@ -652,6 +652,10 @@ export function displayFileContent(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
             const rawContent = e.target.result;
+            
+            // [수정 1] 파일 객체에 읽어온 내용을 반드시 저장해야 합니다.
+            file.content = rawContent; 
+
             const { content: cleanContent, metadata } = parseAndRemoveMetadata(rawContent);
             renderContent(cleanContent, file.name);
             if (metadata) restoreBookmarksFromMetadata(metadata);
@@ -927,22 +931,45 @@ export function updateMarkdownStyles() {
     }
     
     const font = fontSelect.value === 'inherit' ? '' : `font-family: ${fontSelect.value} !important;`;
-    const size = headingSizeSlider ? headingSizeSlider.value : 1.0;
+    const baseSize = headingSizeSlider ? parseFloat(headingSizeSlider.value) : 1.0;
     const hColor = headingColor ? headingColor.value : '#2563eb';
     const tColor = tocColor ? tocColor.value : '#2563eb';
     
+    // [수정 핵심] h1, h2, h3의 크기를 각각 다르게 배율 설정
+    // H1 (메인 제목): 설정값의 1.8배
+    // H2 (챕터 제목): 설정값의 1.4배
+    // H3 (서지 정보): 설정값의 1.1배 (약간 작게)
     styleTag.innerHTML = `
-        #viewerContent h1, #viewerContent h2, #viewerContent h3 { ${font} font-size: calc(1em * ${size}) !important; color: ${hColor} !important; }
+        #viewerContent h1 { 
+            ${font} 
+            font-size: calc(1em * ${baseSize * 1.4}) !important; 
+            color: ${hColor} !important; 
+            border-bottom: 2px solid ${hColor}33; /* 연한 밑줄 추가 */
+            padding-bottom: 0.3em;
+            margin-top: 0.5em;
+        }
+        #viewerContent h2 { 
+            ${font} 
+            font-size: calc(1em * ${baseSize * 1.2}) !important; 
+            color: ${hColor} !important; 
+            margin-top: 1.5em;
+        }
+        #viewerContent h3 { 
+            ${font} 
+            font-size: calc(1em * ${baseSize * 1.0}) !important; 
+            color: ${hColor} !important; 
+            opacity: 0.85; /* 정보성 텍스트는 약간 투명하게 */
+            margin-bottom: 0.2em;
+        }
         #viewerContent .toc a { color: ${tColor} !important; }
     `;
     
-    if(document.getElementById('headingSizeValue')) document.getElementById('headingSizeValue').textContent = `${size}x`;
+    if(document.getElementById('headingSizeValue')) document.getElementById('headingSizeValue').textContent = `${baseSize}x`;
     localStorage.setItem('markdownHeadingFont', fontSelect.value);
-    localStorage.setItem('markdownHeadingSize', size);
+    localStorage.setItem('markdownHeadingSize', baseSize);
     localStorage.setItem('markdownHeadingColor', hColor);
     localStorage.setItem('markdownTocColor', tColor);
 }
-
 export function updateBodyStyles() {
     const viewer = document.getElementById('viewerContent');
     const lh = document.getElementById('lineHeightSlider').value;
@@ -1091,9 +1118,18 @@ export async function handleAIClean() {
             viewer.textContent = cleanedText;
         }
 
+        // [수정 2] 변환된 텍스트를 메모리에 저장 (이 코드가 없으면 원본으로 되돌아감)
+        files[currentFileIndex].content = cleanedText;
+
+        // [추가 권장] 파일 내용이 바뀌었으므로 기존 하이라이트와의 위치 불일치 방지
+        if (fileHighlights[currentFileKey]) {
+            console.warn('AI 변환으로 인해 기존 하이라이트 위치가 맞지 않을 수 있어 초기화합니다.');
+            delete fileHighlights[currentFileKey];
+            localStorage.setItem('ebook_highlights', JSON.stringify(fileHighlights));
+        }
+
         // 스크롤 맨 위로 이동
         window.scrollTo(0, 0);
-
         // 4. 파일 다운로드 (정제된 텍스트 사용)
         const originalName = files[currentFileIndex].name;
         const newName = originalName.replace(/\.[^/.]+$/, "") + "_cleaned.md";
@@ -1165,4 +1201,15 @@ export function handleImportDataFile(file) {
         } catch(err) { alert("파일 오류"); }
     };
     reader.readAsText(file);
+}
+
+export function displayFiles() {
+    const files = getFiles();
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
+    files.forEach(file => {
+        const li = document.createElement('li');
+        li.textContent = file.name;
+        fileList.appendChild(li);
+    });
 }
