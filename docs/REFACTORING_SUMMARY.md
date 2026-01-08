@@ -1,53 +1,146 @@
-# 리팩토링 작업 요약
+# 📊 viewer.js 리팩토링 요약
 
-## 📊 작업 통계
+## ✅ 완료된 작업
 
-| 항목 | 작업 전 | 작업 후 | 개선율 |
-|------|--------|--------|--------|
-| HTML 파일 크기 | 700줄 | 131줄 | **81% 감소** |
-| JavaScript 파일 수 | 1개 (인라인) | 5개 모듈 | 모듈화 완료 |
-| CSS 파일 | 인라인 | 별도 파일 | 분리 완료 |
-| 코드 가독성 | 낮음 | 높음 | 개선 |
+8명의 에이전트가 각자 다른 설계 패턴으로 `viewer.js`를 리팩토링했습니다.
 
-## 📁 생성된 파일
+### 구현 완료된 제안
 
-```
-src/
-├── css/
-│   └── styles.css          (CSS 스타일)
-└── js/
-    ├── utils.js            (유틸리티)
-    ├── settings.js         (설정 관리)
-    ├── google_drive.js     (Google Drive)
-    ├── viewer.js           (뷰어)
-    └── main.js             (초기화)
-```
+1. ✅ **에이전트 1: 클래스 기반 모듈 패턴**
+   - 완전히 구현됨 (모든 파일 작성 완료)
+   - 위치: `src/js/viewer/agent1_class-based/`
 
-## 🎯 주요 개선 사항
+2. ✅ **에이전트 2: 순수 함수형 파이프라인**
+   - 완전히 구현됨 (핵심 모듈 작성 완료)
+   - 위치: `src/js/viewer/agent2_functional-pipeline/`
 
-1. ✅ **코드 분리**: CSS와 JavaScript를 별도 파일로 분리
-2. ✅ **모듈화**: 기능별로 5개 모듈로 분리
-3. ✅ **의존성 관리**: 명확한 import/export 구조
-4. ✅ **유지보수성**: 기능별 코드 분리로 수정 용이
-5. ✅ **기능 보존**: 기존 기능 모두 정상 작동
+3. ✅ **에이전트 3: 이벤트 기반 아키텍처**
+   - 핵심 구조 구현됨 (EventBus + 기본 통합)
+   - 위치: `src/js/viewer/agent3_event-based/`
 
-## 🔗 모듈 의존성
+### 문서화 완료된 제안
 
-```
-main.js
-├── settings.js
-├── viewer.js → utils.js, settings.js
-└── google_drive.js → settings.js, viewer.js (동적)
-```
-
-## 📝 다음 단계
-
-- [ ] TypeScript 도입 검토
-- [ ] 번들링 도구 도입 (Webpack/Vite)
-- [ ] 단위 테스트 추가
-- [ ] 에러 핸들링 개선
+4-8번 에이전트의 제안은 `docs/REFACTORING_PROPOSALS.md`에 상세히 문서화되어 있습니다.
 
 ---
 
-**상세 내용**: [REFACTORING.md](./REFACTORING.md) 참고
+## 📁 생성된 파일 구조
 
+```
+src/js/viewer/
+├── agent1_class-based/
+│   ├── FileManager.js
+│   ├── ContentRenderer.js
+│   ├── BookmarkManager.js
+│   ├── HistoryManager.js
+│   ├── StyleManager.js
+│   └── index.js
+│
+├── agent2_functional-pipeline/
+│   ├── README.md
+│   ├── state.js
+│   ├── pipeline.js
+│   ├── render.js
+│   └── index.js
+│
+└── agent3_event-based/
+    ├── EventBus.js
+    └── index.js
+
+docs/
+├── REFACTORING_PROPOSALS.md  # 모든 에이전트 제안 상세 설명
+└── REFACTORING_SUMMARY.md    # 이 파일
+```
+
+---
+
+## 🎯 각 제안의 핵심 특징
+
+### 에이전트 1: 클래스 기반 (가장 추천 ⭐)
+
+**장점**:
+- ✅ 명확한 책임 분리
+- ✅ JSDoc 타입 안정성
+- ✅ 객체 지향 원칙 준수
+- ✅ 테스트 용이성
+
+**구조**:
+- `FileManager`: 파일 관리
+- `ContentRenderer`: 렌더링
+- `BookmarkManager`: 북마크 관리
+- `HistoryManager`: 히스토리 관리
+- `StyleManager`: 스타일 관리
+- `ViewerCoordinator`: 모든 관리자 조율
+
+### 에이전트 2: 함수형 파이프라인
+
+**장점**:
+- ✅ 순수 함수로 테스트 매우 쉬움
+- ✅ 함수 재사용성 높음
+- ✅ 부작용 없는 설계
+
+**구조**:
+- `state.js`: 불변 상태 관리
+- `pipeline.js`: 함수 체이닝 유틸리티
+- `render.js`: 순수 렌더링 함수들
+- `index.js`: 파이프라인 조합
+
+### 에이전트 3: 이벤트 기반
+
+**장점**:
+- ✅ 모듈 간 완전한 분리
+- ✅ 확장성 매우 높음
+- ✅ 이벤트 로그로 디버깅 가능
+
+**구조**:
+- `EventBus`: 중앙 이벤트 버스
+- `index.js`: 이벤트 발행/구독 로직
+
+---
+
+## 🚀 사용 방법
+
+### 에이전트 1 사용
+
+```javascript
+// main.js에서
+import * as viewer from './viewer/agent1_class-based/index.js';
+
+// 또는 기존 코드와 호환
+import { processFiles, displayFileContent } from './viewer/agent1_class-based/index.js';
+```
+
+### 에이전트 2 사용
+
+```javascript
+// main.js에서
+import * as viewer from './viewer/agent2_functional-pipeline/index.js';
+```
+
+### 에이전트 3 사용
+
+```javascript
+// main.js에서
+import * as viewer from './viewer/agent3_event-based/index.js';
+```
+
+---
+
+## 📝 다음 단계
+
+1. **테스트**: 각 에이전트 제안을 실제로 테스트하여 동작 확인
+2. **선택**: 프로젝트에 가장 적합한 제안 선택
+3. **통합**: 선택한 제안을 기존 `viewer.js`로 교체
+4. **하이라이트 기능**: 하이라이트 관련 코드는 별도 모듈로 분리 필요 (현재 제안에는 포함되지 않음)
+
+---
+
+## ⚠️ 주의사항
+
+- 현재 제안에는 **하이라이트 기능**이 포함되지 않았습니다. 별도로 `HighlightManager` 클래스 또는 모듈로 분리해야 합니다.
+- **AI 변환 기능** (`handleAIClean`)도 별도 모듈로 분리 권장
+- **컨텍스트 메뉴** 관련 코드도 별도 모듈 분리 권장
+
+---
+
+**작성일**: 2026-01-02
