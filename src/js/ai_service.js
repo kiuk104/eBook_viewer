@@ -47,9 +47,9 @@ export async function cleanTextWithAI(text, onProgress) {
     console.log(`📝 텍스트 분할 처리 시작: 총 ${totalChunks}개 구역`);
 
     const modelsToTry = [
-        "gemini-2.0-flash-exp",
-        "gemini-1.5-flash-002",
-        "gemini-1.5-flash"
+        "gemini-2.0-flash",     // 최신 안정화 버전 (exp 제거)
+        "gemini-2.0-flash-001",     // 버전 명시형 (안전장치)
+        "gemini-2.5-flash"          // 최신 고성능 모델 (백업)    
     ];
 
     for (let i = 0; i < totalChunks; i++) {

@@ -72,34 +72,35 @@ export class StyleManager {
 
         const fontFamily = font === 'inherit' ? '' : `font-family: ${font} !important;`;
         
-        // H1, H2, H3 각각 다른 크기 배율 적용
+        // 개선된 코드 (확실한 크기 차이 + H1 강조)
         const styles = `
             #viewerContent h1 { 
                 ${fontFamily} 
-                font-size: calc(1em * ${size * 1.4}) !important; 
+                font-size: calc(1em * ${size * 2.0}) !important; /* 1.4 -> 2.0 (훨씬 크게) */
                 color: ${headingColor} !important; 
                 border-bottom: 2px solid ${headingColor}33;
                 padding-bottom: 0.3em;
                 margin-top: 0.5em;
+                line-height: 1.2;
+                font-weight: 700; /* 굵게 */
             }
             #viewerContent h2 { 
                 ${fontFamily} 
-                font-size: calc(1em * ${size * 1.2}) !important; 
+                font-size: calc(1em * ${size * 1.5}) !important; /* 1.2 -> 1.5 */
                 color: ${headingColor} !important; 
                 margin-top: 1.5em;
+                font-weight: 600;
             }
             #viewerContent h3 { 
                 ${fontFamily} 
-                font-size: calc(1em * ${size * 1.0}) !important; 
+                font-size: calc(1em * ${size * 1.1}) !important; /* 1.0 -> 1.1 (약간만 크게) */
                 color: ${headingColor} !important; 
-                opacity: 0.85;
+                opacity: 0.85; /* 투명도 유지 */
                 margin-bottom: 0.2em;
+                font-weight: normal; /* 보통 굵기 */
             }
             #viewerContent .toc a { color: ${tocColor} !important; }
         `;
-
-        this.#styleElement.innerHTML = styles;
-
         // UI 업데이트
         const sizeValueEl = document.getElementById('headingSizeValue');
         if (sizeValueEl) sizeValueEl.textContent = `${size}x`;

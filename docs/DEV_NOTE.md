@@ -169,6 +169,88 @@
 
 ## 2. 오늘의 배움
 
+### 2026-01-30: v0.2.4.5 - 하이라이트 시스템 구현 및 버그 수정
+
+#### 🎯 주요 작업
+1. **텍스트 하이라이트(형광펜) 시스템 구현**
+   - `HighlightManager.js` 모듈 신설
+   - 컨텍스트 메뉴에 형광펜 색상 팔레트(5색) UI 추가
+   - 텍스트 선택 후 우클릭하여 하이라이트 적용 기능 연결
+   - 하이라이트된 영역 우클릭 시 '삭제' 기능 구현
+   - 하이라이트 데이터 저장 및 복원 기능
+
+2. **AI 텍스트 변환 오류 수정**
+   - Google Gemini API 모델명 변경: `gemini-2.0-flash-exp` → `gemini-2.0-flash` (단종된 exp 모델 제거)
+   - 변환 완료 후 파일 확장자가 `.txt`로 남아 렌더링되지 않던 문제 해결
+   - 파일 로드 시 `file.content` 메모리 누락 문제 해결
+
+3. **다운로드 기능 오류 수정**
+   - `ViewerCoordinator`에 누락되었던 `getCurrentFileName` 메서드 추가
+   - 다운로드 시 파일명을 올바르게 가져오도록 수정
+
+4. **컨텍스트 메뉴 버그 수정**
+   - 메뉴 HTML 구조 깨짐(중첩 태그 오류) 수정
+   - 하이라이트 위에서 우클릭 시 일반 메뉴(북마크 등)가 사라지는 로직 수정
+   - Toggle 로직 개선으로 하이라이트 모드와 일반 모드 전환 안정화
+
+5. **UI/UX 개선**
+   - 마크다운 가독성 개선: `StyleManager.js`에서 제목(H1)과 서지 정보(H3)의 크기 배율 조정
+   - 다크 모드 가독성 개선: 컨텍스트 메뉴에 다크 모드 텍스트 색상(`dark:text-gray-200`) 명시
+
+#### 📚 배운 점
+1. **하이라이트 시스템 설계**
+   - 클래스 기반 모듈 패턴으로 `HighlightManager` 독립 구현
+   - 파일별 하이라이트 데이터 분리 저장으로 확장성 확보
+   - 컨텍스트 메뉴와의 통합으로 사용자 경험 개선
+
+2. **API 모델 버전 관리의 중요성**
+   - 실험적 모델(`exp`)은 단종될 수 있으므로 안정적인 버전 사용
+   - 모델명 변경 시 재시도 로직도 함께 업데이트 필요
+   - API 문서를 정기적으로 확인하여 최신 정보 유지
+
+3. **파일 처리 시 메모리 관리**
+   - `file.content` 같은 큰 데이터는 참조가 끊기지 않도록 주의
+   - 파일 객체를 전달할 때 모든 필수 속성 포함 확인
+   - 파일 확장자 변경 시 파일명도 함께 업데이트 필요
+
+4. **컨텍스트 메뉴 상태 관리**
+   - 하이라이트 모드와 일반 모드를 명확히 구분
+   - Toggle 로직으로 상태 전환 안정화
+   - HTML 구조 검증으로 중첩 태그 오류 방지
+
+#### 🔧 해결 과정
+1. **AI 변환 오류 디버깅**
+   ```
+   문제: 변환된 파일이 렌더링되지 않음
+   원인 분석:
+   - 파일 확장자가 .txt로 남아있음
+   - file.content가 undefined로 전달됨
+   해결:
+   - 파일명을 .md로 강제 변환
+   - file 객체에 content 속성 명시적으로 포함
+   ```
+
+2. **다운로드 기능 오류 디버깅**
+   ```
+   문제: 다운로드 시 파일명이 undefined
+   원인: ViewerCoordinator에 getCurrentFileName 메서드 누락
+   해결: 메서드 추가 및 파일명 가져오기 로직 구현
+   ```
+
+3. **컨텍스트 메뉴 버그 디버깅**
+   ```
+   문제: 하이라이트 위에서 우클릭 시 일반 메뉴가 사라짐
+   원인: Toggle 로직이 단순히 display: none으로 처리
+   해결: 상태 기반으로 메뉴 항목 표시/숨김 로직 개선
+   ```
+
+#### 💡 개선 사항
+- **모듈화**: 하이라이트 기능을 독립 모듈로 분리하여 유지보수성 향상
+- **에러 처리**: 파일 처리 시 null/undefined 체크 강화
+- **사용자 경험**: 다크 모드에서도 텍스트가 명확히 보이도록 색상 명시
+
+---
+
 ### 2026-01-30: 문서화 체계화 및 개발 규칙 정리
 
 #### 🎯 주요 작업
@@ -699,6 +781,128 @@ const isGoogleDrive = item.fileKey?.startsWith('gdrive_') ?? false;
 
 ---
 
+#### 문제 10: AI 텍스트 변환 오류 (v0.2.4.5)
+**증상:**
+- AI 변환 후 파일이 렌더링되지 않음
+- 파일 확장자가 `.txt`로 남아있음
+- `file.content`가 `undefined`로 전달됨
+
+**원인:**
+1. **모델명 문제**: `gemini-2.0-flash-exp` 모델이 단종됨
+2. **파일 확장자 문제**: 변환 후 파일명이 `.txt`로 유지됨
+3. **메모리 누락**: 파일 객체에 `content` 속성이 포함되지 않음
+
+**해결 방법:**
+1. **모델명 변경**
+   ```javascript
+   // ❌ 잘못된 방법 (단종된 모델)
+   const model = 'gemini-2.0-flash-exp';
+   
+   // ✅ 올바른 방법
+   const model = 'gemini-2.0-flash';
+   ```
+
+2. **파일 확장자 강제 변환**
+   ```javascript
+   // ai_service.js 또는 viewer.js
+   const fileName = file.name.replace(/\.txt$/i, '.md');
+   const newFile = {
+       ...file,
+       name: fileName,
+       content: convertedContent
+   };
+   ```
+
+3. **파일 객체에 content 포함**
+   ```javascript
+   // 파일 객체 생성 시 content 명시
+   const fileObj = {
+       name: fileName,
+       size: content.length,
+       content: content,  // ✅ 명시적으로 포함
+       lastModified: Date.now()
+   };
+   ```
+
+**체크리스트:**
+- [ ] 모델명이 최신 안정 버전인가? (`gemini-2.0-flash`)
+- [ ] 파일 확장자가 올바르게 변경되었는가? (`.txt` → `.md`)
+- [ ] 파일 객체에 `content` 속성이 포함되어 있는가?
+- [ ] 파일 전달 시 모든 필수 속성이 포함되어 있는가?
+
+---
+
+#### 문제 11: 다운로드 기능 오류 (v0.2.4.5)
+**증상:**
+- 다운로드 시 파일명이 `undefined`로 표시됨
+- 다운로드 기능이 작동하지 않음
+
+**원인:**
+- `ViewerCoordinator` 클래스에 `getCurrentFileName` 메서드가 누락됨
+- 다운로드 함수에서 현재 파일명을 가져올 수 없음
+
+**해결 방법:**
+```javascript
+// viewer.js - ViewerCoordinator 클래스에 추가
+getCurrentFileName() {
+    const currentFile = this.#fileManager.getCurrentFile();
+    return currentFile ? currentFile.name : 'untitled.txt';
+}
+```
+
+**체크리스트:**
+- [ ] `ViewerCoordinator`에 `getCurrentFileName` 메서드가 있는가?
+- [ ] 현재 파일이 존재하는지 확인하는 로직이 있는가?
+- [ ] 기본 파일명이 제공되는가? (`untitled.txt`)
+
+---
+
+#### 문제 12: 컨텍스트 메뉴 버그 (v0.2.4.5)
+**증상:**
+- 하이라이트 위에서 우클릭 시 일반 메뉴(북마크 등)가 사라짐
+- 메뉴 HTML 구조가 깨져서 일부 항목이 표시되지 않음
+- 중첩 태그 오류로 인한 렌더링 문제
+
+**원인:**
+1. **Toggle 로직 문제**: 하이라이트 모드와 일반 모드를 전환할 때 단순히 `display: none`으로 처리
+2. **HTML 구조 오류**: 태그가 중첩되어 올바르게 닫히지 않음
+
+**해결 방법:**
+1. **상태 기반 메뉴 표시**
+   ```javascript
+   // viewer.js - handleContextMenu()
+   if (highlightSpan) {
+       // 하이라이트 모드: 삭제 버튼만 표시
+       document.getElementById('ctxRemoveHighlight').classList.remove('hidden');
+       document.getElementById('normalMenuOptions').style.display = 'none';
+   } else {
+       // 일반 모드: 모든 메뉴 표시
+       document.getElementById('ctxRemoveHighlight').classList.add('hidden');
+       document.getElementById('normalMenuOptions').style.display = 'block';
+   }
+   ```
+
+2. **HTML 구조 검증**
+   ```html
+   <!-- ❌ 잘못된 방법 (중첩 태그) -->
+   <div id="normalMenuOptions">
+       <button>북마크 추가</button>
+       <div>  <!-- 닫는 태그 누락 -->
+   
+   <!-- ✅ 올바른 방법 -->
+   <div id="normalMenuOptions">
+       <button>북마크 추가</button>
+   </div>
+   ```
+
+**체크리스트:**
+- [ ] 하이라이트 모드와 일반 모드가 명확히 구분되는가?
+- [ ] HTML 태그가 올바르게 닫혀있는가?
+- [ ] 메뉴 항목이 상태에 따라 올바르게 표시/숨김되는가?
+- [ ] 브라우저 개발자 도구에서 HTML 구조 오류가 없는가?
+
+---
+
 ### 🟢 심각도: 낮음 (Low)
 
 #### 문제 5: "함수가 정의되지 않음"
@@ -920,6 +1124,9 @@ git push origin main
 | 모듈 import 오류 | 함수 export 누락 | export/import 일치 확인 | [문서](#문제-4-모듈-import-오류-v0241) |
 | Google Drive 버튼 작동 안 함 | onclick 속성 누락 | HTML에 onclick 속성 추가 | [문서](#문제-8-google-drive-버튼-작동-안-함-v0242) |
 | 로컬 파일 로딩 오류 | fileKey null 체크 누락 | null 체크 로직 추가 | [문서](#문제-9-로컬-파일-로딩-오류-v0243) |
+| AI 텍스트 변환 오류 | 모델명 단종, 파일 확장자 문제, content 누락 | 모델명 변경, 확장자 강제 변환, content 포함 | [문서](#문제-10-ai-텍스트-변환-오류-v0245) |
+| 다운로드 기능 오류 | getCurrentFileName 메서드 누락 | ViewerCoordinator에 메서드 추가 | [문서](#문제-11-다운로드-기능-오류-v0245) |
+| 컨텍스트 메뉴 버그 | Toggle 로직 문제, HTML 구조 오류 | 상태 기반 메뉴 표시, HTML 구조 검증 | [문서](#문제-12-컨텍스트-메뉴-버그-v0245) |
 | CORS 오류 | file:// 프로토콜 사용 | 웹 서버 사용 (`python -m http.server 8000`) | [문서](#문제-7-cors-오류) |
 
 ### 개발 워크플로우 요약
@@ -982,5 +1189,5 @@ git push origin main
 ---
 
 **마지막 업데이트**: 2026-01-30  
-**버전**: v0.2.4.3  
+**버전**: v0.2.4.5  
 **작성자**: Development Team

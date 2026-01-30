@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>이북 텍스트 뷰어 v0.2.4.3</title>
+    <title>이북 텍스트 뷰어 v0.2.4.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
@@ -326,46 +326,45 @@
     </div>
 
     <!-- 커스텀 컨텍스트 메뉴 -->
-    <div id="contextMenu" class="hidden fixed z-[100] w-48 theme-panel-bg backdrop-blur-md rounded-lg shadow-xl border theme-border overflow-hidden transform transition-opacity duration-200">
-        <ul class="text-sm theme-text-body">
-            <li class="px-4 py-2 border-b theme-border flex justify-between items-center cursor-default">
-                <span class="text-xs text-gray-500 font-medium">형광펜</span>
-                <div class="flex gap-2" id="highlightPalette">
-                    <button data-color="#fef08a" class="w-5 h-5 rounded-full bg-yellow-200 border border-gray-300 hover:ring-2 ring-yellow-400 transition-all shadow-sm" title="노랑"></button>
-                    <button data-color="#bbf7d0" class="w-5 h-5 rounded-full bg-green-200 border border-gray-300 hover:ring-2 ring-green-400 transition-all shadow-sm" title="초록"></button>
-                    <button data-color="#bfdbfe" class="w-5 h-5 rounded-full bg-blue-200 border border-gray-300 hover:ring-2 ring-blue-400 transition-all shadow-sm" title="파랑"></button>
-                    <button data-color="#fbcfe8" class="w-5 h-5 rounded-full bg-pink-200 border border-gray-300 hover:ring-2 ring-pink-400 transition-all shadow-sm" title="분홍"></button>
-                    <button data-color="#e9d5ff" class="w-5 h-5 rounded-full bg-purple-200 border border-gray-300 hover:ring-2 ring-purple-400 transition-all shadow-sm" title="보라"></button>
-                </div>
-            </li>
-            <li id="ctxRemoveHighlight" class="hidden px-4 py-3 cursor-pointer hover:bg-red-50 text-red-600 flex items-center gap-2 transition-colors border-b theme-border">
-                <span>🗑️</span> 하이라이트 삭제
-            </li>
-            <div id="normalMenuOptions">
-                <li id="ctxBookmark" class="px-4 py-3 cursor-pointer hover:bg-white/40 flex items-center gap-2 transition-colors border-b theme-border">
-                    <span>🔖</span> 북마크 추가
-                </li>
-            <li id="ctxNote" class="px-4 py-3 cursor-pointer hover:bg-white/40 flex items-center gap-2 transition-colors border-b theme-border">
-                <span>📝</span> 각주/메모 달기
-            </li>
-            <li id="ctxShare" class="px-4 py-3 cursor-pointer hover:bg-white/40 flex items-center gap-2 transition-colors border-b theme-border">
-                <span>📤</span> 텍스트 공유
-            </li>
-            <li id="ctxSettings" class="px-4 py-3 cursor-pointer hover:bg-white/40 flex items-center gap-2 transition-colors border-b theme-border">
-                <span>⚙️</span> 뷰어 설정
-            </li>
-            <li id="ctxExpandPanel" class="px-4 py-3 cursor-pointer hover:bg-white/40 flex items-center gap-2 transition-colors border-b theme-border">
-                <span>📂</span> 패널 펼치기
-            </li>
-            </div>
-        </ul>
+    <div id="contextMenu" class="hidden fixed z-50 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 py-1 w-48 text-sm">
         
-        <div class="px-3 py-2 border-t theme-border bg-blue-50/30">
-            <div class="text-[10px] text-blue-600 text-center leading-tight">
-                💡 <span class="font-semibold">Ctrl + 우클릭</span>하면 브라우저 기본 메뉴
+        <div id="highlightPalette" class="px-4 py-2 flex justify-between border-t border-gray-200 dark:border-gray-700">
+            <button class="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform" style="background-color: #fef08a;" data-color="#fef08a" title="노랑"></button>
+            <button class="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform" style="background-color: #bbf7d0;" data-color="#bbf7d0" title="초록"></button>
+            <button class="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform" style="background-color: #bfdbfe;" data-color="#bfdbfe" title="파랑"></button>
+            <button class="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform" style="background-color: #fbcfe8;" data-color="#fbcfe8" title="분홍"></button>
+            <button class="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform" style="background-color: #e9d5ff;" data-color="#e9d5ff" title="보라"></button>
+        </div>
+
+        <button id="ctxRemoveHighlight" class="hidden w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700">
+            <span>🗑️</span> 하이라이트 삭제
+        </button>
+
+        <div id="normalMenuOptions">
+            <div id="ctxBookmark" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
+                <span>🔖</span> 북마크 추가
+            </div>
+            <div id="ctxNote" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
+                <span>📝</span> 각주/메모 달기
+            </div>
+            <div id="ctxShare" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
+                <span>📤</span> 텍스트 공유
+            </div>
+            <div id="ctxSettings" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
+                <span>⚙️</span> 뷰어 설정
+            </div>
+            <div id="ctxExpandPanel" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                <span>📂</span> 패널 펼치기
             </div>
         </div>
         
+        <div class="px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30">
+            <div class="text-[10px] text-blue-600 dark:text-blue-300 text-center leading-tight">
+                💡 <span class="font-semibold">Ctrl + 우클릭</span>하면 브라우저 기본 메뉴
+            </div>
+        </div>
+    </div>
+                
         <div class="px-4 py-3 border-t theme-border flex items-center justify-between bg-gray-50/10 hover:bg-white/20 transition-colors">
             <span class="text-xs theme-text-body opacity-80">커스텀 메뉴 사용</span>
             <label class="relative inline-flex items-center cursor-pointer" title="끄면 시스템 기본 메뉴가 나타납니다">

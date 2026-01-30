@@ -6,7 +6,7 @@
 import { APP_NAME, APP_VERSION } from './config.js';
 import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
 // toggleUploadSection, toggleHistorySection, toggleBookmarksSection 추가
-import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, toggleBookmark, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile } from './viewer.js';
+import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, toggleBookmark, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile, setupContextMenuListener } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -126,6 +126,9 @@ function initApp() {
     
     // 컨텍스트 메뉴 설정 복원
     restoreContextMenuSetting();
+    
+    // 컨텍스트 메뉴 이벤트 리스너 설정
+    setupContextMenuListener();
 
     // 마지막 읽은 파일 복원 시도
     restoreLastReadFile();
@@ -389,6 +392,7 @@ window.resetAllSettings = resetAllSettings;
 // [추가] 컨텍스트 메뉴 설정 함수 노출
 window.toggleContextMenuSetting = toggleContextMenuSetting;
 window.restoreContextMenuSetting = restoreContextMenuSetting;
+window.setupContextMenuListener = setupContextMenuListener;
 
 // [추가] 데이터 백업/복원 함수 노출
 window.exportData = exportData;

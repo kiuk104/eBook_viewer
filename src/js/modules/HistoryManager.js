@@ -117,7 +117,7 @@ export class HistoryManager {
      */
     #createHistoryItem(item, index, onItemClick) {
         // fileKey가 null이면 로컬 파일로 간주
-        const isGoogleDrive = item.fileKey ? item.fileKey.startsWith('gdrive_') : false;
+        const isGoogleDrive = item.fileKey ? item.fileKey && item.fileKey.startsWith('gdrive_') : false;
         const isMdFile = item.name.endsWith('.md');
         const icon = isMdFile ? '📝' : '📄';
         const iconColor = isGoogleDrive ? 'text-blue-600' : 'text-gray-600';

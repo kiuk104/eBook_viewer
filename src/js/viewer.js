@@ -17,6 +17,7 @@ import { HistoryManager } from './modules/HistoryManager.js';
 import { StyleManager } from './modules/StyleManager.js';
 import { formatFileSize, formatTimestamp } from './utils.js';
 import { saveReadingProgress, loadReadingProgress } from './settings.js';
+import { HighlightManager } from './modules/HighlightManager.js';
 
 /**
  * 뷰어 코디네이터 클래스
@@ -60,6 +61,12 @@ export class ViewerCoordinator {
     #scrollSaveTimer = null;
 
     /**
+     * @private
+     * @type {HighlightManager}
+     */    
+    #highlightManager;
+
+    /**
      * 생성자
      */
     constructor() {
@@ -68,6 +75,7 @@ export class ViewerCoordinator {
         this.#bookmarkManager = new BookmarkManager();
         this.#historyManager = new HistoryManager();
         this.#styleManager = new StyleManager();
+        this.#highlightManager = new HighlightManager();
 
         // 렌더러 초기화
         this.#renderer.setViewerElement('viewerContent');
@@ -150,8 +158,8 @@ export class ViewerCoordinator {
         this.displayFileContent(file);
     }
 
-    /**
-     * 파일 내용 표시
+/**
+ * 파일 내용 표시
      * @param {File} file - 파일 객체
      */
     async displayFileContent(file) {
@@ -168,13 +176,14 @@ export class ViewerCoordinator {
         // 파일 키 업데이트
         const fileKey = this.#fileManager.getCurrentFileKey();
         this.#bookmarkManager.setCurrentFileKey(fileKey);
+        this.#highlightManager.setCurrentFileKey(fileKey);
 
         // 파일 내용 읽기
         let content = '';
         if (typeof file.content === 'string') {
             content = file.content;
             this.#renderContent(content, file.name);
-        } else {
+    } else {
             const reader = new FileReader();
             reader.onload = (e) => {
                 content = e.target.result;
@@ -241,6 +250,14 @@ export class ViewerCoordinator {
     }
 
     // === Public API ===
+    // [Public API 메서드 추가]
+    applyHighlight(range, color) {
+        return this.#highlightManager.addHighlight(range, color);
+    }
+
+    removeHighlight(element) {
+        this.#highlightManager.removeHighlight(element);
+    }
 
     /**
      * 북마크 토글 (현재 위치에 북마크 추가)
@@ -322,15 +339,15 @@ export class ViewerCoordinator {
                 panel.classList.remove('hidden');
                 grid.classList.add('hidden');
                 if (btn) btn.innerHTML = '📂 불러오기';
-            } else {
+    } else {
                 panel.classList.add('hidden');
                 grid.classList.remove('hidden');
                 if (btn) btn.innerHTML = '⚙️ 설정';
             }
-        }
     }
+}
 
-    /**
+/**
      * 히스토리 섹션 토글
      */
     toggleHistorySection() {
@@ -506,6 +523,15 @@ export class ViewerCoordinator {
         this.#fileManager.setCurrentFileKey(fileKey);
         this.#bookmarkManager.setCurrentFileKey(fileKey);
     }
+    // ▼▼▼ [viewer.getCurrentFileName() 호출이 정상적으로 FileManager로 연결 추가] ▼▼▼
+    /**
+     * 현재 파일명 가져오기
+     * @returns {string}
+     */
+    getCurrentFileName() {
+        return this.#fileManager.getCurrentFileName();
+    }
+    // ▲▲▲ [추가 끝] ▲▲▲
 }
 
 // 싱글톤 인스턴스 생성 및 export
@@ -569,34 +595,53 @@ export const downloadAsMarkdown = () => {
 };
 
 export const handleAIClean = async () => {
-    // AI 변환 처리
-    const viewerElement = document.getElementById('viewerContent');
-    const content = viewerElement ? viewerElement.textContent : '';
+    // 1. 현재 파일 가져오기
+    const files = viewer.getFiles();
+    const currentIndex = viewer.getCurrentFileIndex();
+    
+    if (currentIndex === -1 || !files[currentIndex]) {
+        alert('변환할 파일이 없습니다.');
+        return;
+    }
+
+    const currentFile = files[currentIndex];
+    const content = currentFile.content; 
     
     if (!content) {
-        alert('변환할 텍스트가 없습니다.');
+        alert('변환할 텍스트 내용이 비어있습니다. 파일을 다시 열어주세요.');
         return;
     }
     
     if (confirm('AI 변환을 시작하시겠습니까? 시간이 걸릴 수 있습니다.')) {
         try {
             const aiService = await import('./ai_service.js');
+            // 진행 상황 콜백과 함께 AI 요청
             const cleanedText = await aiService.cleanTextWithAI(content, (progress) => {
                 console.log(progress);
-                // 진행 상황 표시 (선택사항)
             });
             
-            // 변환된 내용으로 업데이트
-            viewer.displayContent(cleanedText, viewer.getCurrentFileName());
-            alert('AI 변환이 완료되었습니다!');
+            // [핵심] 확장자를 .md로 변경한 '새로운 파일 객체' 생성
+            const newFileName = currentFile.name.replace(/\.[^/.]+$/, "") + ".md";
+            const newFile = new File([cleanedText], newFileName, { type: "text/markdown" });
+            newFile.content = cleanedText; // 내용 강제 주입
+
+            // 파일 목록 교체
+            const newFiles = [...files];
+            newFiles[currentIndex] = newFile;
+            viewer.setFiles(newFiles);
+
+            // 화면 갱신 (마크다운 모드로 렌더링됨)
+            viewer.displayFileContent(newFile);
+            
+            alert('AI 변환이 완료되었습니다! (마크다운 포맷 적용됨)');
+            
         } catch (error) {
             console.error('AI 변환 오류:', error);
             alert('AI 변환 중 오류가 발생했습니다: ' + error.message);
         }
     }
-};
 
-export const toggleFavorite = () => {
+};export const toggleFavorite = () => {
     // 즐겨찾기 토글 (북마크와 유사한 기능)
     alert('즐겨찾기 기능은 곧 추가될 예정입니다.');
 };export const resetAllSettings = () => {
@@ -616,7 +661,7 @@ export const exportData = () => {
             theme: localStorage.getItem('readerTheme'),
             fontSize: localStorage.getItem('readerFontSize'),
         },
-        version: '0.2.4.1',
+        version: '0.2.4.5',
         exportDate: new Date().toISOString()
     };
     
@@ -662,17 +707,310 @@ export const handleImportDataFile = (file) => {
     reader.readAsText(file);
 };
 
-export const restoreContextMenuSetting = () => {
-    const setting = localStorage.getItem('ctxMenuInternalToggle');
-    const toggle = document.getElementById('ctxMenuInternalToggle');
-    if (toggle && setting !== null) {
-        toggle.checked = setting === 'true';
+// 컨텍스트 메뉴 관련 변수
+let lastSelectionRange = null;
+let activeHighlightSpan = null;
+
+/**
+ * 컨텍스트 메뉴 표시 위치 설정
+ * @param {number} x - X 좌표
+ * @param {number} y - Y 좌표
+ */
+function showMenuAt(x, y) {
+    const contextMenu = document.getElementById('contextMenu');
+    if (!contextMenu) return;
+    
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+    contextMenu.classList.remove('hidden');
+}
+
+/**
+ * 컨텍스트 메뉴 숨기기
+ */
+function hideContextMenu() {
+    const contextMenu = document.getElementById('contextMenu');
+    if (contextMenu) {
+        contextMenu.classList.add('hidden');
     }
+    activeHighlightSpan = null;
+}
+
+/**
+ * 텍스트 선택 영역 저장 (mouseup 이벤트)
+ */
+function handleMouseUp() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
+        lastSelectionRange = selection.getRangeAt(0).cloneRange();
+        console.log('✅ mouseup: 선택 영역 자동 저장됨 (' + selection.toString().trim().length + '자)');
+    }
+}
+
+/**
+ * 컨텍스트 메뉴 핸들러 (우클릭 이벤트)
+ * @param {MouseEvent} e - 마우스 이벤트
+ */
+/**
+ * 우클릭 컨텍스트 메뉴 처리 핸들러
+ * - 하이라이트 위에서 클릭 시: 삭제 버튼 표시 + 일반 메뉴 유지
+ * - 텍스트 선택 시: 형광펜 팔레트 표시
+ */
+function handleContextMenu(e) {
+    // Ctrl 키를 누른 상태라면 브라우저 기본 메뉴 허용
+    if (e.ctrlKey) return;
+
+    e.preventDefault();
+
+    const contextMenu = document.getElementById('contextMenu');
+    const ctxRemoveHighlight = document.getElementById('ctxRemoveHighlight');
+    const highlightPalette = document.getElementById('highlightPalette');
+    const normalMenuOptions = document.getElementById('normalMenuOptions'); // 일반 메뉴 그룹 ID
+
+    if (!contextMenu) return;
+
+    // 1. 클릭 타겟 확인 (하이라이트된 스팬인지?)
+    const target = e.target;
+    const isHighlight = target.classList.contains('highlight-span');
+    
+    // 전역 변수에 현재 선택된 하이라이트 요소 저장 (삭제 기능을 위해)
+    activeHighlightSpan = isHighlight ? target : null;
+
+    // 2. [수정 핵심] 메뉴 표시 로직 변경
+    
+    // (A) 하이라이트 삭제 버튼: 하이라이트 위에서만 보임
+    if (ctxRemoveHighlight) {
+        if (isHighlight) {
+            ctxRemoveHighlight.classList.remove('hidden');
+            ctxRemoveHighlight.classList.add('flex'); // flex로 보여야 아이콘 정렬됨
+        } else {
+            ctxRemoveHighlight.classList.add('hidden');
+            ctxRemoveHighlight.classList.remove('flex');
+        }
+    }
+
+    // (B) 형광펜 팔레트: 텍스트가 드래그(선택)되어 있을 때만 보임
+    const selection = window.getSelection();
+    const hasSelection = selection.toString().trim().length > 0;
+    
+    if (highlightPalette) {
+        if (hasSelection) {
+            highlightPalette.classList.remove('hidden');
+            highlightPalette.classList.add('flex');
+            
+            // 드래그된 텍스트 범위 저장 (형광펜 칠하기 위해)
+            if (selection.rangeCount > 0) {
+                lastSelectionRange = selection.getRangeAt(0).cloneRange();
+            }
+    } else {
+            // 선택된 텍스트가 없으면 팔레트 숨김
+            highlightPalette.classList.add('hidden');
+            highlightPalette.classList.remove('flex');
+            lastSelectionRange = null;
+        }
+    }
+
+    // (C) [해결] 일반 메뉴(북마크 등)는 항상 보임
+    // 기존 코드에서 여기서 else { hide() } 처리를 해서 안 보였던 것입니다.
+    if (normalMenuOptions) {
+        normalMenuOptions.classList.remove('hidden');
+    }
+
+    // 3. 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+    
+    // 메뉴 표시
+    contextMenu.classList.remove('hidden');
+
+    // 화면 오른쪽/아래 넘침 방지 로직
+    const rect = contextMenu.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth) {
+        contextMenu.style.left = `${window.innerWidth - rect.width - 10}px`;
+    }
+    if (y + rect.height > window.innerHeight) {
+        contextMenu.style.top = `${window.innerHeight - rect.height - 10}px`;
+    }
+}
+
+/**
+ * 컨텍스트 메뉴 이벤트 리스너 설정
+ */
+export function setupContextMenuListener() {
+    const viewerContent = document.getElementById('viewerContent');
+    const contextMenu = document.getElementById('contextMenu');
+    if (!viewerContent || !contextMenu) return;
+    
+    // 먼저 설정 복원 (중요: 리스너 등록 전에 실행)
+    restoreContextMenuSetting();
+    
+    // 기존 리스너 제거
+    viewerContent.removeEventListener('contextmenu', handleContextMenu);
+    viewerContent.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener('click', hideContextMenu);
+    
+    // 커스텀 메뉴가 활성화되어 있을 때만 리스너 등록
+    const isEnabled = localStorage.getItem('contextMenuEnabled') !== 'false';
+    
+    if (isEnabled) {
+        viewerContent.addEventListener('contextmenu', handleContextMenu);
+        document.addEventListener('click', hideContextMenu);
+        viewerContent.addEventListener('mouseup', handleMouseUp);
+        console.log('✅ 커스텀 컨텍스트 메뉴 활성화됨');
+    } else {
+        console.log('⚠️ 커스텀 컨텍스트 메뉴 비활성화됨 - 브라우저 기본 메뉴 사용');
+    }
+}
+
+/**
+ * 컨텍스트 메뉴 설정 복원
+ */
+export const restoreContextMenuSetting = () => {
+    const enabled = localStorage.getItem('contextMenuEnabled') !== 'false';
+    
+    // 두 토글 모두 동기화
+    const toggleSettings = document.getElementById('ctxMenuSettingsToggle');
+    const toggleInternal = document.getElementById('ctxMenuInternalToggle');
+    
+    if (toggleSettings) toggleSettings.checked = enabled;
+    if (toggleInternal) toggleInternal.checked = enabled;
+    
+    console.log(`🔄 컨텍스트 메뉴 설정 복원: ${enabled ? '활성화' : '비활성화'}`);
 };
 
+/**
+ * 컨텍스트 메뉴 설정 토글
+ * @param {string} id - 토글 ID
+ */
 export const toggleContextMenuSetting = (id) => {
-    const checkbox = document.getElementById(id);
-    if (checkbox) {
-        localStorage.setItem(id, checkbox.checked.toString());
-    }
+    const toggleSettings = document.getElementById('ctxMenuSettingsToggle');
+    const toggleInternal = document.getElementById('ctxMenuInternalToggle');
+    
+    // 클릭된 토글의 상태를 가져옴
+    const clickedToggle = document.getElementById(id);
+    const enabled = clickedToggle ? clickedToggle.checked : true;
+    
+    console.log(`🔄 토글 클릭: ${id}, 새 값: ${enabled}`);
+    
+    // localStorage에 저장
+    localStorage.setItem('contextMenuEnabled', enabled.toString());
+    
+    // 두 토글 모두 동기화
+    if (toggleSettings) toggleSettings.checked = enabled;
+    if (toggleInternal) toggleInternal.checked = enabled;
+    
+    // 설정 변경 시 컨텍스트 메뉴 리스너 재등록
+    setupContextMenuListener();
+    console.log(`✅ 컨텍스트 메뉴 설정 완료: ${enabled ? '활성화' : '비활성화'}`);
 };
+
+// 컨텍스트 메뉴 항목 클릭 이벤트 설정
+function setupContextMenuItems() {
+    // 북마크 추가
+    const ctxBookmark = document.getElementById('ctxBookmark');
+    if (ctxBookmark) {
+        ctxBookmark.addEventListener('click', () => {
+            toggleBookmark();
+            hideContextMenu();
+        });
+    }
+    
+    // 각주/메모 달기
+    const ctxNote = document.getElementById('ctxNote');
+    if (ctxNote) {
+        ctxNote.addEventListener('click', () => {
+            alert('각주/메모 기능은 곧 추가될 예정입니다.');
+            hideContextMenu();
+        });
+    }
+    
+    // 텍스트 공유
+    const ctxShare = document.getElementById('ctxShare');
+    if (ctxShare) {
+        ctxShare.addEventListener('click', () => {
+            const selection = window.getSelection();
+            const text = selection.toString().trim();
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('텍스트가 클립보드에 복사되었습니다.');
+                }).catch(() => {
+                    alert('텍스트 복사 실패');
+                });
+            } else {
+                alert('공유할 텍스트를 선택해주세요.');
+            }
+            hideContextMenu();
+        });
+    }
+    
+    // 뷰어 설정
+    const ctxSettings = document.getElementById('ctxSettings');
+    if (ctxSettings) {
+        ctxSettings.addEventListener('click', () => {
+            toggleSettings();
+            hideContextMenu();
+        });
+    }
+    
+    // 패널 펼치기
+    const ctxExpandPanel = document.getElementById('ctxExpandPanel');
+    if (ctxExpandPanel) {
+        ctxExpandPanel.addEventListener('click', () => {
+            toggleUploadSection();
+            hideContextMenu();
+        });
+    }
+    
+    // [수정 1] 하이라이트 삭제 로직 (기능 연결)
+    const ctxRemoveHighlight = document.getElementById('ctxRemoveHighlight');
+    if (ctxRemoveHighlight) {
+        ctxRemoveHighlight.addEventListener('click', () => {
+            if (activeHighlightSpan) {
+                // [변경] 단순히 태그만 지우는 게 아니라 매니저를 통해 데이터까지 삭제
+                if (window.viewer) {
+                    window.viewer.removeHighlight(activeHighlightSpan);
+                } else if (typeof viewer !== 'undefined') {
+                    viewer.removeHighlight(activeHighlightSpan);
+                }
+                
+                activeHighlightSpan = null;
+                hideContextMenu();
+            }
+        });
+    }
+
+    // [수정 2] 형광펜 팔레트 로직 (기능 연결)
+        const highlightPalette = document.getElementById('highlightPalette');
+        if (highlightPalette) {
+            highlightPalette.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-color]');
+                if (button) {
+                    const color = button.dataset.color;
+                    
+                    // [변경] console.log만 있던 부분을 실제 로직으로 교체
+                    if (lastSelectionRange) {
+                        // viewer 인스턴스를 통해 하이라이트 적용
+                        if (window.viewer) {
+                            window.viewer.applyHighlight(lastSelectionRange, color);
+                        } else if (typeof viewer !== 'undefined') {
+                            viewer.applyHighlight(lastSelectionRange, color);
+                        }
+                        lastSelectionRange = null; // 사용 후 초기화
+                    } else {
+                        alert('텍스트를 먼저 선택해주세요.');
+                    }
+                    
+                    hideContextMenu();            }
+            });
+    }
+}
+
+// DOM 로드 후 메뉴 항목 이벤트 설정
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupContextMenuItems);
+} else {
+    setupContextMenuItems();
+}
