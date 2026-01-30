@@ -1,672 +1,275 @@
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    transition: background 0.5s ease;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-.viewer-container {
-    max-width: 100%;
-    width: 100%;
-    margin: 0 auto;
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    box-sizing: border-box;
-}
-/* 줄간격 강제 적용을 위한 CSS 변수 */
-.ebook-content {
-    /* 기본값 1.8 */
-    --user-line-height: 1.8;
-    line-height: var(--user-line-height) !important;
+/* 이북 뷰어 커스텀 스타일 */
+
+/* 스크롤바 커스터마이징 */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
 
-/* 1. 기본 상태: 자동 줄바꿈 (창 너비에 맞춤) */
-.ebook-content:not(.markdown-mode) {
-    max-height: 70vh;
-    font-size: 16px;
-    
-    /* 텍스트 줄바꿈 관련 */
-    white-space: pre-wrap !important;       /* 공간 부족하면 줄바꿈 */
-    word-break: break-word !important;      /* 긴 단어도 끊어서 줄바꿈 */
-    overflow-wrap: break-word !important;   
-    
-    /* 스크롤 관련 */
-    overflow-x: hidden !important;          /* 가로 스크롤 숨김 */
-    overflow-y: auto !important;            /* 세로 스크롤 허용 */
-    
-    /* 크기 제한 - mainTextContainer에서 제어하므로 max-width 제거 */
-    width: 100% !important;                 /* 부모 너비에 딱 맞춤 */
-    /* max-width는 mainTextContainer에서 제어 */
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-/* 내부의 모든 문단, 제목, 리스트 등도 부모 설정을 따르게 강제함 */
-.ebook-content p, 
-.ebook-content h1, 
-.ebook-content h2, 
-.ebook-content h3,
-.ebook-content h4,
-.ebook-content h5,
-.ebook-content h6,
-.ebook-content li,
-.ebook-content div,
-.ebook-content span,
-.ebook-content blockquote,
-.ebook-content td,
-.ebook-content th {
-    line-height: var(--user-line-height) !important;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
 }
 
-/* 2. 원본 보기 모드: 줄바꿈 금지 (가로 스크롤 발생) */
-.ebook-content.nowrap-mode:not(.markdown-mode) {
-    /* 텍스트 줄바꿈 관련 */
-    white-space: pre !important;            /* 절대 줄바꿈 하지 않음 (엔터만 인정) */
-    word-break: keep-all !important;        /* 단어 중간에 끊기 금지 */
-    overflow-wrap: normal !important;
-    
-    /* 스크롤 관련 */
-    overflow-x: auto !important;            /* 가로 스크롤 허용 (필수) */
-    
-    /* 크기 제한 해제 (핵심: 이게 없으면 가로 스크롤이 안 생김) */
-    width: auto !important;                 /* 너비 자동 확장 */
-    max-width: none !important;             /* 최대 너비 제한 해제 */
-    display: inline-block !important;       /* 콘텐츠만큼 늘어나도록 변경 */
-    min-width: 100% !important;             /* 최소한 화면 너비만큼은 차지 */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
 }
 
-/* 텍스트 정리 기능으로 생성된 HTML 요소 스타일 */
-.ebook-content h3 {
-    font-weight: bold !important;
-    font-size: 1.25em !important;
-    margin-top: 1.5em !important;
-    margin-bottom: 0.75em !important;
-    color: #2563eb !important; /* blue-600 */
-    white-space: normal !important;
+/* 테마별 스타일 */
+.theme-light {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
 }
 
-.ebook-content p {
-    margin-bottom: 0.15em !important; /* 최소한의 문단 간격 (0.15rem) */
-    margin-top: 0 !important; /* 위쪽 마진 제거 */
-    /* line-height는 CSS 변수로 강제 적용됨 */
-    text-align: justify !important;
-    white-space: normal !important;
-    color: #374151 !important; /* text-gray-700 강제 적용 */
-    padding: 0 !important; /* 패딩 제거 */
+.theme-dark {
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
 }
 
-/* 다크 모드 지원 */
-.theme-dark .ebook-content p,
-.theme-dark .ebook-content h3 {
-    color: #d1d5db !important; /* text-gray-300 */
+.theme-sepia {
+    --bg-primary: #f5f0e8;
+    --bg-secondary: #ebe5db;
+    --text-primary: #5c4a3a;
+    --text-secondary: #8b7355;
+    --border-color: #d4c5b0;
 }
 
-.theme-sepia .ebook-content p {
-    color: #78350f !important;
+.theme-green {
+    --bg-primary: #f0fdf4;
+    --bg-secondary: #dcfce7;
+    --text-primary: #14532d;
+    --text-secondary: #166534;
+    --border-color: #bbf7d0;
 }
 
-.theme-green .ebook-content p {
-    color: #14532d !important;
-}
-
-.ebook-content br {
-    display: block;
-    margin-bottom: 0.5em;
-    content: "";
-}
-.font-system { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-.font-nanum { font-family: 'Nanum Gothic', sans-serif; }
-.font-nanum-myeongjo { font-family: 'Nanum Myeongjo', serif; }
-.font-noto-sans { font-family: 'Noto Sans KR', sans-serif; }
-.font-noto-serif { font-family: 'Noto Serif KR', serif; }
-.font-malgun { font-family: 'Malgun Gothic', sans-serif; }
-.font-gulim { font-family: 'Gulim', sans-serif; }
-.font-dotum { font-family: 'Dotum', sans-serif; }
-
-.theme-light { background-color: #ffffff; color: #1f2937; }
-.theme-dark { background-color: #1f2937; color: #f3f4f6; }
-.theme-sepia { background-color: #fef9e7; color: #78350f; }
-.theme-green { background-color: #f0fdf4; color: #14532d; }
 .theme-custom {
-    /* 커스텀 테마는 JavaScript로 동적 적용 */
-    color: inherit; /* 플레이스홀더 - 실제 스타일은 JavaScript로 동적 적용 */
+    --bg-primary: var(--custom-bg, #ffffff);
+    --text-primary: var(--custom-text, #1f2937);
 }
 
-/* 커스텀 테마에서 내부 컨테이너 배경색 조정 */
-.theme-custom .bg-white,
-.theme-custom .bg-gray-50,
-.theme-custom .bg-blue-50,
-.theme-custom .bg-purple-50 {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(10px);
+/* 테마 클래스 적용 */
+.theme-panel-bg {
+    background-color: var(--bg-secondary);
 }
 
-/* 커스텀 테마에서 설정 패널 배경 */
-.theme-custom .settings-panel {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
+.theme-text-title {
+    color: var(--text-primary);
 }
 
-/* 테마별 배경 통일 */
-.theme-light .bg-white, .theme-light .bg-gray-50 { background: #ffffff !important; }
-.theme-dark .bg-white, .theme-dark .bg-gray-50 { background: #1f2937 !important; }
-.theme-sepia .bg-white, .theme-sepia .bg-gray-50 { background: #fef9e7 !important; }
-.theme-green .bg-white, .theme-green .bg-gray-50 { background: #f0fdf4 !important; }
-
-/* 테마별 텍스트 색상 */
-.theme-light .text-white { color: #1f2937 !important; }
-.theme-dark .text-white { color: #f3f4f6 !important; }
-.theme-sepia .text-white { color: #78350f !important; }
-.theme-green .text-white { color: #14532d !important; }
-
-.settings-panel { transition: all 0.3s ease; }
-.theme-option { cursor: pointer; transition: all 0.2s; }
-.theme-option:hover { transform: scale(1.05); }
-.theme-option.active { border-width: 3px; border-color: #6366f1; }
-
-/* Upload section collapse */
-#uploadSectionContent {
-    max-height: 1000px;
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
-    opacity: 1;
-}
-#uploadSectionContent.collapsed,
-#historySectionContent.collapsed,
-#bookmarksSectionContent.collapsed {
-    max-height: 0;
-    opacity: 0;
-    padding: 0 !important;
-    overflow: hidden;
+.theme-text-body {
+    color: var(--text-secondary);
 }
 
-.page-section { display: none; }
-.page-section.active { display: block; }
-
-/* === 커스텀 스크롤바 디자인 === */
-
-/* 1. 스크롤바 크기 */
-::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+.theme-border {
+    border-color: var(--border-color);
 }
 
-/* 2. 스크롤바 배경 (트랙) */
-::-webkit-scrollbar-track {
-    background: transparent; /* 배경 투명하게 하여 테마색 유지 */
+.theme-item-bg:hover {
+    background-color: var(--bg-primary);
 }
 
-/* 3. 스크롤바 손잡이 (기본: 회색) */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.5); /* 반투명 회색 */
-    border-radius: 6px;
-    border: 3px solid transparent; /* 여백 효과 */
-    background-clip: content-box;
+/* 마크다운 모드 스타일 */
+.markdown-mode {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* 4. 스크롤바 호버 효과 */
-::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(107, 114, 128, 0.8);
-}
-
-/* === 테마별 스크롤바 색상 === */
-
-/* 다크 모드 */
-body.theme-dark ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-}
-body.theme-dark ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* 세피아 모드 */
-body.theme-sepia ::-webkit-scrollbar-thumb {
-    background-color: rgba(139, 69, 19, 0.3);
-}
-
-/* 그린 모드 */
-body.theme-green ::-webkit-scrollbar-thumb {
-    background-color: rgba(20, 83, 45, 0.3);
-}
-
-/* src/css/styles.css 추가 */
-
-/* 마크다운 뷰어 스타일 */
-.ebook-content h1, .ebook-content h2, .ebook-content h3 {
+.markdown-mode h1,
+.markdown-mode h2,
+.markdown-mode h3,
+.markdown-mode h4,
+.markdown-mode h5,
+.markdown-mode h6 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
-    font-weight: bold;
-    color: #2563eb; /* 파란색 포인트 */
-}
-.ebook-content p {
-    margin-bottom: 1.2em;
-    line-height: 1.8;
-}
-.ebook-content strong {
-    color: #d97706; /* 강조색 */
-}
-.ebook-content ul {
-    list-style-type: disc;
-    padding-left: 1.5em;
+    font-weight: 600;
 }
 
-/* 마크다운 본문 스타일 (.markdown-body 클래스) */
-.markdown-body {
-    max-width: 100%;
-    word-wrap: break-word;
-}
-
-.markdown-body h1 {
+.markdown-mode h1 {
     font-size: 2em;
-    font-weight: bold;
-    margin: 1em 0 0.5em;
-    color: #2563eb;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 0.3em;
 }
 
-.markdown-body h2 {
+.markdown-mode h2 {
     font-size: 1.5em;
-    font-weight: bold;
-    margin: 1em 0 0.5em;
-    color: #3b82f6;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 0.2em;
 }
 
-.markdown-body h3 {
+.markdown-mode h3 {
     font-size: 1.25em;
-    font-weight: bold;
-    margin: 1em 0 0.5em;
-    color: #2563eb;
 }
 
-.markdown-body h4 {
-    font-size: 1.1em;
-    font-weight: bold;
-    margin: 0.8em 0 0.4em;
-}
-
-.markdown-body p {
-    margin-bottom: 1.2em;
-    line-height: 1.8;
-    text-align: justify;
-}
-
-.markdown-body ul,
-.markdown-body ol {
-    margin-bottom: 1.2em;
-    padding-left: 1.5em;
-    line-height: 1.8;
-}
-
-.markdown-body ul {
-    list-style-type: disc;
-}
-
-.markdown-body ol {
-    list-style-type: decimal;
-}
-
-.markdown-body li {
-    margin-bottom: 0.5em;
-}
-
-.markdown-body blockquote {
-    border-left: 4px solid #e5e7eb;
-    padding-left: 1em;
-    margin: 1em 0;
-    color: #6b7280;
-    font-style: italic;
-}
-
-.markdown-body code {
-    background-color: #f3f4f6;
-    padding: 0.2em 0.4em;
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-}
-
-.markdown-body pre {
-    background-color: #f3f4f6;
-    padding: 1em;
-    border-radius: 5px;
-    overflow-x: auto;
-    margin: 1em 0;
-}
-
-.markdown-body pre code {
-    background-color: transparent;
-    padding: 0;
-}
-
-.markdown-body strong {
-    font-weight: bold;
-    color: #d97706;
-}
-
-.markdown-body em {
-    font-style: italic;
-}
-
-.markdown-body a {
-    color: #2563eb;
-    text-decoration: underline;
-}
-
-.markdown-body a:hover {
-    color: #1d4ed8;
-}
-
-.markdown-body hr {
-    border: none;
-    border-top: 2px solid #e5e7eb;
-    margin: 2em 0;
-}
-
-/* 다크 모드 지원 */
-.theme-dark .markdown-body h1,
-.theme-dark .markdown-body h2,
-.theme-dark .markdown-body h3 {
-    color: #60a5fa;
-}
-
-.theme-dark .markdown-body blockquote {
-    border-left-color: #4b5563;
-    color: #9ca3af;
-}
-
-.theme-dark .markdown-body code,
-.theme-dark .markdown-body pre {
-    background-color: #374151;
-    color: #f3f4f6;
-}
-
-.theme-dark .markdown-body a {
-    color: #60a5fa;
-}
-
-.theme-dark .markdown-body hr {
-    border-top-color: #4b5563;
-}
-
-/* 마크다운 모드 전용 스타일 */
-.ebook-content.markdown-mode {
-    white-space: normal !important; /* 텍스트가 화면 끝에서 자동 줄바꿈 */
-    overflow-x: hidden !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    text-align: left;
-    /* max-width는 mainTextContainer에서 제어하므로 제거 */
-    margin: 0 auto;
-    padding: 1em;
-}
-
-/* 화면 꽉 채우기 모드 (강제 적용) */
-.ebook-content.full-width-mode {
-    max-width: 100% !important; /* 너비 제한 해제 */
-    width: 100% !important;
-    margin: 0 !important;       /* 중앙 정렬 해제 */
-    padding-left: 2rem !important;         /* 좌우 여백 확보 */
-    padding-right: 2rem !important;
-}
-
-/* 마크다운 모드에서도 화면 꽉 채우기 적용 */
-.ebook-content.markdown-mode.full-width-mode {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-}
-
-/* 마크다운 모드에서 pre, code 요소 스타일 오버라이드 */
-.ebook-content.markdown-mode pre {
-    white-space: pre-wrap !important; /* 코드 블록은 줄바꿈 유지하되 자동 줄바꿈도 허용 */
-    overflow-x: auto !important;
-}
-
-.ebook-content.markdown-mode code {
-    white-space: pre-wrap !important; /* 인라인 코드도 줄바꿈 허용 */
-}
-
-/* 마크다운 모드의 모든 자식 요소에 white-space normal 적용 (pre, code 제외) */
-.ebook-content.markdown-mode > *:not(pre):not(code) {
-    white-space: normal !important;
-}
-
-.ebook-content.markdown-mode h1,
-.ebook-content.markdown-mode h2,
-.ebook-content.markdown-mode h3,
-.ebook-content.markdown-mode h4,
-.ebook-content.markdown-mode h5,
-.ebook-content.markdown-mode h6 {
-    color: #2563eb; /* Cursor 스타일 파란색 */
-    font-weight: 700;
-    margin-top: 2em;
+.markdown-mode p {
     margin-bottom: 1em;
-    /* line-height는 CSS 변수로 강제 적용됨 (제목도 사용자 설정을 따름) */
-    line-height: var(--user-line-height) !important;
-    border-bottom: 1px solid #e5e7eb; /* 제목 아래 옅은 줄 */
-    padding-bottom: 0.5rem;
+    line-height: 1.8;
 }
 
-.ebook-content.markdown-mode h1 {
-    font-size: 2em;
-    border-bottom-width: 2px;
-}
-
-.ebook-content.markdown-mode h2 {
-    font-size: 1.5em;
-}
-
-.ebook-content.markdown-mode h3 {
-    font-size: 1.25em;
-}
-
-.ebook-content.markdown-mode p {
-    margin-bottom: 1.2em;
-    /* line-height는 CSS 변수로 강제 적용됨 */
-    color: inherit;
-    white-space: normal !important;
-}
-
-.ebook-content.markdown-mode ul,
-.ebook-content.markdown-mode ol {
-    margin-bottom: 1.2em;
-    padding-left: 1.5em;
-    /* line-height는 CSS 변수로 강제 적용됨 */
-}
-
-.ebook-content.markdown-mode ul {
-    list-style-type: disc;
-}
-
-.ebook-content.markdown-mode ol {
-    list-style-type: decimal;
-}
-
-.ebook-content.markdown-mode li {
-    margin-bottom: 0.5em;
-    white-space: normal !important;
-}
-
-.ebook-content.markdown-mode blockquote {
-    border-left: 4px solid #e5e7eb;
-    padding-left: 1em;
-    margin: 1em 0;
-    color: #6b7280;
-    font-style: italic;
-    white-space: normal !important;
-}
-
-.ebook-content.markdown-mode code {
-    background-color: #f3f4f6;
+.markdown-mode code {
+    background-color: var(--bg-secondary);
     padding: 0.2em 0.4em;
     border-radius: 3px;
-    font-family: 'Courier New', monospace;
     font-size: 0.9em;
-    white-space: pre-wrap !important; /* 코드는 줄바꿈 유지 */
 }
 
-.ebook-content.markdown-mode pre {
-    background-color: #f3f4f6;
+.markdown-mode pre {
+    background-color: var(--bg-secondary);
     padding: 1em;
-    border-radius: 5px;
+    border-radius: 6px;
     overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+.markdown-mode blockquote {
+    border-left: 4px solid var(--border-color);
+    padding-left: 1em;
+    color: var(--text-secondary);
     margin: 1em 0;
-    white-space: pre !important; /* 코드 블록은 줄바꿈 유지 */
 }
 
-.ebook-content.markdown-mode pre code {
-    background-color: transparent;
-    padding: 0;
-    white-space: pre !important;
+.markdown-mode ul,
+.markdown-mode ol {
+    margin-left: 1.5em;
+    margin-bottom: 1em;
 }
 
-.ebook-content.markdown-mode strong {
-    font-weight: bold;
-    color: #d97706;
+.markdown-mode li {
+    margin-bottom: 0.5em;
 }
 
-.ebook-content.markdown-mode em {
-    font-style: italic;
+.markdown-mode table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1em;
 }
 
-.ebook-content.markdown-mode a {
-    color: #2563eb;
-    text-decoration: underline;
+.markdown-mode th,
+.markdown-mode td {
+    border: 1px solid var(--border-color);
+    padding: 0.5em 1em;
 }
 
-.ebook-content.markdown-mode a:hover {
-    color: #1d4ed8;
+.markdown-mode th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
 }
 
-.ebook-content.markdown-mode hr {
-    border: none;
-    border-top: 2px solid #e5e7eb;
-    margin: 2em 0;
+/* 뷰어 콘텐츠 스타일 */
+#viewerContent {
+    line-height: var(--user-line-height, 1.8);
 }
 
-/* 다크 모드 지원 */
-.theme-dark .ebook-content.markdown-mode h1,
-.theme-dark .ebook-content.markdown-mode h2,
-.theme-dark .ebook-content.markdown-mode h3,
-.theme-dark .ebook-content.markdown-mode h4,
-.theme-dark .ebook-content.markdown-mode h5,
-.theme-dark .ebook-content.markdown-mode h6 {
-    color: #60a5fa;
-    border-bottom-color: #4b5563;
+/* 줄바꿈 모드 */
+.nowrap-mode {
+    white-space: nowrap;
+    overflow-x: auto;
 }
 
-.theme-dark .ebook-content.markdown-mode blockquote {
-    border-left-color: #4b5563;
-    color: #9ca3af;
+/* 설정 패널 */
+.settings-panel {
+    animation: slideDown 0.3s ease-out;
 }
 
-.theme-dark .ebook-content.markdown-mode code,
-.theme-dark .ebook-content.markdown-mode pre {
-    background-color: #374151;
-    color: #f3f4f6;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.theme-dark .ebook-content.markdown-mode a {
-    color: #60a5fa;
+/* 버튼 호버 효과 개선 */
+button:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.theme-dark .ebook-content.markdown-mode hr {
-    border-top-color: #4b5563;
-}
-/* src/css/styles.css */
-
-/* src/css/styles.css */
-
-/* 1. 줄간격 강제 적용 (JS의 --user-line-height 변수와 연결) */
-.ebook-content {
-    --user-line-height: 1.8; /* 기본값 */
-    line-height: var(--user-line-height) !important;
+button:not(:disabled):active {
+    transform: translateY(0);
 }
 
-/* 내부 요소들도 부모의 줄간격을 따르도록 강제 */
-.ebook-content p, 
-.ebook-content h1, 
-.ebook-content h2, 
-.ebook-content h3, 
-.ebook-content li, 
-.ebook-content div {
-    line-height: var(--user-line-height) !important;
+/* 북마크 아이템 애니메이션 */
+.theme-item-bg {
+    transition: all 0.2s ease;
 }
 
-/* 2. 화면 꽉 채우기 모드 (JS의 full-width-mode 클래스와 연결) */
-.ebook-content.full-width-mode {
-    max-width: 100% !important;  /* 너비 제한 해제 */
-    width: 100% !important;
-    margin: 0 !important;        /* 중앙 정렬 해제 */
-    padding-left: 3rem;          /* 좌우 여백 확보 */
-    padding-right: 3rem;
+/* 프로그레스 바 */
+#reading-progress-bar {
+    transition: width 0.15s ease-out;
 }
 
-/* =========================================
-   테마별 패널 동적 컬러 스타일 (투명도 강화 버전)
-   ========================================= */
-:root {
-    /* 기본(라이트) 테마 - 투명도 60% */
-    --panel-bg: rgba(255, 255, 255, 0.6); 
-    --item-bg: rgba(255, 255, 255, 0.3);
-    --item-hover-bg: rgba(255, 255, 255, 0.5);
-    --panel-text-title: #1f2937;
-    --panel-text-body: #4b5563;
-    --panel-border: rgba(209, 213, 219, 0.4);
+/* 로딩 애니메이션 */
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* 다크 테마 - 투명도 70% (가독성 위해 약간 높음) */
-body[data-theme="dark"] {
-    --panel-bg: rgba(31, 41, 55, 0.70); 
-    --item-bg: rgba(55, 65, 81, 0.4);
-    --item-hover-bg: rgba(75, 85, 99, 0.6);
-    --panel-text-title: #f3f4f6;
-    --panel-text-body: #d1d5db;
-    --panel-border: rgba(75, 85, 99, 0.4);
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
-/* 세피아 테마 - 투명도 60% */
-body[data-theme="sepia"] {
-    --panel-bg: rgba(254, 243, 199, 0.6); 
-    --item-bg: rgba(255, 251, 235, 0.3);
-    --item-hover-bg: rgba(253, 230, 138, 0.5);
-    --panel-text-title: #78350f;
-    --panel-text-body: #92400e;
-    --panel-border: rgba(252, 211, 77, 0.4);
+/* 파일 업로드 박스 호버 */
+#uploadBox:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
 }
 
-/* 그린 테마 - 투명도 60% */
-body[data-theme="green"] {
-    --panel-bg: rgba(220, 252, 231, 0.6); 
-    --item-bg: rgba(240, 253, 244, 0.3);
-    --item-hover-bg: rgba(187, 247, 208, 0.5);
-    --panel-text-title: #14532d;
-    --panel-text-body: #166534;
-    --panel-border: rgba(134, 239, 172, 0.4);
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .markdown-mode h1 {
+        font-size: 1.5em;
+    }
+    
+    .markdown-mode h2 {
+        font-size: 1.25em;
+    }
+    
+    .markdown-mode h3 {
+        font-size: 1.1em;
+    }
 }
 
-/* 유틸리티 클래스 수정 (블러 효과 강화) */
-.theme-panel-bg { 
-    background-color: var(--panel-bg); 
-    color: var(--panel-text-body); 
-    border-color: var(--panel-border);
-    backdrop-filter: blur(12px); /* 투명해진 만큼 블러를 강하게 */
-    -webkit-backdrop-filter: blur(12px);
+/* 컨텍스트 메뉴 애니메이션 */
+#contextMenu {
+    animation: fadeIn 0.2s ease-out;
 }
-.theme-item-bg { 
-    background-color: var(--item-bg); 
-    color: var(--panel-text-body); 
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
-.theme-item-bg:hover { 
-    background-color: var(--item-hover-bg); 
+
+/* 프린트 스타일 */
+@media print {
+    #uploadAreaContainer,
+    #uploadToggleBtn,
+    #contextMenu,
+    #reading-progress-container {
+        display: none !important;
+    }
+    
+    #viewerContent {
+        max-width: 100% !important;
+    }
 }
-.theme-text-title { color: var(--panel-text-title) !important; }
-.theme-text-body { color: var(--panel-text-body) !important; }
-.theme-border { border-color: var(--panel-border) !important; }

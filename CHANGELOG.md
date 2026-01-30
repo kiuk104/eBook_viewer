@@ -6,6 +6,125 @@
 
 ---
 
+## [v0.2.4.3] - 2026-01-30
+
+### 🐛 수정됨 (Fixed)
+- **로컬 파일 로딩 오류 해결**
+  - `HistoryManager.js` 119번째 줄: `fileKey`가 `null`인 경우 처리 추가
+  - 히스토리 데이터에 `fileKey: null`인 항목이 있어 `TypeError` 발생하던 문제 해결
+  - null 체크 추가로 앱 초기화 중단 문제 해결
+  - 파일 선택 기능 정상 작동하도록 수정
+
+**기술적 세부사항:**
+- `item.fileKey.startsWith('gdrive_')` → `item.fileKey ? item.fileKey.startsWith('gdrive_') : false`
+- 구버전 데이터 호환성 개선
+- 방어적 프로그래밍 패턴 적용
+
+---
+
+## [v0.2.4.2] - 2026-01-30
+
+### 🐛 수정됨 (Fixed)
+- **Google Drive 버튼 오류 수정**
+  - `ebook_viewer.html` 71번째 줄: Google Drive 버튼에 `onclick="loadGoogleDriveFiles()"` 속성 추가
+  - 버튼 클릭 시 함수 호출되지 않던 문제 해결
+  - HTML onclick과 JavaScript 함수 연결 완료
+
+**원인:**
+- 이전 버전에서 이벤트 리스너 등록 코드가 누락됨
+- onclick 속성도 없어 버튼이 완전히 작동하지 않음
+
+**해결:**
+- HTML onclick 속성 추가로 즉시 실행 가능하도록 수정
+- 다른 버튼들과 일관된 방식으로 통일
+
+---
+
+## [v0.2.4.1] - 2026-01-30
+
+### 🐛 수정됨 (Fixed)
+- **모듈 import 오류 수정**
+  - `main.js`의 import 문에서 누락된 `toggleBookmark` 추가
+  - 모든 export 함수가 올바르게 import되도록 수정
+  - 디버깅 코드 8개 제거 (fetch 호출)
+  - 깨끗한 프로덕션 코드로 정리
+
+- **viewer.js 함수 추가**
+  - `downloadAsMarkdown()`: 마크다운 파일 다운로드 기능
+  - `handleAIClean()`: AI 텍스트 변환 기능
+  - `toggleFavorite()`: 즐겨찾기 토글
+  - `resetAllSettings()`: 모든 설정 초기화
+  - `exportData()` / `importData()` / `handleImportDataFile()`: 데이터 백업/복원
+  - `restoreContextMenuSetting()` / `toggleContextMenuSetting()`: 컨텍스트 메뉴 설정
+
+- **경로 구조 최적화**
+  - 깃허브 레포지토리 구조에 맞게 폴더 구조 재정리
+  - `src/js/modules/` 폴더에 클래스 모듈 배치
+  - 모든 import 경로 검증 및 수정
+
+### ✨ 추가됨 (Added)
+- **테스트 도구**
+  - `test_modules.html`: 모듈 로딩 테스트용 HTML
+  - `TEST_CHECKLIST.md`: 상세한 테스트 체크리스트
+  - 6단계 테스트 프로세스 문서화
+
+- **문서화 개선**
+  - `GITHUB_DEPLOY_GUIDE.md`: GitHub Pages 배포 가이드
+  - `QUICKSTART.md`: 3단계 빠른 시작 가이드
+  - `FIXED_REPORT_V2.md`: 상세한 수정 보고서
+  - `DEV_NOTE.md`: 개발 규칙 및 트러블슈팅 가이드
+  - 트러블슈팅 가이드 추가
+
+### ♻️ 변경됨 (Changed)
+- **main.js 개선**
+  - window 객체에 모든 함수 올바르게 할당
+  - HTML onclick 이벤트와 완벽 연결
+  - 불필요한 디버깅 로그 제거
+
+- **viewer.js 개선**
+  - 동적 import를 사용한 지연 로딩
+  - AI 서비스 및 유틸리티 함수 on-demand 로딩
+  - 메모리 효율성 개선
+
+### 📝 문서화 (Documentation)
+- 클래스 기반 모듈 구조 설명 추가
+- ES6 모듈 시스템 사용법 문서화
+- 디버깅 전략 및 체크리스트 작성
+- 개발 워크플로우 가이드 추가
+
+---
+
+## [v0.2.4] - 2026-01-30
+
+### 🔧 리팩토링 (Refactored)
+- **클래스 기반 모듈 구조 채택**
+  - 에이전트 1 (클래스 기반 모듈 패턴)을 메인 구현으로 채택
+  - `ViewerCoordinator` 클래스로 모든 관리자 클래스 통합
+  - 각 기능별 독립된 클래스 모듈 (`src/js/modules/` 폴더)
+  - 단일 책임 원칙(SRP) 준수
+  - 싱글톤 패턴으로 인스턴스 관리
+
+### ✨ 추가됨 (Added)
+- **누락된 함수 추가**
+  - `downloadAsMarkdown()`: 마크다운 파일 다운로드
+  - `handleAIClean()`: AI 변환 처리
+  - `toggleFavorite()`: 즐겨찾기 토글
+  - `resetAllSettings()`: 모든 설정 초기화
+  - `exportData()` / `importData()` / `handleImportDataFile()`: 데이터 백업/복원
+  - `restoreContextMenuSetting()` / `toggleContextMenuSetting()`: 컨텍스트 메뉴 설정
+
+### 🗑️ 제거됨 (Removed)
+- 중복된 `src/js/viewer/` 폴더 제거
+- 사용하지 않는 에이전트 제안 파일 삭제 (agent2, agent3)
+- 관련 테스트 스크립트 및 문서 정리
+- `viewer.js.backup` 파일 제거
+
+### 📝 문서화 (Documentation)
+- `PROJECT_BRIEF.md` 업데이트: 클래스 기반 구조 반영
+- 프로젝트 구조 문서화 개선
+
+---
+
 ## [v0.2.3.2] - 2026-01-02
 
 ### 🔧 개선됨 (Improved)

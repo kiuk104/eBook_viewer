@@ -31,36 +31,21 @@ window.resetGoogleDrive = resetGoogleDrive;
  * Initialize Google API Client
  */
 async function initGoogleAPI() {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:33',message:'initGoogleAPI called',data:{gapiInitialized,gapiExists:typeof gapi !== 'undefined',googleExists:typeof google !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     if (gapiInitialized) return true;
     const s = getGoogleDriveSettings();
     if (!s.clientId || !s.apiKey) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:37',message:'Missing settings in initGoogleAPI',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         throw new Error('설정에서 Google API 정보를 입력해주세요.');
     }
 
     return new Promise((resolve, reject) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:41',message:'Before gapi.load',data:{gapiExists:typeof gapi !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         console.log('🔍 initGoogleAPI: gapi 상태 확인', { gapiExists: typeof gapi !== 'undefined' });
         if (typeof gapi === 'undefined') {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:42',message:'gapi is undefined',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             console.error('❌ gapi가 정의되지 않았습니다. Google API 스크립트가 로드되지 않았습니다.');
             reject(new Error('Google API 스크립트가 로드되지 않았습니다. 페이지를 새로고침해주세요.'));
             return;
         }
         console.log('🔵 gapi.load("client") 호출 중...');
         gapi.load('client', async () => {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:45',message:'gapi.load callback executed',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
             console.log('✅ gapi.load("client") 콜백 실행됨');
             try {
                 console.log('🔵 gapi.client.init 호출 중...');
@@ -68,15 +53,9 @@ async function initGoogleAPI() {
                     apiKey: s.apiKey, 
                     discoveryDocs: DISCOVERY_DOCS 
                 });
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:50',message:'gapi.client.init completed',data:{googleExists:typeof google !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
                 console.log('✅ gapi.client.init 완료');
                 console.log('🔍 google 객체 상태:', { googleExists: typeof google !== 'undefined' });
                 if (typeof google === 'undefined') {
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:52',message:'google is undefined',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                    // #endregion
                     console.error('❌ google 객체가 정의되지 않았습니다.');
                     reject(new Error('Google Identity Services 스크립트가 로드되지 않았습니다.'));
                     return;
@@ -88,15 +67,9 @@ async function initGoogleAPI() {
                     callback: ''
                 });
                 gapiInitialized = true;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:60',message:'initGoogleAPI success',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
                 console.log('✅ initGoogleAPI 성공');
                 resolve(true);
             } catch (err) {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:64',message:'initGoogleAPI error',data:{errorMessage:err.message,errorStack:err.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
                 console.error('❌ initGoogleAPI 오류:', err);
                 console.error('❌ 오류 상세:', { message: err.message, stack: err.stack, name: err.name });
                 reject(err);
@@ -217,19 +190,10 @@ async function pickerCallback(data) {
         // Display first file if any (viewer.js의 함수 사용)
         if (downloadedFiles.length > 0) {
             // viewer.js의 함수들을 동적으로 import하여 사용
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:217',message:'Before importing viewer.js',data:{downloadedFilesCount:downloadedFiles.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             let viewerModule;
             try {
                 viewerModule = await import('./viewer.js');
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:220',message:'viewer.js imported successfully',data:{hasAddFile:!!viewerModule.addFile,hasSetFiles:!!viewerModule.setFiles,hasDisplayFileContent:!!viewerModule.displayFileContent,hasToggleUploadSection:!!viewerModule.toggleUploadSection,exportedFunctions:Object.keys(viewerModule)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
             } catch (importError) {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:223',message:'viewer.js import failed',data:{errorMessage:importError.message,errorStack:importError.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
                 console.error('❌ viewer.js import 실패:', importError);
                 alert('파일 로드 실패: viewer.js를 불러올 수 없습니다.');
                 return;
@@ -237,17 +201,10 @@ async function pickerCallback(data) {
             
             const { setFiles, setCurrentFileIndex, displayFileContent, toggleUploadSection } = viewerModule;
             
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:230',message:'Before calling viewer functions',data:{hasSetFiles:!!setFiles,hasSetCurrentFileIndex:!!setCurrentFileIndex,hasDisplayFileContent:!!displayFileContent,hasToggleUploadSection:!!toggleUploadSection},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
-            
             // 파일 배열 업데이트
             if (setFiles) {
                 setFiles(downloadedFiles);
             } else {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:235',message:'setFiles is undefined',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
                 console.error('❌ setFiles 함수를 찾을 수 없습니다.');
                 alert('파일 로드 실패: setFiles 함수를 찾을 수 없습니다.');
                 return;
@@ -261,13 +218,7 @@ async function pickerCallback(data) {
             
             if (displayFileContent) {
                 displayFileContent(downloadedFiles[0]);
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:250',message:'displayFileContent called successfully',data:{fileName:downloadedFiles[0].name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
             } else {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:253',message:'displayFileContent is undefined',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
                 console.error('❌ displayFileContent 함수를 찾을 수 없습니다.');
                 alert('파일 로드 실패: displayFileContent 함수를 찾을 수 없습니다.');
                 return;
@@ -290,15 +241,9 @@ async function pickerCallback(data) {
  * Create and show Google Picker
  */
 async function createPicker() {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:190',message:'createPicker called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     console.log('🔵 createPicker 호출됨');
     
     const s = getGoogleDriveSettings();
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:193',message:'Google Drive settings retrieved',data:{hasClientId:!!s.clientId,hasApiKey:!!s.apiKey,clientIdLength:s.clientId?.length || 0,apiKeyLength:s.apiKey?.length || 0},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     console.log('🔍 Google Drive 설정:', { 
         hasClientId: !!s.clientId, 
         hasApiKey: !!s.apiKey,
@@ -307,38 +252,20 @@ async function createPicker() {
     });
     
     if (!s.clientId || !s.apiKey) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:196',message:'Missing Google Drive settings',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         console.error('❌ Google Drive 설정이 없습니다.');
         alert('설정에서 Google Client ID와 API 키를 입력해주세요.');
         return;
     }
 
     try {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:201',message:'Before initGoogleAPI',data:{gapiInitialized,gapiExists:typeof gapi !== 'undefined',googleExists:typeof google !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         // Initialize APIs
         await initGoogleAPI();
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:204',message:'initGoogleAPI completed',data:{gapiInitialized},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         await loadPickerAPI();
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:206',message:'loadPickerAPI completed',data:{pickerApiLoaded},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         
         // Get access token if not available
         if (!accessToken) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:209',message:'Before signInToGoogle',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             console.log('🔵 signInToGoogle 호출 중...');
             await signInToGoogle();
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:212',message:'signInToGoogle completed',data:{hasAccessToken:!!accessToken},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             console.log('✅ signInToGoogle 완료', { hasAccessToken: !!accessToken });
         } else {
             console.log('✅ Access token 이미 있음');
@@ -370,19 +297,10 @@ async function createPicker() {
             .setTitle('텍스트 파일 선택')
             .build();
 
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:235',message:'Before picker.setVisible',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
         console.log('🔵 picker.setVisible(true) 호출 중...');
         picker.setVisible(true);
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:237',message:'picker.setVisible called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
         console.log('✅ Picker 표시 완료');
     } catch (error) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:239',message:'createPicker error caught',data:{errorMessage:error.message,errorStack:error.stack,errorName:error.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         console.error('❌ Picker 생성 실패:', error);
         console.error('❌ 오류 상세:', { message: error.message, stack: error.stack, name: error.name });
         alert('Google Drive 파일 선택 오류: ' + (error.message || '설정을 확인해주세요.'));
@@ -427,15 +345,9 @@ async function waitForGoogleAPIScripts(maxWaitMs = 5000) {
  * Load Google Drive files using Picker
  */
 export async function loadGoogleDriveFiles(event) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:243',message:'loadGoogleDriveFiles called',data:{hasEvent:!!event,windowLoadGoogleDriveFiles:typeof window.loadGoogleDriveFiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     console.log('🔵 loadGoogleDriveFiles 호출됨', { event, windowLoadGoogleDriveFiles: typeof window.loadGoogleDriveFiles });
     
     // Google API 스크립트 로드 확인 및 대기
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:247',message:'Checking gapi and google objects',data:{hasGapi:typeof gapi !== 'undefined',hasGoogle:typeof google !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     console.log('🔍 Google API 상태 (초기 체크):', { 
         hasGapi: typeof gapi !== 'undefined', 
         hasGoogle: typeof google !== 'undefined',
@@ -451,9 +363,6 @@ export async function loadGoogleDriveFiles(event) {
         if (!scriptsLoaded) {
             const errorMsg = 'Google API 스크립트가 로드되지 않았습니다. 네트워크 연결을 확인하고 페이지를 새로고침해주세요.';
             console.error('❌', errorMsg);
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:254',message:'gapi/google undefined after wait',data:{hasGapi:typeof gapi !== 'undefined',hasGoogle:typeof google !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             alert(errorMsg);
             return;
         }
@@ -468,14 +377,8 @@ export async function loadGoogleDriveFiles(event) {
     
     try {
         await createPicker();
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:251',message:'createPicker completed successfully',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         console.log('✅ createPicker 완료');
     } catch (error) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:254',message:'createPicker failed',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         console.error('❌ Google Drive 파일 로드 실패:', error);
         console.error('❌ 오류 상세:', { message: error.message, stack: error.stack, name: error.name });
         alert('Google Drive 오류: ' + (error.message || '설정을 확인하세요.'));
@@ -509,19 +412,10 @@ export async function loadLastReadGoogleDriveFile(fileId) {
         const lastModified = new Date(fileInfo.result.modifiedTime).getTime();
         
         // viewer.js의 함수들을 동적으로 import
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:462',message:'Before importing viewer.js in loadLastReadGoogleDriveFile',data:{fileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         let viewerModule;
         try {
             viewerModule = await import('./viewer.js');
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:465',message:'viewer.js imported in loadLastReadGoogleDriveFile',data:{hasSetFiles:!!viewerModule.setFiles,hasDisplayFileContent:!!viewerModule.displayFileContent,exportedFunctions:Object.keys(viewerModule)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
         } catch (importError) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:468',message:'viewer.js import failed in loadLastReadGoogleDriveFile',data:{errorMessage:importError.message,errorStack:importError.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             console.error('❌ viewer.js import 실패:', importError);
             throw importError;
         }
@@ -538,15 +432,8 @@ export async function loadLastReadGoogleDriveFile(fileId) {
             fileId: fileId   // 하위 호환성을 위해 유지
         };
         
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:480',message:'Before calling viewer functions in loadLastReadGoogleDriveFile',data:{hasSetFiles:!!setFiles,hasDisplayFileContent:!!displayFileContent,fileName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
-        
         // 파일 배열 설정 및 표시
         if (!setFiles) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:483',message:'setFiles is undefined in loadLastReadGoogleDriveFile',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             throw new Error('setFiles 함수를 찾을 수 없습니다.');
         }
         
@@ -558,16 +445,10 @@ export async function loadLastReadGoogleDriveFile(fileId) {
         document.getElementById('mainContent').classList.remove('hidden');
         
         if (!displayFileContent) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:492',message:'displayFileContent is undefined in loadLastReadGoogleDriveFile',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             throw new Error('displayFileContent 함수를 찾을 수 없습니다.');
         }
         
         displayFileContent(fileObj);
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:499',message:'displayFileContent called successfully in loadLastReadGoogleDriveFile',data:{fileName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         
         // Auto collapse upload section
         const uploadContent = document.getElementById('uploadSectionContent');

@@ -130,9 +130,21 @@ taskkill /PID <프로세스ID> /F
 
 ## 📚 추가 문서
 
-- `docs/local_server_setup.md` - 로컬 서버 구동 방법 상세 가이드
-- `docs/google_oauth_setup_guide.md` - Google OAuth 설정 가이드
-- `docs/google_drive_architecture.md` - Google Drive 통합 아키텍처
+### 빠른 시작
+- [빠른 시작 가이드](./QUICKSTART.md) - 3단계로 시작하기
+- [변경 이력](./CHANGELOG.md) - 버전별 변경 사항
+
+### 개발자 문서
+- [프로젝트 브리핑](./docs/PROJECT_BRIEF.md) - 프로젝트 전체 개요 및 아키텍처
+- [개발 규칙 및 문제 해결](./docs/DEV_NOTE.md) - 개발 규칙 및 트러블슈팅 가이드
+- [문서 목차](./docs/INDEX.md) - 모든 문서 인덱스
+
+### 가이드
+- [로컬 서버 구동 가이드](./docs/local_server_setup.md) - 로컬 서버 구동 방법 상세 가이드
+- [Google OAuth 설정 가이드](./docs/google_oauth_setup_guide.md) - Google OAuth 설정 가이드
+- [Google Drive 통합 아키텍처](./docs/google_drive_architecture.md) - Google Drive 통합 아키텍처
+- [GitHub 배포 가이드](./docs/GITHUB_DEPLOY_GUIDE.md) - GitHub Pages 배포 가이드
+- [테스트 체크리스트](./docs/TEST_CHECKLIST.md) - 테스트 프로세스 가이드
 
 ## 📝 라이선스
 

@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>이북 텍스트 뷰어 v0.2.3.2 (Everything URL Protocol)</title>
+    <title>이북 텍스트 뷰어 v0.2.4.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
@@ -68,7 +68,7 @@
                                         <button id="selectFilesBtn" onclick="document.getElementById('file-input').click()" class="bg-gray-800 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-all duration-200 text-sm shadow-md border-none">
                                             내 컴퓨터 파일
                                         </button>                               
-                                        <button id="loadGoogleDriveBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 text-sm shadow-md flex items-center justify-center gap-2 border-none">
+                                        <button id="loadGoogleDriveBtn" onclick="loadGoogleDriveFiles()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 text-sm shadow-md flex items-center justify-center gap-2 border-none">
                                             Google Drive
                                         </button>
                                     </div>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>모듈 경로 테스트</title>
+</head>
+<body>
+    <h1>모듈 로딩 테스트</h1>
+    <div id="result"></div>
+    
+    <script type="module">
+        const resultDiv = document.getElementById('result');
+        
+        try {
+            // 각 모듈을 순차적으로 import하여 어디서 실패하는지 확인
+            resultDiv.innerHTML += '<p>✅ HTML 로드 성공</p>';
+            
+            // 1. config.js 테스트
+            import('./src/js/config.js')
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ config.js 로드 성공</p>';
+                    return import('./src/js/utils.js');
+                })
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ utils.js 로드 성공</p>';
+                    return import('./src/js/settings.js');
+                })
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ settings.js 로드 성공</p>';
+                    return import('./src/js/modules/BookmarkManager.js');
+                })
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ BookmarkManager.js 로드 성공</p>';
+                    return import('./src/js/viewer.js');
+                })
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ viewer.js 로드 성공</p>';
+                    return import('./src/js/google_drive.js');
+                })
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ google_drive.js 로드 성공</p>';
+                    return import('./src/js/main.js');
+                })
+                .then(module => {
+                    resultDiv.innerHTML += '<p>✅ main.js 로드 성공</p>';
+                    resultDiv.innerHTML += '<p style="color: green; font-weight: bold;">🎉 모든 모듈 로드 성공!</p>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML += `<p style="color: red;">❌ 오류 발생: ${error.message}</p>`;
+                    resultDiv.innerHTML += `<pre style="background: #f5f5f5; padding: 10px;">${error.stack}</pre>`;
+                });
+                
+        } catch (error) {
+            resultDiv.innerHTML += `<p style="color: red;">❌ 초기화 오류: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

@@ -10,11 +10,11 @@
  * - JSDoc을 통한 타입 안정성 향상
  */
 
-import { FileManager } from './viewer/FileManager.js';
-import { ContentRenderer } from './viewer/ContentRenderer.js';
-import { BookmarkManager } from './viewer/BookmarkManager.js';
-import { HistoryManager } from './viewer/HistoryManager.js';
-import { StyleManager } from './viewer/StyleManager.js';
+import { FileManager } from './modules/FileManager.js';
+import { ContentRenderer } from './modules/ContentRenderer.js';
+import { BookmarkManager } from './modules/BookmarkManager.js';
+import { HistoryManager } from './modules/HistoryManager.js';
+import { StyleManager } from './modules/StyleManager.js';
 import { formatFileSize, formatTimestamp } from './utils.js';
 import { saveReadingProgress, loadReadingProgress } from './settings.js';
 
@@ -550,3 +550,129 @@ export const setFiles = (files) => viewer.setFiles(files);
 export const getCurrentFileIndex = () => viewer.getCurrentFileIndex();
 export const setCurrentFileIndex = (index) => viewer.setCurrentFileIndex(index);
 
+// 추가 export 함수들
+export const downloadAsMarkdown = () => {
+    // 현재 파일 내용을 마크다운으로 다운로드
+    const viewerElement = document.getElementById('viewerContent');
+    const fileName = viewer.getCurrentFileName();
+    if (viewerElement && fileName) {
+        const content = viewerElement.textContent || viewerElement.innerHTML;
+        const isHtml = viewerElement.innerHTML !== viewerElement.textContent;
+        
+        // utils.js의 downloadAsMarkdown 함수 사용
+        import('./utils.js').then(module => {
+            module.downloadAsMarkdown(content, fileName, isHtml);
+        });
+    } else {
+        alert('다운로드할 내용이 없습니다.');
+    }
+};
+
+export const handleAIClean = async () => {
+    // AI 변환 처리
+    const viewerElement = document.getElementById('viewerContent');
+    const content = viewerElement ? viewerElement.textContent : '';
+    
+    if (!content) {
+        alert('변환할 텍스트가 없습니다.');
+        return;
+    }
+    
+    if (confirm('AI 변환을 시작하시겠습니까? 시간이 걸릴 수 있습니다.')) {
+        try {
+            const aiService = await import('./ai_service.js');
+            const cleanedText = await aiService.cleanTextWithAI(content, (progress) => {
+                console.log(progress);
+                // 진행 상황 표시 (선택사항)
+            });
+            
+            // 변환된 내용으로 업데이트
+            viewer.displayContent(cleanedText, viewer.getCurrentFileName());
+            alert('AI 변환이 완료되었습니다!');
+        } catch (error) {
+            console.error('AI 변환 오류:', error);
+            alert('AI 변환 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+};
+
+export const toggleFavorite = () => {
+    // 즐겨찾기 토글 (북마크와 유사한 기능)
+    alert('즐겨찾기 기능은 곧 추가될 예정입니다.');
+};export const resetAllSettings = () => {
+    if (confirm('모든 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+        localStorage.clear();
+        alert('모든 설정이 초기화되었습니다. 페이지를 새로고침합니다.');
+        window.location.reload();
+    }
+};
+
+export const exportData = () => {
+    // 데이터 내보내기
+    const data = {
+        bookmarks: localStorage.getItem('readerBookmarks'),
+        history: localStorage.getItem('readerHistory'),
+        settings: {
+            theme: localStorage.getItem('readerTheme'),
+            fontSize: localStorage.getItem('readerFontSize'),
+        },
+        version: '0.2.4.1',
+        exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ebook_viewer_backup_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
+export const importData = () => {
+    const input = document.getElementById('importDataInput');
+    if (input) {
+        input.click();
+    }
+};
+
+export const handleImportDataFile = (file) => {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (data.bookmarks) localStorage.setItem('readerBookmarks', data.bookmarks);
+            if (data.history) localStorage.setItem('readerHistory', data.history);
+            if (data.settings) {
+                if (data.settings.theme) localStorage.setItem('readerTheme', data.settings.theme);
+                if (data.settings.fontSize) localStorage.setItem('readerFontSize', data.settings.fontSize);
+            }
+            
+            alert('데이터를 성공적으로 불러왔습니다. 페이지를 새로고침합니다.');
+            window.location.reload();
+        } catch (error) {
+            alert('데이터 불러오기 실패: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+};
+
+export const restoreContextMenuSetting = () => {
+    const setting = localStorage.getItem('ctxMenuInternalToggle');
+    const toggle = document.getElementById('ctxMenuInternalToggle');
+    if (toggle && setting !== null) {
+        toggle.checked = setting === 'true';
+    }
+};
+
+export const toggleContextMenuSetting = (id) => {
+    const checkbox = document.getElementById(id);
+    if (checkbox) {
+        localStorage.setItem(id, checkbox.checked.toString());
+    }
+};

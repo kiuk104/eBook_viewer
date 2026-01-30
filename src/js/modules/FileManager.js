@@ -5,8 +5,8 @@
  * 단일 책임: 파일 배열 관리, 파일 키 생성, 파일 선택
  */
 
-import { generateFileKey } from '../../utils.js';
-import { saveLastReadFile } from '../../settings.js';
+import { generateFileKey } from '../utils.js';
+import { saveLastReadFile } from '../settings.js';
 
 /**
  * 파일 관리자 클래스

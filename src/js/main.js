@@ -6,7 +6,7 @@
 import { APP_NAME, APP_VERSION } from './config.js';
 import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
 // toggleUploadSection, toggleHistorySection, toggleBookmarksSection 추가
-import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile } from './viewer.js';
+import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, toggleBookmark, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -146,7 +146,6 @@ function initApp() {
     // Google Drive 버튼 클릭 이벤트 리스너 추가
     const loadGoogleDriveBtn = document.getElementById('loadGoogleDriveBtn');
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:152',message:'Looking for loadGoogleDriveBtn',data:{buttonFound:!!loadGoogleDriveBtn,windowLoadGoogleDriveFiles:typeof window.loadGoogleDriveFiles,loadGoogleDriveFilesType:typeof loadGoogleDriveFiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
     console.log('🔍 Google Drive 버튼 찾기:', { 
         buttonFound: !!loadGoogleDriveBtn,
@@ -167,7 +166,6 @@ function initApp() {
             e.stopPropagation();
             
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:163',message:'Google Drive button clicked',data:{windowLoadGoogleDriveFiles:typeof window.loadGoogleDriveFiles,loadGoogleDriveFilesType:typeof loadGoogleDriveFiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
             // #endregion
             console.log('🔵 Google Drive 버튼 클릭 이벤트 리스너 실행');
             console.log('🔍 함수 상태:', { 
@@ -183,7 +181,6 @@ function initApp() {
                     await loadGoogleDriveFiles();
                 } catch (error) {
                     // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:171',message:'loadGoogleDriveFiles error in listener',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
                     // #endregion
                     console.error('❌ loadGoogleDriveFiles 실행 중 오류:', error);
                     console.error('❌ 오류 상세:', { message: error.message, stack: error.stack, name: error.name });
@@ -195,14 +192,12 @@ function initApp() {
                     await window.loadGoogleDriveFiles();
                 } catch (error) {
                     // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:171',message:'window.loadGoogleDriveFiles error in listener',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
                     // #endregion
                     console.error('❌ window.loadGoogleDriveFiles 실행 중 오류:', error);
                     console.error('❌ 오류 상세:', { message: error.message, stack: error.stack, name: error.name });
                 }
             } else {
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:174',message:'loadGoogleDriveFiles not found anywhere',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
                 // #endregion
                 console.error('❌ loadGoogleDriveFiles 함수를 찾을 수 없습니다.');
                 alert('Google Drive 기능을 사용할 수 없습니다. 페이지를 새로고침해주세요.');
@@ -212,12 +207,10 @@ function initApp() {
         loadGoogleDriveBtn._clickListener = clickListener; // 참조 저장
         loadGoogleDriveBtn.addEventListener('click', clickListener, { capture: false, passive: false });
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:180',message:'Google Drive button listener registered',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
         // #endregion
         console.log('✅ Google Drive 버튼 이벤트 리스너 등록 완료');
     } else {
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:182',message:'loadGoogleDriveBtn not found',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
         // #endregion
         console.warn('⚠️ loadGoogleDriveBtn 요소를 찾을 수 없습니다.');
     }
@@ -355,7 +348,6 @@ window.setFontSize = setFontSize;
 window.saveGoogleDriveSettings = saveGoogleDriveSettings;
 window.loadGoogleDriveFiles = loadGoogleDriveFiles;
 // #region agent log
-fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:314',message:'window.loadGoogleDriveFiles assigned',data:{isFunction:typeof loadGoogleDriveFiles === 'function',functionName:loadGoogleDriveFiles?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
 // #endregion
 console.log('✅ window.loadGoogleDriveFiles 할당 완료', { 
     isFunction: typeof loadGoogleDriveFiles === 'function',
@@ -393,6 +385,27 @@ window.updateTextStroke = updateTextStroke;
 
 // [추가] 설정 초기화 함수 노출
 window.resetAllSettings = resetAllSettings;
+
+// [추가] 컨텍스트 메뉴 설정 함수 노출
+window.toggleContextMenuSetting = toggleContextMenuSetting;
+window.restoreContextMenuSetting = restoreContextMenuSetting;
+
+// [추가] 데이터 백업/복원 함수 노출
+window.exportData = exportData;
+window.importData = importData;
+window.handleImportDataFile = handleImportDataFile;
+
+// [추가] 북마크 함수 노출
+window.toggleBookmark = toggleBookmark;
+
+// [추가] 히스토리 표시 함수 노출
+window.displayUploadHistory = displayUploadHistory;
+window.displayUploadBookmarks = displayUploadBookmarks;
+
+// [추가] Google Drive 관련 함수 노출
+window.loadLastReadGoogleDriveFile = loadLastReadGoogleDriveFile;
+
+console.log('✅ 모든 전역 함수 할당 완료');
 
 // [추가] 컨텍스트 메뉴 설정 함수 노출
 window.toggleContextMenuSetting = toggleContextMenuSetting;

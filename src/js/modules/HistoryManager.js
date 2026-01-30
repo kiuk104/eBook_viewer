@@ -5,8 +5,8 @@
  * 단일 책임: 읽기 히스토리 추가/삭제/조회, 히스토리 UI 표시
  */
 
-import { getHistory, setHistory } from '../../settings.js';
-import { formatTimestamp } from '../../utils.js';
+import { getHistory, setHistory } from '../settings.js';
+import { formatTimestamp } from '../utils.js';
 
 /**
  * 히스토리 관리자 클래스
@@ -116,7 +116,8 @@ export class HistoryManager {
      * @returns {HTMLElement} 히스토리 항목 요소
      */
     #createHistoryItem(item, index, onItemClick) {
-        const isGoogleDrive = item.fileKey.startsWith('gdrive_');
+        // fileKey가 null이면 로컬 파일로 간주
+        const isGoogleDrive = item.fileKey ? item.fileKey.startsWith('gdrive_') : false;
         const isMdFile = item.name.endsWith('.md');
         const icon = isMdFile ? '📝' : '📄';
         const iconColor = isGoogleDrive ? 'text-blue-600' : 'text-gray-600';

@@ -5,7 +5,7 @@
  * 단일 책임: 북마크 추가/삭제/조회, 북마크 UI 표시
  */
 
-import { getBookmarks, setBookmarks } from '../../settings.js';
+import { getBookmarks, setBookmarks } from '../settings.js';
 
 /**
  * 북마크 관리자 클래스
