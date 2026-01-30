@@ -1,18 +1,20 @@
-# Cursor Complete Sync Script
+# Cursor Settings Sync Script
 # Run in PowerShell: .\scripts\sync_cursor_all.ps1
 #
-# This script syncs Cursor settings, chat history, and extensions between devices
+# This script syncs Cursor settings, keybindings, snippets, and extensions between devices
+# Note: Chat history is excluded due to large file size
 # Usage:
 #   - First time: Set your cloud folder path (Google Drive, OneDrive, etc.)
-#   - Run this script to backup/restore all Cursor data
+#   - Run this script to backup/restore Cursor settings
 
 # Set output encoding to UTF-8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Cursor Complete Sync" -ForegroundColor Cyan
-Write-Host "  (Settings + Chat History + Extensions)" -ForegroundColor Cyan
+Write-Host "  Cursor Settings Sync" -ForegroundColor Cyan
+Write-Host "  (Settings + Keybindings + Snippets + Extensions)" -ForegroundColor Cyan
+Write-Host "  (Chat History excluded - use sync_cursor_chat.ps1)" -ForegroundColor Gray
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -41,12 +43,13 @@ $syncItems = @{
         "Description" = "Code snippets"
         "IsDirectory" = $true
     }
-    "ChatHistory" = @{
-        "Path" = "$cursorUserFolder\globalStorage\state.vscdb"
-        "CloudPath" = "chat_history.vscdb"
-        "Required" = $false
-        "Description" = "Chat conversation history"
-    }
+    # ChatHistory excluded due to large file size
+    # "ChatHistory" = @{
+    #     "Path" = "$cursorUserFolder\globalStorage\state.vscdb"
+    #     "CloudPath" = "chat_history.vscdb"
+    #     "Required" = $false
+    #     "Description" = "Chat conversation history"
+    # }
     "Extensions" = @{
         "Path" = "$cursorUserFolder\extensions"
         "CloudPath" = "extensions_list.txt"

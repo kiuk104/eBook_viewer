@@ -1,6 +1,9 @@
-# Cursor 완전 동기화 가이드
+# Cursor 설정 동기화 가이드
 
-Cursor IDE의 **설정, 대화 기록, 확장 프로그램, 스니펫**을 노트북과 데스크톱 간에 동기화하는 방법입니다.
+Cursor IDE의 **설정, 키보드 단축키, 스니펫, 확장 프로그램**을 노트북과 데스크톱 간에 동기화하는 방법입니다.
+
+> **참고**: 대화 기록(Chat History)은 파일 크기가 매우 크기 때문에 기본적으로 제외됩니다.  
+> 대화 기록만 동기화하려면 `sync_cursor_chat.ps1` 스크립트를 사용하세요.
 
 ## 📋 개요
 
@@ -29,8 +32,8 @@ Cursor는 기본적으로 Settings Sync 기능이 없을 수 있습니다. 이 �
    - ✅ **Settings** - Cursor 설정
    - ✅ **Keybindings** - 키보드 단축키
    - ✅ **Snippets** - 코드 스니펫
-   - ✅ **Chat History** - 대화 기록
    - ✅ **Extensions** - 설치된 확장 프로그램 목록
+   - ❌ **Chat History** - 대화 기록 (제외됨 - 용량이 큼)
 
 ### 3. 전체 복원 (클라우드 → 새 PC/노트북)
 
@@ -56,16 +59,16 @@ Cursor는 기본적으로 Settings Sync 기능이 없을 수 있습니다. 이 �
 - **Settings**: `%APPDATA%\Cursor\User\settings.json`
 - **Keybindings**: `%APPDATA%\Cursor\User\keybindings.json`
 - **Snippets**: `%APPDATA%\Cursor\User\snippets\`
-- **Chat History**: `%APPDATA%\Cursor\User\globalStorage\state.vscdb`
 - **Extensions**: `%APPDATA%\Cursor\User\extensions\` (목록만 저장)
+- ~~**Chat History**: `%APPDATA%\Cursor\User\globalStorage\state.vscdb`~~ (제외됨)
 
 ### 클라우드 백업 위치:
 - 설정한 클라우드 폴더 내:
   - `settings.json`
   - `keybindings.json`
   - `snippets\` (폴더)
-  - `chat_history.vscdb`
   - `extensions_list.txt`
+  - ~~`chat_history.vscdb`~~ (제외됨)
 
 ## ⚠️ 중요 주의사항
 
@@ -79,8 +82,8 @@ Cursor는 기본적으로 Settings Sync 기능이 없을 수 있습니다. 이 �
 - 복원 후 모든 확장 프로그램이 자동 설치되므로 시간이 걸릴 수 있습니다.
 
 ### 3. 파일 크기
-- 대화 기록 파일은 수백 MB ~ 수 GB까지 커질 수 있습니다.
-- 클라우드 동기화에 시간이 걸릴 수 있습니다.
+- 대화 기록은 용량이 크기 때문에 기본적으로 제외됩니다.
+- 대화 기록만 동기화하려면 `sync_cursor_chat.ps1` 스크립트를 별도로 사용하세요.
 
 ### 4. 클라우드 동기화
 - 클라우드 폴더가 자동으로 동기화되도록 설정되어 있어야 합니다.
@@ -120,13 +123,15 @@ Cursor는 기본적으로 Settings Sync 기능이 없을 수 있습니다. 이 �
 
 ### 시나리오 3: 특정 항목만 동기화
 
-예: 대화 기록만 동기화
+예: 스니펫만 동기화
 
 ```powershell
 .\scripts\sync_cursor_all.ps1
 # 옵션 3 선택 (Backup Selected)
-# 4 입력 (Chat History)
+# 3 입력 (Snippets)
 ```
+
+> **대화 기록만 동기화**: `sync_cursor_chat.ps1` 스크립트를 사용하세요.
 
 ## 🛠️ 메뉴 옵션 상세
 
@@ -163,9 +168,9 @@ Cursor는 기본적으로 Settings Sync 기능이 없을 수 있습니다. 이 �
 - 확장 프로그램은 목록만 저장되므로, 복원 시 재설치됩니다.
 - 인터넷 연결이 필요합니다.
 
-### 5. 대화 기록 크기 관리
-- 대화 기록이 너무 크면 클라우드 동기화에 시간이 걸립니다.
-- 필요시 Cursor에서 오래된 대화를 삭제할 수 있습니다.
+### 5. 대화 기록 동기화
+- 대화 기록은 기본적으로 제외됩니다 (용량이 큼).
+- 대화 기록만 동기화하려면 `scripts/sync_cursor_chat.ps1` 스크립트를 사용하세요.
 
 ## 🐛 문제 해결
 
