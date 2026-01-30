@@ -217,19 +217,68 @@ async function pickerCallback(data) {
         // Display first file if any (viewer.js의 함수 사용)
         if (downloadedFiles.length > 0) {
             // viewer.js의 함수들을 동적으로 import하여 사용
-            const { addFile, setFiles, setCurrentFileIndex, displayFileContent, toggleUploadSection } = await import('./viewer.js');
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:217',message:'Before importing viewer.js',data:{downloadedFilesCount:downloadedFiles.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            let viewerModule;
+            try {
+                viewerModule = await import('./viewer.js');
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:220',message:'viewer.js imported successfully',data:{hasAddFile:!!viewerModule.addFile,hasSetFiles:!!viewerModule.setFiles,hasDisplayFileContent:!!viewerModule.displayFileContent,hasToggleUploadSection:!!viewerModule.toggleUploadSection,exportedFunctions:Object.keys(viewerModule)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                // #endregion
+            } catch (importError) {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:223',message:'viewer.js import failed',data:{errorMessage:importError.message,errorStack:importError.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                // #endregion
+                console.error('❌ viewer.js import 실패:', importError);
+                alert('파일 로드 실패: viewer.js를 불러올 수 없습니다.');
+                return;
+            }
+            
+            const { setFiles, setCurrentFileIndex, displayFileContent, toggleUploadSection } = viewerModule;
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:230',message:'Before calling viewer functions',data:{hasSetFiles:!!setFiles,hasSetCurrentFileIndex:!!setCurrentFileIndex,hasDisplayFileContent:!!displayFileContent,hasToggleUploadSection:!!toggleUploadSection},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
             
             // 파일 배열 업데이트
-            setFiles(downloadedFiles);
-            setCurrentFileIndex(0);
+            if (setFiles) {
+                setFiles(downloadedFiles);
+            } else {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:235',message:'setFiles is undefined',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                // #endregion
+                console.error('❌ setFiles 함수를 찾을 수 없습니다.');
+                alert('파일 로드 실패: setFiles 함수를 찾을 수 없습니다.');
+                return;
+            }
+            
+            if (setCurrentFileIndex) {
+                setCurrentFileIndex(0);
+            }
             
             document.getElementById('mainContent').classList.remove('hidden');
-            displayFileContent(downloadedFiles[0]);
+            
+            if (displayFileContent) {
+                displayFileContent(downloadedFiles[0]);
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:250',message:'displayFileContent called successfully',data:{fileName:downloadedFiles[0].name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                // #endregion
+            } else {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:253',message:'displayFileContent is undefined',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                // #endregion
+                console.error('❌ displayFileContent 함수를 찾을 수 없습니다.');
+                alert('파일 로드 실패: displayFileContent 함수를 찾을 수 없습니다.');
+                return;
+            }
             
             // Auto collapse upload section
             const uploadContent = document.getElementById('uploadSectionContent');
             if (uploadContent && !uploadContent.classList.contains('hidden')) {
-                toggleUploadSection();
+                if (toggleUploadSection) {
+                    toggleUploadSection();
+                }
             }
         }
     } else if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) {
@@ -460,7 +509,24 @@ export async function loadLastReadGoogleDriveFile(fileId) {
         const lastModified = new Date(fileInfo.result.modifiedTime).getTime();
         
         // viewer.js의 함수들을 동적으로 import
-        const { setFiles, setCurrentFileIndex, displayFileContent, toggleUploadSection } = await import('./viewer.js');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:462',message:'Before importing viewer.js in loadLastReadGoogleDriveFile',data:{fileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
+        let viewerModule;
+        try {
+            viewerModule = await import('./viewer.js');
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:465',message:'viewer.js imported in loadLastReadGoogleDriveFile',data:{hasSetFiles:!!viewerModule.setFiles,hasDisplayFileContent:!!viewerModule.displayFileContent,exportedFunctions:Object.keys(viewerModule)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+        } catch (importError) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:468',message:'viewer.js import failed in loadLastReadGoogleDriveFile',data:{errorMessage:importError.message,errorStack:importError.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            console.error('❌ viewer.js import 실패:', importError);
+            throw importError;
+        }
+        
+        const { setFiles, setCurrentFileIndex, displayFileContent, toggleUploadSection } = viewerModule;
         
         // 파일 객체 생성
         const fileObj = {
@@ -472,17 +538,43 @@ export async function loadLastReadGoogleDriveFile(fileId) {
             fileId: fileId   // 하위 호환성을 위해 유지
         };
         
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:480',message:'Before calling viewer functions in loadLastReadGoogleDriveFile',data:{hasSetFiles:!!setFiles,hasDisplayFileContent:!!displayFileContent,fileName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
+        
         // 파일 배열 설정 및 표시
+        if (!setFiles) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:483',message:'setFiles is undefined in loadLastReadGoogleDriveFile',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            throw new Error('setFiles 함수를 찾을 수 없습니다.');
+        }
+        
         setFiles([fileObj]);
-        setCurrentFileIndex(0);
+        if (setCurrentFileIndex) {
+            setCurrentFileIndex(0);
+        }
         
         document.getElementById('mainContent').classList.remove('hidden');
+        
+        if (!displayFileContent) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:492',message:'displayFileContent is undefined in loadLastReadGoogleDriveFile',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            throw new Error('displayFileContent 함수를 찾을 수 없습니다.');
+        }
+        
         displayFileContent(fileObj);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'google_drive.js:499',message:'displayFileContent called successfully in loadLastReadGoogleDriveFile',data:{fileName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         
         // Auto collapse upload section
         const uploadContent = document.getElementById('uploadSectionContent');
         if (uploadContent && !uploadContent.classList.contains('hidden')) {
-            toggleUploadSection();
+            if (toggleUploadSection) {
+                toggleUploadSection();
+            }
         }
         
         console.log('마지막 읽은 Google Drive 파일 복원 완료:', fileName);

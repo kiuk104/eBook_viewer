@@ -1,5 +1,5 @@
 /**
- * 에이전트 1 제안: 클래스 기반 모듈 패턴
+ * 뷰어 모듈 - 클래스 기반 모듈 패턴
  * 
  * 뷰어 모듈 진입점 - 모든 관리자 클래스를 통합
  * 
@@ -10,13 +10,13 @@
  * - JSDoc을 통한 타입 안정성 향상
  */
 
-import { FileManager } from './FileManager.js';
-import { ContentRenderer } from './ContentRenderer.js';
-import { BookmarkManager } from './BookmarkManager.js';
-import { HistoryManager } from './HistoryManager.js';
-import { StyleManager } from './StyleManager.js';
-import { formatFileSize, formatTimestamp } from '../../utils.js';
-import { saveReadingProgress, loadReadingProgress } from '../../settings.js';
+import { FileManager } from './viewer/FileManager.js';
+import { ContentRenderer } from './viewer/ContentRenderer.js';
+import { BookmarkManager } from './viewer/BookmarkManager.js';
+import { HistoryManager } from './viewer/HistoryManager.js';
+import { StyleManager } from './viewer/StyleManager.js';
+import { formatFileSize, formatTimestamp } from './utils.js';
+import { saveReadingProgress, loadReadingProgress } from './settings.js';
 
 /**
  * 뷰어 코디네이터 클래스
