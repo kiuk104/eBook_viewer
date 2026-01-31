@@ -340,6 +340,10 @@
             <span>🗑️</span> 하이라이트 삭제
         </button>
 
+        <button id="ctxDownload" class="w-full text-left px-4 py-2 text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-gray-700 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700">
+            <span>💾</span> 현재 파일 저장하기 (.md)
+        </button>
+       
         <div id="normalMenuOptions">
             <div id="ctxBookmark" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
                 <span>🔖</span> 북마크 추가
@@ -363,14 +367,13 @@
                 💡 <span class="font-semibold">Ctrl + 우클릭</span>하면 브라우저 기본 메뉴
             </div>
         </div>
-    </div>
-                
         <div class="px-4 py-3 border-t theme-border flex items-center justify-between bg-gray-50/10 hover:bg-white/20 transition-colors">
             <span class="text-xs theme-text-body opacity-80">커스텀 메뉴 사용</span>
             <label class="relative inline-flex items-center cursor-pointer" title="끄면 시스템 기본 메뉴가 나타납니다">
                 <input type="checkbox" id="ctxMenuInternalToggle" class="sr-only peer" checked onchange="toggleContextMenuSetting('ctxMenuInternalToggle')">
                 <div class="w-7 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
             </label>
+        </div>
         </div>
     </div>
 

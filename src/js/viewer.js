@@ -70,6 +70,9 @@ export class ViewerCoordinator {
      * 생성자
      */
     constructor() {
+        // [🚨 핵심 수정] 이 줄을 추가해서 전역에서 뷰어를 찾을 수 있게 합니다.
+        window.viewer = this; 
+
         this.#fileManager = new FileManager();
         this.#renderer = new ContentRenderer();
         this.#bookmarkManager = new BookmarkManager();
@@ -196,6 +199,37 @@ export class ViewerCoordinator {
         }
 
         this.#historyManager.addHistoryItem(file.name, fileKey, content);
+    }
+
+    /**
+     * 현재 보고 있는 파일 다운로드 (내용 보장)
+     */
+    downloadCurrentFile() {
+        const file = this.#fileManager.getCurrentFile();
+        
+        // 1. 파일이나 내용이 없으면 중단
+        if (!file || !file.content) {
+            alert('저장할 내용이 없습니다.');
+            return;
+        }
+
+        // 2. 현재 메모리에 있는 텍스트(file.content)로 새로운 Blob 생성
+        // (이 과정이 있어야 빈 파일이 되지 않습니다)
+        const blob = new Blob([file.content], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        
+        // 3. 가짜 링크를 만들어 다운로드 실행
+        const a = document.createElement('a');
+        a.href = url;
+        // 파일명이 .md로 안 끝나면 붙여줌
+        a.download = file.name.endsWith('.md') ? file.name : file.name + '.md';
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // 4. 뒷정리
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     /**
@@ -1006,6 +1040,19 @@ function setupContextMenuItems() {
                     hideContextMenu();            }
             });
     }
+    // setupContextMenuItems 함수 내부
+
+    // [추가] 다운로드 버튼 이벤트 연결
+    const ctxDownload = document.getElementById('ctxDownload');
+    if (ctxDownload) {
+        ctxDownload.addEventListener('click', () => {
+            if (window.viewer) {
+                window.viewer.downloadCurrentFile();
+            }
+            hideContextMenu();
+        });
+    }
+    
 }
 
 // DOM 로드 후 메뉴 항목 이벤트 설정
@@ -1013,4 +1060,27 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setupContextMenuItems);
 } else {
     setupContextMenuItems();
+
+// [기존 저장 버튼 수리 완료]
+// 확인된 ID: downloadMdBtn
+document.addEventListener('DOMContentLoaded', () => {
+    const existingSaveBtn = document.getElementById('downloadMdBtn'); // ID 수정됨
+    
+    if (existingSaveBtn) {
+        // 기존의 downloadAsMarkdown() 함수 호출을 막고, 새로운 저장 기능으로 교체
+        existingSaveBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation(); 
+            
+            if (window.viewer) {
+                // 내용이 보장된 강력한 저장 함수 호출
+                window.viewer.downloadCurrentFile(); 
+                console.log('💾 상단 버튼으로 파일 저장 완료');
+            } else {
+                alert('뷰어가 초기화되지 않았습니다.');
+            }
+        };
+    }
+});
+
 }

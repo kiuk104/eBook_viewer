@@ -197,6 +197,16 @@
    - 마크다운 가독성 개선: `StyleManager.js`에서 제목(H1)과 서지 정보(H3)의 크기 배율 조정
    - 다크 모드 가독성 개선: 컨텍스트 메뉴에 다크 모드 텍스트 색상(`dark:text-gray-200`) 명시
 
+6. **🐛 긴급 버그 수정 (Hotfix)**
+   - **파일 저장 기능 정상화**
+     - 상단 툴바의 'MD 저장' 버튼(`downloadMdBtn`) 클릭 시 0바이트(빈 파일)로 저장되던 문제 해결
+     - 기존 저장 버튼 이벤트를 `viewer.downloadCurrentFile()` 메서드로 재연결하여 메모리 내 최신 데이터를 저장하도록 수정
+   - **뷰어 초기화 오류 수정**
+     - `ViewerCoordinator` 생성자에서 `window.viewer` 전역 인스턴스 할당 누락 수정 ("뷰어가 초기화되지 않았습니다" 오류 해결)
+   - **HTML 구조 및 중복 ID 정리**
+     - `ebook_viewer.html`: 컨텍스트 메뉴 내 중복된 `ctxRemoveHighlight` 버튼 제거
+     - '커스텀 메뉴 사용' 토글 스위치가 컨텍스트 메뉴 영역 밖으로 이탈해 있던 HTML 구조 수정
+
 #### 📚 배운 점
 1. **하이라이트 시스템 설계**
    - 클래스 기반 모듈 패턴으로 `HighlightManager` 독립 구현
@@ -244,10 +254,34 @@
    해결: 상태 기반으로 메뉴 항목 표시/숨김 로직 개선
    ```
 
+4. **파일 저장 기능 오류 디버깅**
+   ```
+   문제: MD 저장 버튼 클릭 시 0바이트 파일로 저장됨
+   원인: 저장 버튼 이벤트가 잘못된 함수에 연결되어 있음
+   해결: viewer.downloadCurrentFile() 메서드로 재연결하여 메모리 내 최신 데이터 저장
+   ```
+
+5. **뷰어 초기화 오류 디버깅**
+   ```
+   문제: "뷰어가 초기화되지 않았습니다" 오류 발생
+   원인: ViewerCoordinator 생성자에서 window.viewer 전역 인스턴스 할당 누락
+   해결: 생성자에 window.viewer = this; 추가
+   ```
+
+6. **HTML 구조 오류 디버깅**
+   ```
+   문제: 중복된 ID와 잘못된 HTML 구조
+   원인: 컨텍스트 메뉴 내 중복된 ctxRemoveHighlight 버튼, 토글 스위치 위치 오류
+   해결: 중복 ID 제거 및 HTML 구조 정리
+   ```
+
 #### 💡 개선 사항
 - **모듈화**: 하이라이트 기능을 독립 모듈로 분리하여 유지보수성 향상
 - **에러 처리**: 파일 처리 시 null/undefined 체크 강화
 - **사용자 경험**: 다크 모드에서도 텍스트가 명확히 보이도록 색상 명시
+- **전역 인스턴스 관리**: ViewerCoordinator 생성 시 window.viewer에 할당하여 전역 접근성 보장
+- **HTML 구조 검증**: 중복 ID 제거 및 구조 정리로 렌더링 안정성 향상
+- **파일 저장 안정성**: 메모리 내 최신 데이터를 직접 참조하여 저장하도록 개선
 
 ---
 
@@ -903,6 +937,123 @@ getCurrentFileName() {
 
 ---
 
+#### 문제 13: 파일 저장 기능 오류 (v0.2.4.5 Hotfix)
+**증상:**
+- 상단 툴바의 'MD 저장' 버튼(`downloadMdBtn`) 클릭 시 0바이트(빈 파일)로 저장됨
+- 저장된 파일이 비어있거나 내용이 없음
+
+**원인:**
+- 저장 버튼 이벤트가 잘못된 함수에 연결되어 있음
+- 메모리 내 최신 데이터를 참조하지 않고 오래된 데이터를 저장함
+
+**해결 방법:**
+```javascript
+// main.js 또는 viewer.js
+// ❌ 잘못된 방법
+document.getElementById('downloadMdBtn').addEventListener('click', () => {
+    downloadFile(...);  // 오래된 데이터 참조
+});
+
+// ✅ 올바른 방법
+document.getElementById('downloadMdBtn').addEventListener('click', () => {
+    if (window.viewer) {
+        window.viewer.downloadCurrentFile();  // 메모리 내 최신 데이터 저장
+    }
+});
+```
+
+**체크리스트:**
+- [ ] 저장 버튼 이벤트가 올바른 함수에 연결되어 있는가?
+- [ ] `viewer.downloadCurrentFile()` 메서드를 사용하는가?
+- [ ] 메모리 내 최신 데이터를 참조하는가?
+
+---
+
+#### 문제 14: 뷰어 초기화 오류 (v0.2.4.5 Hotfix)
+**증상:**
+- "뷰어가 초기화되지 않았습니다" 오류 발생
+- `window.viewer`가 `undefined`로 표시됨
+- 뷰어 관련 기능이 작동하지 않음
+
+**원인:**
+- `ViewerCoordinator` 생성자에서 `window.viewer` 전역 인스턴스 할당 누락
+- 다른 모듈에서 `window.viewer`를 참조할 수 없음
+
+**해결 방법:**
+```javascript
+// viewer.js - ViewerCoordinator 클래스
+constructor() {
+    this.#fileManager = new FileManager();
+    this.#contentRenderer = new ContentRenderer();
+    this.#bookmarkManager = new BookmarkManager();
+    this.#historyManager = new HistoryManager();
+    this.#styleManager = new StyleManager();
+    this.#highlightManager = new HighlightManager();
+    
+    // ✅ 전역 인스턴스 할당 추가
+    window.viewer = this;
+}
+```
+
+**체크리스트:**
+- [ ] `ViewerCoordinator` 생성자에 `window.viewer = this;`가 있는가?
+- [ ] 다른 모듈에서 `window.viewer`를 참조할 수 있는가?
+- [ ] 뷰어 초기화 후 `window.viewer`가 정의되어 있는가?
+
+---
+
+#### 문제 15: HTML 구조 및 중복 ID 오류 (v0.2.4.5 Hotfix)
+**증상:**
+- 컨텍스트 메뉴 내 중복된 `ctxRemoveHighlight` 버튼이 존재함
+- '커스텀 메뉴 사용' 토글 스위치가 컨텍스트 메뉴 영역 밖으로 이탈
+- HTML 구조 오류로 인한 렌더링 문제
+
+**원인:**
+- HTML 구조가 잘못되어 중복된 ID가 생성됨
+- 토글 스위치의 위치가 잘못된 부모 요소 안에 있음
+
+**해결 방법:**
+1. **중복 ID 제거**
+   ```html
+   <!-- ❌ 잘못된 방법 (중복 ID) -->
+   <div id="contextMenu">
+       <button id="ctxRemoveHighlight">하이라이트 삭제</button>
+       <button id="ctxRemoveHighlight">하이라이트 삭제</button>  <!-- 중복 -->
+   </div>
+   
+   <!-- ✅ 올바른 방법 -->
+   <div id="contextMenu">
+       <button id="ctxRemoveHighlight">하이라이트 삭제</button>
+   </div>
+   ```
+
+2. **토글 스위치 위치 수정**
+   ```html
+   <!-- ❌ 잘못된 방법 (토글이 메뉴 밖으로 이탈) -->
+   <div id="contextMenu">
+       <!-- 메뉴 항목들 -->
+   </div>
+   <div>  <!-- 잘못된 위치 -->
+       <input type="checkbox" id="customMenuToggle">
+   </div>
+   
+   <!-- ✅ 올바른 방법 -->
+   <div id="contextMenu">
+       <!-- 메뉴 항목들 -->
+       <div>  <!-- 메뉴 내부에 위치 -->
+           <input type="checkbox" id="customMenuToggle">
+       </div>
+   </div>
+   ```
+
+**체크리스트:**
+- [ ] HTML에 중복된 ID가 없는가?
+- [ ] 토글 스위치가 올바른 부모 요소 안에 있는가?
+- [ ] 브라우저 개발자 도구에서 HTML 구조 오류가 없는가?
+- [ ] 모든 태그가 올바르게 닫혀있는가?
+
+---
+
 ### 🟢 심각도: 낮음 (Low)
 
 #### 문제 5: "함수가 정의되지 않음"
@@ -1127,6 +1278,9 @@ git push origin main
 | AI 텍스트 변환 오류 | 모델명 단종, 파일 확장자 문제, content 누락 | 모델명 변경, 확장자 강제 변환, content 포함 | [문서](#문제-10-ai-텍스트-변환-오류-v0245) |
 | 다운로드 기능 오류 | getCurrentFileName 메서드 누락 | ViewerCoordinator에 메서드 추가 | [문서](#문제-11-다운로드-기능-오류-v0245) |
 | 컨텍스트 메뉴 버그 | Toggle 로직 문제, HTML 구조 오류 | 상태 기반 메뉴 표시, HTML 구조 검증 | [문서](#문제-12-컨텍스트-메뉴-버그-v0245) |
+| 파일 저장 기능 오류 | 저장 버튼 이벤트 잘못 연결 | viewer.downloadCurrentFile() 메서드로 재연결 | [문서](#문제-13-파일-저장-기능-오류-v0245-hotfix) |
+| 뷰어 초기화 오류 | window.viewer 할당 누락 | ViewerCoordinator 생성자에 window.viewer = this 추가 | [문서](#문제-14-뷰어-초기화-오류-v0245-hotfix) |
+| HTML 구조 및 중복 ID 오류 | 중복 ID, 토글 스위치 위치 오류 | 중복 ID 제거, HTML 구조 정리 | [문서](#문제-15-html-구조-및-중복-id-오류-v0245-hotfix) |
 | CORS 오류 | file:// 프로토콜 사용 | 웹 서버 사용 (`python -m http.server 8000`) | [문서](#문제-7-cors-오류) |
 
 ### 개발 워크플로우 요약
