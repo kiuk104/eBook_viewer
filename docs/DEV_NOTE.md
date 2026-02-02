@@ -169,6 +169,566 @@
 
 ## 2. 오늘의 배움
 
+### 2026-02-01: 편집 패널 UI 개선 및 자동 저장 시스템 구현 (v0.2.4.13)
+
+#### 🎯 주요 작업
+
+1. **편집 패널 UI 대폭 개선**
+   - 버튼 재구성: 메모리 저장 / 파일 저장 / 원본으로 / 닫기
+   - 중앙 상태 표시 영역 추가 (변경 횟수, 저장 시간)
+   - 시각적 구분 강화
+
+2. **즉시 저장 기능 구현**
+   - `saveEditedContentNow()` 메서드 추가
+   - 확인 없이 즉시 저장 (메모리)
+   - 마지막 저장 시간 표시
+
+3. **원본 복원 기능 구현**
+   - `restoreOriginal()` 메서드 추가
+   - 확인 대화상자로 원본으로 되돌리기
+   - 편집 히스토리 초기화
+
+4. **편집 패널 닫기 기능 구현**
+   - `closeEditPanel()` 메서드 추가
+   - 변경사항이 있으면 저장 여부 확인
+   - 예/아니오/취소 옵션 제공
+
+5. **파일 다운로드 기능 구현**
+   - `downloadEditedFile()` 메서드 추가
+   - 편집 내용을 파일로 다운로드
+   - 파일명에 타임스탬프 자동 추가
+
+6. **자동 저장 시스템 구현**
+   - 5분마다 자동 저장 (`saveEditedContentNow()`)
+   - 편집 모드 활성화 시 자동 시작
+   - 편집 모드 비활성화 시 자동 정지
+
+7. **로컬스토리지 임시 저장 구현**
+   - 30초마다 자동 저장 (로컬스토리지)
+   - 브라우저 새로고침 시 복원 기능
+   - 저장 시각 표시 및 확인 대화상자
+   - 편집 모드 종료 시 자동 정리
+
+#### 배운 점
+
+- **자동 저장 시스템 설계**
+  - 두 가지 자동 저장 방식 (메모리 저장 vs 로컬스토리지)
+  - 타이머 관리 및 정리 중요성
+  - 사용자 경험 개선 (브라우저 새로고침 시 복원)
+
+- **편집 상태 관리**
+  - 변경 횟수 추적
+  - 마지막 저장 시간 표시
+  - 상태별 색상 구분
+
+- **UI/UX 개선**
+  - 버튼 그룹화 및 역할 명확화
+  - 상태 표시 영역 추가
+  - 툴팁으로 사용법 안내
+
+#### 해결 과정
+
+1. 편집 패널 버튼 재구성
+2. 즉시 저장 기능 구현
+3. 원본 복원 기능 구현
+4. 편집 패널 닫기 기능 구현
+5. 파일 다운로드 기능 구현
+6. 자동 저장 시스템 구현
+7. 로컬스토리지 임시 저장 구현
+8. 편집 상태 표시 개선
+
+#### 개선 사항
+
+- 편집 패널 UI 개선
+- 자동 저장 시스템 구축
+- 브라우저 새로고침 시 복원 기능
+- 편집 상태 표시 개선
+- 단축키 개선 (Ctrl+S)
+
+---
+
+### 2026-02-01: 링크 수정 및 삭제 기능 구현 (v0.2.4.11)
+
+#### 🎯 주요 작업
+
+1. **링크 수정 및 삭제 기능 구현**
+   - 더블클릭으로 링크 URL 및 텍스트 수정
+   - Alt+클릭으로 링크 삭제 (텍스트는 유지)
+   - 우클릭 컨텍스트 메뉴 (수정/복사/열기/삭제)
+   - URL 유효성 검사 (`new URL()` 사용)
+   - 링크 목록 조회 기능 (`getAllLinks()` 메서드)
+
+2. **선택 영역 자동 저장 시스템**
+   - 편집 모드에서 텍스트 선택 시 자동 저장
+   - 5초 후 자동 만료 (타이머 관리)
+   - 링크/이미지/테이블 삽입 시 저장된 선택 영역 사용
+   - 선택 영역 저장 시 토스트 메시지 표시
+
+3. **링크 스타일 및 UI 개선**
+   - 기본 링크 스타일 추가 (파란색 밑줄)
+   - 편집 모드에서 링크 강조 (점선 테두리)
+   - 편집 패널 사용 방법 안내 추가
+   - 링크 삽입 시 툴팁 추가
+
+#### 📚 배운 점
+
+1. **이벤트 리스너 관리**
+   - `closest('a')`로 링크 요소 찾기
+   - `preventDefault()`와 `stopPropagation()`으로 기본 동작 방지
+   - 이벤트 버블링 제어
+
+2. **URL 유효성 검사**
+   - `new URL()` 생성자로 URL 형식 검증
+   - try-catch로 에러 처리
+
+3. **선택 영역 관리**
+   - `window.getSelection()`과 `Range` 객체 사용
+   - `cloneRange()`로 선택 영역 복사
+   - 전역 변수(`window.lastSelectionRange`)로 선택 영역 저장
+
+4. **컨텍스트 메뉴 구현**
+   - 동적 메뉴 생성 및 위치 조정
+   - 외부 클릭 시 자동 닫기
+   - 다크 모드 지원
+
+#### 🔧 해결 과정
+
+1. **선택 영역 해제 문제**
+   - 문제: 링크 삽입 시 선택 영역이 해제됨
+   - 해결: `mouseup` 이벤트로 선택 영역 자동 저장
+   - 결과: 선택 영역이 유지되어 링크 삽입 가능
+
+2. **URL 유효성 검사**
+   - 문제: 잘못된 URL 형식도 저장됨
+   - 해결: `new URL()` 생성자로 검증
+   - 결과: 유효한 URL만 저장
+
+3. **컨텍스트 메뉴 위치**
+   - 문제: 메뉴가 화면 밖으로 나감
+   - 해결: `getBoundingClientRect()`로 위치 조정
+   - 결과: 화면 내에 메뉴 표시
+
+#### 💡 개선 사항
+
+1. **사용자 경험 개선**
+   - 링크 관리 단축키 안내
+   - 토스트 메시지로 피드백 제공
+   - 편집 모드에서 링크 시각적 강조
+
+2. **코드 구조 개선**
+   - 이벤트 리스너를 `#setupLinkEvents()`로 분리
+   - 링크 관련 메서드를 private 메서드로 캡슐화
+   - `getAllLinks()` public 메서드로 외부 접근 가능
+
+---
+
+### 2026-02-01: 편집 기능 및 UI 개선 (v0.2.4.10)
+
+#### 🎯 주요 개선사항
+
+1. **ERR_CONNECTION_REFUSED 에러 메시지 제거**
+   - 외부 디버깅 서비스 사용 가능 여부를 1회만 체크
+   - 서비스가 사용 불가능하면 fetch 호출 자체를 하지 않아 콘솔 에러 제거
+   - `ContentRenderer.js`와 `viewer.js`에 조건부 로그 전송 로직 추가
+
+2. **편집 기능 개선**
+   - 제목, 인용, 코드, 목록 변환 시 마크다운 문법 텍스트 대신 실제 HTML 요소로 삽입
+   - 링크 삽입 시 실제 `<a>` 태그로 삽입
+   - 이미지 삽입 시 실제 `<img>` 태그로 삽입
+   - 테이블 삽입 시 실제 `<table>` HTML 구조로 삽입
+   - 모든 편집 기능에 편집 모드 체크 및 히스토리 저장 기능 추가
+
+3. **UI 개선**
+   - 읽기 진행률 표시 상자 테두리 제거
+   - 상단 버튼을 파스텔톤 색상으로 변경
+   - 버튼 배경색 채도 낮춤
+   - 모든 버튼 텍스트 색상을 `text-gray-800`으로 통일
+
+#### 📚 배운 점
+
+- **조건부 네트워크 요청**
+  - 서비스 사용 가능 여부를 캐싱하여 불필요한 요청 방지
+  - 사용자 경험 개선 (콘솔 에러 제거)
+
+- **편집 모드에서의 HTML 요소 삽입**
+  - contentEditable 환경에서는 마크다운 문법이 아닌 실제 HTML 요소로 삽입해야 함
+  - 사용자가 즉시 시각적으로 확인 가능
+
+#### 🔧 기술적 세부사항
+
+1. **조건부 디버깅 로그 전송**
+```javascript
+async #checkDebugService() {
+    if (this.#debugServiceAvailable !== null) {
+        return this.#debugServiceAvailable;
+    }
+    try {
+        const response = await fetch('http://127.0.0.1:7242/health', {
+            method: 'GET',
+            signal: AbortSignal.timeout(500)
+        });
+        this.#debugServiceAvailable = response.ok;
+    } catch (error) {
+        this.#debugServiceAvailable = false;
+    }
+    return this.#debugServiceAvailable;
+}
+```
+
+2. **HTML 요소로 변환 삽입**
+```javascript
+convertToMarkdown(type) {
+    let element;
+    switch(type) {
+        case 'heading':
+            element = document.createElement('h2');
+            element.textContent = selectedText;
+            break;
+        case 'quote':
+            element = document.createElement('blockquote');
+            element.textContent = selectedText;
+            break;
+        // ...
+    }
+    range.deleteContents();
+    range.insertNode(element);
+}
+```
+
+---
+
+### 2026-02-01: 편집 기능 대폭 개선 (v0.2.4.9)
+
+#### 🎯 주요 개선사항
+
+1. **편집 모드 시스템**
+   - contentEditable 활성화로 직접 텍스트 편집 가능
+   - 편집 중인 영역에 파란색 점선 테두리 표시
+   - 편집 패널 닫을 때 저장 여부 확인
+
+2. **편집 히스토리 시스템**
+   - 0.5초마다 변경사항 자동 저장
+   - 최대 50개 편집 상태 유지
+   - 중간 상태에서 편집 시 새로운 분기 생성
+
+3. **실행 취소/다시 실행**
+   - Ctrl+Z: 최대 50단계 실행 취소
+   - Ctrl+Y: 다시 실행
+   - 토스트 알림으로 현재 상태 표시
+
+4. **키보드 단축키**
+   - Ctrl+Z/Y: 실행 취소/다시 실행
+   - Ctrl+S: 저장
+   - Esc: 편집 모드 종료
+
+5. **토스트 알림 시스템**
+   - 성공/경고 메시지 표시
+   - 2초 후 자동 사라짐
+   - fadeInOut 애니메이션
+
+6. **저장 기능**
+   - HTML → 마크다운 자동 변환
+   - 파일 객체 업데이트
+   - 다운로드 권장 안내
+
+#### 📚 배운 점
+
+- **contentEditable 활용**
+  - 브라우저 네이티브 편집 기능 활용
+  - HTML 구조를 유지하면서 편집 가능
+  - 포맷 버튼과 연동하여 스타일 적용
+
+- **편집 히스토리 관리**
+  - 배열 기반 히스토리 저장
+  - 인덱스로 현재 상태 추적
+  - 분기 처리로 새로운 편집 경로 지원
+
+- **사용자 피드백**
+  - 토스트 알림으로 즉각적인 피드백
+  - 시각적 표시 (테두리, 버튼 색상)
+  - 상태 표시 (실행 취소 3/10)
+
+#### 🔧 기술적 세부사항
+
+1. **편집 히스토리 저장**
+```javascript
+#saveToHistory() {
+    const currentContent = viewerContent.innerHTML;
+    if (this.#editHistory[this.#editHistoryIndex] !== currentContent) {
+        // 현재 인덱스 이후의 히스토리 삭제 (새로운 분기)
+        this.#editHistory = this.#editHistory.slice(0, this.#editHistoryIndex + 1);
+        // 새 히스토리 추가
+        this.#editHistory.push(currentContent);
+        this.#editHistoryIndex++;
+        // 최대 50개 유지
+        if (this.#editHistory.length > 50) {
+            this.#editHistory.shift();
+            this.#editHistoryIndex--;
+        }
+    }
+}
+```
+
+2. **토스트 알림**
+```javascript
+#showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
+    toast.style.animation = 'fadeInOut 2s ease-in-out';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+}
+```
+
+#### 📝 관련 문서
+- `EDIT_IMPROVEMENT_COMPLETE_GUIDE.md`
+- `IMPROVED_EDIT_FUNCTIONS.js`
+- `EDIT_HTML_CSS_ADDITIONS.md`
+
+---
+
+### 2026-02-01: 편집 메뉴 및 읽기 진행률 추가 (v0.2.4.7-8)
+
+#### 🎯 주요 개선사항
+
+1. **킨들 스타일 읽기 진행률 표시 (v0.2.4.7)**
+   - 좌측 하단에 위치와 퍼센트 표시
+   - 설정 토글로 ON/OFF 가능
+   - 앱 정보 자동 숨김 기능
+   
+2. **편집 메뉴 서브메뉴 (v0.2.4.8)**
+   - Google Docs 스타일 계층형 메뉴
+   - CSS 애니메이션 (slideInRight)
+   - 호버 시 자동 표시
+
+#### 📚 배운 점
+
+- **CSS 서브메뉴 구현**
+  - `:hover` 선택자로 서브메뉴 표시/숨김
+  - `position: absolute`와 `left-full`로 위치 조정
+  - CSS 애니메이션으로 자연스러운 전환
+  
+- **읽기 진행률 계산**
+  - 킨들 스타일: `(scrollTop / scrollHeight) * 1000`
+  - 퍼센트: `(scrollTop / (scrollHeight - clientHeight)) * 100`
+  
+- **테마 클래스 활용**
+  - `theme-panel-bg`, `theme-border`, `theme-text-body`
+  - 테마 변경 시 자동으로 색상 적용
+
+#### 🔧 기술적 세부사항
+
+1. **서브메뉴 CSS**
+```css
+.context-menu-item:hover .submenu {
+    display: block !important;
+}
+
+.submenu {
+    animation: slideInRight 0.15s ease-out;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(-5px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+```
+
+2. **읽기 진행률 계산**
+```javascript
+// 위치 (0-1000)
+const location = Math.round((scrollTop / scrollHeight) * 1000);
+
+// 퍼센트 (0-100%)
+const percentage = ((scrollTop / (scrollHeight - clientHeight)) * 100).toFixed(1);
+```
+
+#### 📝 관련 문서
+- `docs/03_troubleshooting/2026-02-01_UI_전환_실패.md`
+- `docs/03_troubleshooting/2026-02-01_편집_메뉴_및_읽기_진행률.md`
+
+---
+
+### 2026-02-01: v0.2.4.7 - UI 전환 실패 및 하이라이트 복원 문제 해결
+
+#### 🎯 주요 작업
+1. **UI 전환 실패 문제 해결**
+   - HTML 구조상 `mainContent`가 `page-upload` 내부에 위치하여 부모를 숨기면 자식도 숨겨지는 문제 발견
+   - `uploadAreaContainer`만 `-translate-y-full`로 화면 밖으로 이동하도록 수정
+   - `mainContent` 명시적 표시 (`display: block`, `visibility: visible`, `opacity: 1`)
+   - 토글 버튼 아이콘(▼)과 텍스트("패널 펼치기") 동기화
+
+2. **파일명 미표시 문제 해결**
+   - `#updateFileNameDisplay()` 함수 추가
+   - `currentFileName` 요소에 파일명 표시
+   - `fileInfo` 요소에 파일 크기 및 글자 수 표시
+
+3. **하이라이트 복원 기능 추가**
+   - `#calculateTextIndices()` 메서드로 정확한 텍스트 위치(startIndex/endIndex) 계산
+   - `#saveHighlightData()` 함수에 위치 정보 저장 로직 추가
+   - `restoreHighlights()` 메서드로 파일 재업로드 시 하이라이트 자동 복원
+   - `#applyHighlight()` 메서드로 TreeWalker API 사용하여 정확한 위치 복원
+   - 위치 정보가 없는 하이라이트 필터링 (기존 데이터 호환성)
+   - 뒤에서부터 복원하여 인덱스 변경 방지
+
+4. **디버깅 로그 개선**
+   - UI 전환 과정 로그 추가 (🔄, ✅, 🎉 이모지 사용)
+   - 하이라이트 저장/복원 과정 로그 추가 (💾, 🎨, ✅ 이모지 사용)
+   - 에러 발생 시 명확한 경고 메시지 출력
+
+#### 📚 배운 점
+1. **HTML 구조 이해의 중요성**
+   - 부모 요소를 숨기면 자식 요소도 함께 숨겨짐
+   - CSS 클래스와 inline style의 우선순위 확인 필요
+   - DOM 구조를 정확히 파악한 후 수정해야 함
+
+2. **데이터 저장 시 위치 정보 포함**
+   - DOM 요소 기반 저장은 재렌더링 시 실패
+   - 텍스트 인덱스 기반 저장이 더 안정적
+   - TreeWalker API로 정확한 텍스트 위치 계산 가능
+
+3. **복원 순서의 중요성**
+   - 앞에서부터 복원하면 인덱스가 변경됨
+   - 뒤에서부터 복원하여 인덱스 변경 방지
+   - 배열을 역순으로 순회하는 패턴 유용
+
+4. **UI 상태 동기화**
+   - 토글 버튼의 아이콘과 텍스트를 함께 업데이트해야 함
+   - 명시적인 스타일 설정으로 CSS 우선순위 문제 방지
+   - 여러 요소의 상태를 일관되게 유지
+
+#### 🔧 해결 과정
+1. **UI 전환 실패 디버깅**
+   ```
+   문제: 파일 업로드 후 패널이 사라지지 않음
+   원인 분석:
+   - page-upload를 숨기면 mainContent도 함께 숨겨짐
+   - HTML 구조를 정확히 파악하지 못함
+   해결:
+   - uploadAreaContainer만 translate-y-full로 이동
+   - mainContent 명시적 표시
+   ```
+
+2. **파일명 미표시 디버깅**
+   ```
+   문제: 상단에 "파일을 선택하세요" 텍스트가 남아있음
+   원인: 파일명 업데이트 로직 누락
+   해결: #updateFileNameDisplay() 함수 추가
+   ```
+
+3. **하이라이트 복원 실패 디버깅**
+   ```
+   문제: 하이라이트가 복원되지 않음
+   원인:
+   - 위치 정보(startIndex/endIndex)를 저장하지 않음
+   - restoreHighlights() 메서드 미구현
+   해결:
+   - TreeWalker API로 정확한 위치 계산
+   - 위치 정보 저장 및 복원 로직 구현
+   - 뒤에서부터 복원하여 인덱스 변경 방지
+   ```
+
+#### 💡 개선 사항
+- **HTML 구조 이해**: DOM 구조를 정확히 파악한 후 수정
+- **데이터 저장 전략**: 텍스트 인덱스 기반 저장으로 안정성 향상
+- **복원 알고리즘**: 역순 복원으로 인덱스 변경 방지
+- **UI 상태 관리**: 명시적 스타일 설정으로 CSS 우선순위 문제 해결
+- **디버깅 로그**: 이모지를 사용한 직관적인 로그 메시지
+
+---
+
+
+### 2026-02-01: v0.2.4.6 - 디버깅 로그 추가 및 문제 발견
+
+#### 🎯 주요 작업
+1. **Google Drive API 디버깅 로그 추가**
+   - `initGoogleAPI()` 함수에 상세한 로그 추가 (🔍, 🔵, ✅, ❌ 이모지 사용)
+   - `gapi` 및 `google` 객체 로드 상태 확인 로그
+   - `loadPickerAPI()` 함수에 로그 추가
+   - `createPicker()` 함수에 단계별 로그 추가
+   - `waitForGoogleAPIScripts()` 함수 추가 (스크립트 로드 대기 기능)
+   - 에러 발생 시 상세 정보 출력 (message, stack, name)
+
+2. **viewer.js 디버깅 로그 추가**
+   - `displayFileContent()` 함수에 단계별 로그 추가
+   - 파일 내용 읽기 과정 로그 (FileReader 사용 여부)
+   - 메타데이터 파싱 과정 로그
+   - 렌더링 전후 상태 로그
+   - fetch를 통한 외부 로깅 시스템 연동 (디버깅 모드)
+
+3. **문제 발견 및 분석**
+   - UI 전환 실패 문제 발견 (파일 업로드 후 패널이 사라지지 않음)
+   - 파일명 미표시 문제 발견 (상단에 "파일을 선택하세요" 텍스트가 남아있음)
+   - 하이라이트 복원 실패 문제 발견 (북마크는 정상 작동하나 하이라이트는 복원 안 됨)
+   - HTML 구조 분석 시작 (mainContent와 page-upload 관계 파악)
+
+4. **디버깅 인프라 구축**
+   - 외부 로깅 서버 연동 (fetch를 통한 로그 전송)
+   - 가설 기반 디버깅 접근법 적용 (H1, H2, H3 등 가설 ID 부여)
+   - 단계별 로그로 문제 발생 지점 추적
+
+#### 📚 배운 점
+1. **체계적인 디버깅 접근법**
+   - 가설 생성 → 로그 추가 → 재현 → 분석 → 수정의 순환 과정
+   - 각 단계마다 명확한 로그 포인트 설정
+   - 이모지를 사용한 직관적인 로그 메시지
+
+2. **Google API 스크립트 로드 타이밍 문제**
+   - `gapi`와 `google` 객체가 비동기적으로 로드됨
+   - 스크립트 로드 대기 함수(`waitForGoogleAPIScripts`) 필요
+   - 타임아웃 설정으로 무한 대기 방지
+
+3. **디버깅 로그의 중요성**
+   - 문제 재현 시 정확한 상태 파악 가능
+   - 단계별 로그로 문제 발생 지점 정확히 추적
+   - 외부 로깅 시스템으로 브라우저 콘솔 외부에서도 확인 가능
+
+4. **HTML 구조 이해의 중요성**
+   - 부모-자식 관계를 정확히 파악해야 함
+   - CSS 클래스만으로는 충분하지 않을 수 있음
+   - 명시적인 스타일 설정이 필요할 때가 있음
+
+#### 🔧 해결 과정
+1. **Google Drive API 디버깅**
+   ```
+   문제: Google Drive 버튼 클릭 시 오류 발생
+   원인 분석:
+   - gapi 또는 google 객체가 로드되지 않음
+   - 스크립트 로드 타이밍 문제
+   해결:
+   - waitForGoogleAPIScripts() 함수 추가
+   - 각 단계마다 상세한 로그 추가
+   - 에러 발생 시 명확한 메시지 출력
+   ```
+
+2. **UI 전환 문제 발견**
+   ```
+   문제: 파일 업로드 후 패널이 사라지지 않음
+   발견 과정:
+   - 디버깅 로그로 UI 전환 과정 추적
+   - HTML 구조 분석 시작
+   - mainContent와 page-upload 관계 파악
+   ```
+
+3. **하이라이트 복원 문제 발견**
+   ```
+   문제: 하이라이트가 복원되지 않음
+   발견 과정:
+   - 북마크는 정상 작동하나 하이라이트는 복원 안 됨
+   - 하이라이트 저장/복원 로직 분석 시작
+   - 위치 정보 저장 여부 확인 필요
+   ```
+
+#### 💡 개선 사항
+- **디버깅 인프라**: 외부 로깅 시스템 연동으로 문제 추적 용이
+- **로그 가독성**: 이모지를 사용한 직관적인 로그 메시지
+- **에러 처리**: 상세한 에러 정보 출력으로 문제 파악 용이
+- **단계별 추적**: 각 단계마다 로그를 추가하여 문제 발생 지점 정확히 파악
+
+---
+
+
 ### 2026-01-30: v0.2.4.5 - 하이라이트 시스템 구현 및 버그 수정
 
 #### 🎯 주요 작업
@@ -1054,6 +1614,185 @@ constructor() {
 
 ---
 
+#### 문제 16: UI 전환 실패 및 하이라이트 복원 문제 (v0.2.4.7)
+**증상:**
+- 파일 업로드 후 패널이 사라지지 않음
+- 상단에 "파일을 선택하세요" 텍스트가 남아있음
+- 하이라이트가 복원되지 않음 (북마크는 정상 작동)
+
+**원인:**
+1. **HTML 구조 오해**: `mainContent`가 `page-upload` 내부에 위치하여 부모를 숨기면 자식도 숨겨짐
+2. **파일명 업데이트 로직 누락**: 파일명을 표시하는 함수가 없음
+3. **하이라이트 위치 정보 미저장**: DOM 요소 기반 저장으로 재렌더링 시 실패
+
+**근본 원인 분석:**
+
+**문제 1: UI 전환 실패**
+
+HTML 구조:
+```html
+<!-- 실제 HTML 구조 -->
+<div id="page-upload" class="page-section active">
+    <div id="uploadAreaContainer">...</div>
+    
+    <!-- mainContent가 page-upload 안에 있음! -->
+    <div id="mainContent" class="hidden">...</div>
+</div>
+```
+
+**기존 코드** (viewer.js:266-270):
+```javascript
+// ❌ 잘못된 코드
+if (uploadSection) {
+    uploadSection.classList.add('hidden');
+    uploadSection.style.display = 'none'; // ← 부모를 숨기면 자식도 숨겨짐!
+}
+```
+
+**문제 2: 파일명 미표시**
+- 파일명 업데이트 로직이 없어서 `currentFileName` 요소가 업데이트되지 않음
+
+**문제 3: 하이라이트 복원 실패**
+- 하이라이트 저장 시 위치 정보(startIndex/endIndex)를 저장하지 않음
+- `restoreHighlights()` 메서드 미구현
+
+**해결 방법:**
+
+1. **UI 전환 수정** (viewer.js)
+   ```javascript
+   #forceSwitchToViewerMode() {
+       // ❌ page-upload 숨기기 제거
+       // ✅ uploadAreaContainer만 화면 밖으로 이동
+       if (uploadAreaContainer) {
+           uploadAreaContainer.classList.remove('translate-y-0');
+           uploadAreaContainer.classList.add('-translate-y-full');
+           
+           const btnText = document.getElementById('uploadToggleText');
+           const btnIcon = document.getElementById('uploadToggleIcon');
+           if (btnText) btnText.textContent = '패널 펼치기';
+           if (btnIcon) btnIcon.textContent = '▼';
+       }
+       
+       // ✅ mainContent 명시적으로 표시
+       if (mainContent) {
+           mainContent.classList.remove('hidden');
+           mainContent.style.display = 'block';
+           mainContent.style.visibility = 'visible';
+           mainContent.style.opacity = '1';
+       }
+   }
+   ```
+
+2. **파일명 업데이트 추가** (viewer.js)
+   ```javascript
+   #updateFileNameDisplay(fileName) {
+       const fileNameElement = document.getElementById('currentFileName');
+       const fileInfoElement = document.getElementById('fileInfo');
+       
+       if (fileNameElement) {
+           fileNameElement.textContent = fileName || '파일명 없음';
+       }
+       
+       if (fileInfoElement) {
+           const file = this.#fileManager.getCurrentFile();
+           if (file && file.content) {
+               const size = formatFileSize(file.content.length);
+               const chars = file.content.length.toLocaleString();
+               fileInfoElement.textContent = `크기: ${size} (${chars}자)`;
+           }
+       }
+   }
+   ```
+
+3. **하이라이트 복원 기능 추가** (HighlightManager.js)
+
+   **3-1. 위치 정보 저장**:
+   ```javascript
+   #calculateTextIndices(element, container) {
+       const walker = document.createTreeWalker(
+           container,
+           NodeFilter.SHOW_TEXT,
+           null,
+           false
+       );
+       
+       let currentIndex = 0;
+       let startIndex = -1, endIndex = -1;
+       
+       while (walker.nextNode()) {
+           const node = walker.currentNode;
+           const nodeLength = node.textContent.length;
+           
+           if (element.contains(node)) {
+               if (startIndex === -1) startIndex = currentIndex;
+               endIndex = currentIndex + nodeLength;
+           }
+           
+           currentIndex += nodeLength;
+       }
+       
+       return { startIndex, endIndex };
+   }
+   ```
+
+   **3-2. 하이라이트 복원**:
+   ```javascript
+   restoreHighlights() {
+       const highlights = this.getData(this.#currentFileKey);
+       const validHighlights = highlights.filter(hl => 
+           hl.startIndex !== undefined && hl.endIndex !== undefined
+       );
+       
+       // 뒤에서부터 복원 (인덱스 변경 방지)
+       for (let i = validHighlights.length - 1; i >= 0; i--) {
+           const hl = validHighlights[i];
+           this.#applyHighlight(hl.startIndex, hl.endIndex, hl.color, hl.id);
+       }
+   }
+   ```
+
+**테스트 결과:**
+
+**Before (v0.2.4.6)**
+- ❌ 파일 업로드 후 패널이 남아있음
+- ❌ "파일을 선택하세요" 텍스트 표시
+- ❌ 하이라이트 복원 안 됨
+
+**After (v0.2.4.7)**
+- ✅ 파일 업로드 후 즉시 뷰어 모드로 전환
+- ✅ 파일명과 크기 정보 표시
+- ✅ 하이라이트 자동 복원 (위치 정보 기반)
+
+**체크리스트:**
+- [ ] HTML 구조를 정확히 파악했는가? (부모-자식 관계)
+- [ ] 부모 요소를 숨기지 않고 자식만 표시하는 방법을 사용했는가?
+- [ ] 파일명 업데이트 함수가 구현되어 있는가?
+- [ ] 하이라이트 저장 시 위치 정보(startIndex/endIndex)를 포함하는가?
+- [ ] 복원 시 뒤에서부터 복원하는가? (인덱스 변경 방지)
+- [ ] 기존 데이터 호환성을 고려했는가? (위치 정보 없는 하이라이트 필터링)
+
+**교훈:**
+1. **HTML 구조 이해의 중요성**
+   - 부모 요소를 숨기면 자식 요소도 함께 숨겨짐
+   - CSS 클래스와 inline style의 우선순위 확인 필요
+
+2. **데이터 저장 시 위치 정보 포함**
+   - DOM 요소 기반 저장은 재렌더링 시 실패
+   - 텍스트 인덱스 기반 저장이 더 안정적
+
+3. **복원 순서의 중요성**
+   - 앞에서부터 복원하면 인덱스가 변경됨
+   - 뒤에서부터 복원하여 인덱스 변경 방지
+
+**관련 파일:**
+- `src/js/viewer.js`
+- `src/js/modules/HighlightManager.js`
+- `CHANGELOG.md`
+
+**관련 문서:** `docs/03_troubleshooting/2026-02-01_UI_전환_실패.md`
+
+---
+
 ### 🟢 심각도: 낮음 (Low)
 
 #### 문제 5: "함수가 정의되지 않음"
@@ -1281,6 +2020,7 @@ git push origin main
 | 파일 저장 기능 오류 | 저장 버튼 이벤트 잘못 연결 | viewer.downloadCurrentFile() 메서드로 재연결 | [문서](#문제-13-파일-저장-기능-오류-v0245-hotfix) |
 | 뷰어 초기화 오류 | window.viewer 할당 누락 | ViewerCoordinator 생성자에 window.viewer = this 추가 | [문서](#문제-14-뷰어-초기화-오류-v0245-hotfix) |
 | HTML 구조 및 중복 ID 오류 | 중복 ID, 토글 스위치 위치 오류 | 중복 ID 제거, HTML 구조 정리 | [문서](#문제-15-html-구조-및-중복-id-오류-v0245-hotfix) |
+| UI 전환 실패 및 하이라이트 복원 문제 | HTML 구조 오해, 위치 정보 미저장 | uploadAreaContainer만 숨김, 텍스트 인덱스 기반 저장 | [문서](#문제-16-ui-전환-실패-및-하이라이트-복원-문제-v0247) |
 | CORS 오류 | file:// 프로토콜 사용 | 웹 서버 사용 (`python -m http.server 8000`) | [문서](#문제-7-cors-오류) |
 
 ### 개발 워크플로우 요약
@@ -1325,7 +2065,10 @@ git push origin main
 - `docs/03_troubleshooting/2025-12-26_모든_버튼_작동_불가_문제.md` - ES6 모듈과 onclick 충돌 해결
 - `docs/03_troubleshooting/2026-01-02_하이라이트_및_컨텍스트_메뉴_개선.md` - 하이라이트 기능 개선
 - `docs/03_troubleshooting/2026-01-30_Google_Drive_버튼_오류.md` - Google Drive 버튼 onclick 속성 누락 해결 (v0.2.4.2)
+- `docs/03_troubleshooting/2026-02-01_UI_전환_실패.md` - UI 전환 실패 및 하이라이트 복원 문제 해결 (v0.2.4.7)
+- `docs/03_troubleshooting/2026-02-01_편집_메뉴_및_읽기_진행률.md` - 편집 메뉴 및 읽기 진행률 구현 (v0.2.4.7-8)
 - `docs/03_troubleshooting/2026-01-30_HistoryManager_null_체크_오류.md` - HistoryManager null 체크 오류 해결 (v0.2.4.3)
+- `docs/03_troubleshooting/2026-02-01_UI_전환_실패.md` - UI 전환 실패 및 하이라이트 복원 문제 해결 (v0.2.4.7)
 
 ### 프로젝트 문서
 - `CHANGELOG.md` - 버전별 변경 이력
@@ -1342,6 +2085,6 @@ git push origin main
 
 ---
 
-**마지막 업데이트**: 2026-01-30  
-**버전**: v0.2.4.5  
+**마지막 업데이트**: 2026-02-01  
+**버전**: v0.2.4.13  
 **작성자**: Development Team

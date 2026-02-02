@@ -203,5 +203,30 @@ export class BookmarkManager {
         
         return div;
     }
-}
+// src/js/modules/BookmarkManager.js 클래스 내부 맨 아래
+
+    /**
+     * [수정됨] 현재 파일의 북마크 데이터 반환 (settings.js 연동)
+     */
+    getData(fileKey) {
+        if (!fileKey) return [];
+        const allBookmarks = getBookmarks(); // settings.js에서 가져오기
+        return allBookmarks[fileKey] || [];
+    }
+
+    /**
+     * [수정됨] 외부 데이터(MD 파일)에서 북마크 복원
+     */
+    importData(fileKey, dataList) {
+        if (!fileKey || !dataList || !Array.isArray(dataList)) return;
+        
+        const allBookmarks = getBookmarks();
+        allBookmarks[fileKey] = dataList;
+        
+        setBookmarks(allBookmarks); // settings.js를 통해 저장
+        console.log(`🔖 북마크 ${dataList.length}개 복원 완료`);
+        
+        // 화면 갱신
+        this.displayBookmarks(); 
+    }}
 

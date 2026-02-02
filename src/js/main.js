@@ -6,7 +6,7 @@
 import { APP_NAME, APP_VERSION } from './config.js';
 import { loadSettings, applySettings, loadHistory, loadBookmarks, loadGoogleDriveSettings, setTheme, setFontSize, saveGoogleDriveSettings, loadLastReadFile, updateCustomTheme, saveGeminiApiKey } from './settings.js';
 // toggleUploadSection, toggleHistorySection, toggleBookmarksSection 추가
-import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, toggleBookmark, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile, setupContextMenuListener } from './viewer.js';
+import { displayUploadHistory, displayUploadBookmarks, processFiles, toggleWrapMode, selectFiles, restoreBodyStyles, restoreViewerWidth, restoreMarkdownStyles, toggleSettings, toggleFavorite, toggleUploadSection, toggleHistorySection, toggleBookmarksSection, toggleBookmark, handleAIClean, downloadAsMarkdown, updateViewerWidth, toggleFullWidth, updateBodyStyles, updateMarkdownStyles, updateTextStroke, resetAllSettings, restoreContextMenuSetting, toggleContextMenuSetting, exportData, importData, handleImportDataFile, setupContextMenuListener, toggleReadingStats, toggleEditPanel, handleEditAction, applyTextFormat, convertToMarkdown, alignText, insertLink, insertImage, insertTable, undoEdit, redoEdit, saveEditedContent, cancelEdit, saveEditedContentNow, restoreOriginal, closeEditPanel, downloadEditedFile } from './viewer.js';
 import { loadGoogleDriveFiles, loadLastReadGoogleDriveFile } from './google_drive.js';
 
 /**
@@ -408,6 +408,29 @@ window.displayUploadBookmarks = displayUploadBookmarks;
 
 // [추가] Google Drive 관련 함수 노출
 window.loadLastReadGoogleDriveFile = loadLastReadGoogleDriveFile;
+
+// [추가] 읽기 진행률 함수 노출
+window.toggleReadingStats = toggleReadingStats;
+
+// [추가] 편집 기능 함수 노출
+window.toggleEditPanel = toggleEditPanel;
+window.handleEditAction = handleEditAction;
+window.applyTextFormat = applyTextFormat;
+window.convertToMarkdown = convertToMarkdown;
+window.alignText = alignText;
+window.insertLink = insertLink;
+window.insertImage = insertImage;
+window.insertTable = insertTable;
+window.undoEdit = undoEdit;
+window.redoEdit = redoEdit;
+window.saveEditedContent = saveEditedContent;
+window.cancelEdit = cancelEdit;
+
+// ✨ 새로운 편집 함수 window 할당
+window.saveEditedContentNow = saveEditedContentNow;
+window.restoreOriginal = restoreOriginal;
+window.closeEditPanel = closeEditPanel;
+window.downloadEditedFile = downloadEditedFile;
 
 console.log('✅ 모든 전역 함수 할당 완료');
 

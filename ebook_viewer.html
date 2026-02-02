@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>이북 텍스트 뷰어 v0.2.4.5</title>
+    <title>이북 텍스트 뷰어 v0.2.4.13</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
@@ -16,6 +16,121 @@
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@300;400;500;700&family=Nanum+Gothic&family=Nanum+Myeongjo&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ridibatang-font@1.0.0/dist/ridibatang.css">
     <link rel="stylesheet" href="src/css/styles.css">
+    
+    <!-- 편집 서브메뉴 스타일 -->
+    <style>
+        /* 컨텍스트 메뉴 서브메뉴 */
+        .context-menu-item {
+            position: relative;
+        }
+        
+        .context-menu-item:hover .submenu {
+            display: block !important;
+        }
+        
+        .submenu {
+            animation: slideInRight 0.15s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .submenu-item {
+            transition: background-color 0.15s;
+        }
+                /* 토스트 애니메이션 */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 10px);
+            }
+            10% {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+            90% {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -10px);
+            }
+        }
+
+        /* 편집 모드 */
+        [contenteditable="true"] {
+            cursor: text;
+            min-height: 200px;
+        }
+
+        [contenteditable="true"]:focus {
+            outline: 2px dashed #3b82f6;
+            outline-offset: 4px;
+        }
+
+        /* 링크 스타일 */
+        #viewerContent a {
+            color: #3b82f6;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        #viewerContent a:hover {
+            color: #1d4ed8;
+        }
+
+        #viewerContent a:visited {
+            color: #7c3aed;
+        }
+
+        /* 다크 모드 */
+        .theme-dark #viewerContent a {
+            color: #60a5fa;
+        }
+
+        .theme-dark #viewerContent a:hover {
+            color: #93c5fd;
+        }
+
+        /* 편집 모드에서 링크 강조 */
+        #viewerContent[contenteditable="true"] a {
+            outline: 1px dashed rgba(59, 130, 246, 0.3);
+            outline-offset: 2px;
+            transition: all 0.2s;
+        }
+
+        #viewerContent[contenteditable="true"] a:hover {
+            outline: 1px dashed rgba(59, 130, 246, 0.6);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* 링크 컨텍스트 메뉴 애니메이션 */
+        #linkContextMenu {
+            animation: contextMenuFadeIn 0.15s ease-out;
+        }
+
+        @keyframes contextMenuFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+    </style>
+    
           <script type="importmap">
         {
           "imports": {
@@ -41,10 +156,11 @@
                         <h1 class="text-xl font-bold text-center theme-text-title">📚 이북 텍스트 뷰어</h1>
                         <div class="mt-3 flex justify-center flex-wrap gap-2 pointer-events-auto relative z-50">
                             <button id="wrapModeBtn" onclick="toggleWrapMode()" class="bg-purple-500 text-white px-3 py-1.5 rounded hover:bg-purple-600 transition-colors text-xs font-semibold">줄바꿈: 자동</button>
-                            <button id="aiCleanBtn" onclick="handleAIClean()" class="bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 transition-colors text-xs font-semibold">🤖 AI 변환 & 저장</button>
+                            <button id="aiCleanBtn" onclick="handleAIClean()" class="bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 transition-colors text-xs font-semibold">🤖 AI 변환</button>
                             <button id="downloadMdBtn" onclick="downloadAsMarkdown()" class="bg-green-500 text-white px-3 py-1.5 rounded hover:bg-green-600 transition-colors text-xs font-semibold">💾 MD 저장</button>
                             <button id="bookmarkBtn" onclick="toggleBookmark()" class="bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 transition-colors text-xs font-semibold">📑 책갈피</button>
                             <button id="favoriteBtn" onclick="toggleFavorite()" class="bg-purple-500 text-white px-3 py-1.5 rounded hover:bg-purple-600 transition-colors text-xs font-semibold">⭐ 즐겨찾기</button>
+                            <button id="editPanelToggleBtn" onclick="toggleEditPanel()" class="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 transition-colors text-xs font-semibold">✏️ 편집</button>
                             <button id="settingsToggleBtn" onclick="toggleSettings()" class="bg-gray-600 text-white px-3 py-1.5 rounded hover:bg-gray-700 transition-colors text-xs font-semibold">⚙️ 설정</button>
                         </div>
                     </div>
@@ -185,6 +301,13 @@
                                                 <input type="checkbox" id="fullWidthToggle" onchange="toggleFullWidth()" class="w-4 h-4 text-blue-600 rounded">
                                             </div>
                                             <div class="flex items-center justify-between pt-2">
+                                                <span class="text-xs text-gray-600">읽기 진행률 표시</span>
+                                                <label class="relative inline-flex items-center cursor-pointer" title="좌측 하단에 위치와 퍼센트를 표시합니다">
+                                                    <input type="checkbox" id="showReadingStatsToggle" class="sr-only peer" checked onchange="toggleReadingStats()">
+                                                    <div class="w-7 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
+                                                </label>
+                                            </div>
+                                            <div class="flex items-center justify-between pt-2">
                                                 <span class="text-xs text-gray-600">커스텀 우클릭 메뉴</span>
                                                 <label class="relative inline-flex items-center cursor-pointer" title="끄면 시스템 기본 메뉴가 나타납니다">
                                                     <input type="checkbox" id="ctxMenuSettingsToggle" class="sr-only peer" checked onchange="toggleContextMenuSetting('ctxMenuSettingsToggle')">
@@ -289,6 +412,168 @@
                                         </button>
                                     </div>
                     </div>
+                    
+                    <!-- 편집 패널 -->
+                    <div id="editPanel" class="hidden max-w-[1800px] mx-auto p-6 backdrop-blur-sm rounded-xl shadow-inner theme-panel-bg theme-border">
+                        <!-- 헤더 -->
+                        <div class="flex items-center justify-between mb-4 border-b theme-border pb-2">
+                            <h3 class="text-lg font-bold theme-text-title">✏️ 편집 도구</h3>
+                            <button onclick="toggleEditPanel()" class="theme-text-body hover:opacity-70">✕</button>
+                        </div>
+                         <!-- ✨ 편집 컨트롤 버튼 추가 ✨ -->
+                        <div class="mb-4 flex gap-2 items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                            <!-- 왼쪽: 편집 취소/재실행 -->
+                            <div class="flex gap-2">
+                                <button onclick="undoEdit()" class="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm transition-colors flex items-center gap-1" title="실행 취소 (Ctrl+Z)">
+                                    <span>↩️</span>
+                                    <span>취소</span>
+                                </button>
+                                <button onclick="redoEdit()" class="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm transition-colors flex items-center gap-1" title="다시 실행 (Ctrl+Y)">
+                                    <span>↪️</span>
+                                    <span>재실행</span>
+                                </button>
+                            </div>
+                            
+                            <!-- 중앙: 상태 표시 -->
+                            <div id="editStatus" class="text-sm font-medium theme-text-body">
+                                <span class="opacity-70">편집 중...</span>
+                            </div>
+                            
+                            <!-- 오른쪽: 저장/복원/닫기 -->
+                            <div class="flex gap-2">
+                                <button onclick="saveEditedContentNow()" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded text-sm transition-colors flex items-center gap-1" title="메모리에 저장 (Ctrl+S)">
+                                    <span>💾</span>
+                                    <span>메모리 저장</span>
+                                </button>
+                                <button onclick="downloadEditedFile()" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm transition-colors flex items-center gap-1" title="파일로 다운로드">
+                                    <span>📥</span>
+                                    <span>파일 저장</span>
+                                </button>
+                                <button onclick="restoreOriginal()" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded text-sm transition-colors flex items-center gap-1" title="원본으로 되돌리기">
+                                    <span>🔄</span>
+                                    <span>원본으로</span>
+                                </button>
+                                <button onclick="closeEditPanel()" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded text-sm transition-colors flex items-center gap-1" title="편집 종료 (Esc)">
+                                    <span>❌</span>
+                                    <span>닫기</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 사용 방법 안내 -->
+                        <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <p class="text-xs theme-text-body opacity-70 mb-1">
+                                💡 <strong>사용 방법:</strong> 텍스트를 선택한 후 원하는 포맷을 클릭하세요.
+                            </p>
+                            <p class="text-xs theme-text-body opacity-70">
+                                🔗 <strong>링크 관리:</strong> 더블클릭=수정 | Alt+클릭=삭제 | 우클릭=메뉴
+                            </p>
+                        </div>
+
+                        <!-- 도구 그리드 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            
+                            <!-- 텍스트 편집 -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-bold theme-text-body border-b theme-border pb-1">📝 텍스트 편집</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="applyTextFormat('bold')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm font-bold transition-colors" title="굵게 (Ctrl+B)">
+                                        <span class="font-bold">B</span>
+                                    </button>
+                                    <button onclick="applyTextFormat('italic')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm italic transition-colors" title="기울임 (Ctrl+I)">
+                                        <span class="italic">I</span>
+                                    </button>
+                                    <button onclick="applyTextFormat('underline')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm underline transition-colors" title="밑줄 (Ctrl+U)">
+                                        <span class="underline">U</span>
+                                    </button>
+                                    <button onclick="applyTextFormat('strikethrough')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors" title="취소선">
+                                        <span class="line-through">S</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 마크다운 변환 -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-bold theme-text-body border-b theme-border pb-1">🔄 마크다운 변환</h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="convertToMarkdown('heading')" class="px-2 py-1.5 bg-blue-100 hover:bg-blue-200 rounded text-xs transition-colors" title="선택한 텍스트를 제목으로">
+                                        # 제목
+                                    </button>
+                                    <button onclick="convertToMarkdown('quote')" class="px-2 py-1.5 bg-blue-100 hover:bg-blue-200 rounded text-xs transition-colors" title="선택한 텍스트를 인용문으로">
+                                        &gt; 인용
+                                    </button>
+                                    <button onclick="convertToMarkdown('list')" class="px-2 py-1.5 bg-blue-100 hover:bg-blue-200 rounded text-xs transition-colors" title="선택한 줄들을 목록으로">
+                                        • 목록
+                                    </button>
+                                    <button onclick="convertToMarkdown('code')" class="px-2 py-1.5 bg-blue-100 hover:bg-blue-200 rounded text-xs transition-colors" title="선택한 텍스트를 코드로">
+                                        `코드`
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 텍스트 정렬 -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-bold theme-text-body border-b theme-border pb-1">📐 정렬</h4>
+                                <div class="flex gap-2">
+                                    <button onclick="alignText('left')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors" title="왼쪽 정렬">
+                                        ☰
+                                    </button>
+                                    <button onclick="alignText('center')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors" title="가운데 정렬">
+                                        ☱
+                                    </button>
+                                    <button onclick="alignText('right')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors" title="오른쪽 정렬">
+                                        ☰
+                                    </button>
+                                    <button onclick="alignText('justify')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors" title="양쪽 정렬">
+                                        ☷
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 링크 삽입 -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-bold theme-text-body border-b theme-border pb-1">🔗 링크</h4>
+                                <div class="flex gap-2">
+                                    <input type="text" id="linkUrlInput" placeholder="https://example.com" class="flex-1 px-2 py-1 border theme-border rounded text-sm theme-panel-bg theme-text-body">
+                                    <button onclick="insertLink()" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded text-sm transition-colors">
+                                        삽입
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 이미지 삽입 -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-bold theme-text-body border-b theme-border pb-1">🖼️ 이미지</h4>
+                                <div class="flex gap-2">
+                                    <input type="text" id="imageUrlInput" placeholder="이미지 URL" class="flex-1 px-2 py-1 border theme-border rounded text-sm theme-panel-bg theme-text-body">
+                                    <button onclick="insertImage()" class="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white rounded text-sm transition-colors">
+                                        삽입
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 테이블 생성 -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-bold theme-text-body border-b theme-border pb-1">📊 테이블</h4>
+                                <div class="flex gap-2 items-center">
+                                    <input type="number" id="tableRows" placeholder="행" min="1" max="10" value="2" class="w-16 px-2 py-1 border theme-border rounded text-sm theme-panel-bg theme-text-body">
+                                    <span class="theme-text-body">×</span>
+                                    <input type="number" id="tableCols" placeholder="열" min="1" max="10" value="2" class="w-16 px-2 py-1 border theme-border rounded text-sm theme-panel-bg theme-text-body">
+                                    <button onclick="insertTable()" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded text-sm transition-colors">
+                                        생성
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <!-- 안내 메시지 -->
+                        <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <p class="text-xs theme-text-body opacity-70">
+                                💡 <strong>사용 방법:</strong> 텍스트를 선택한 후 원하는 포맷을 클릭하세요. 링크/이미지/테이블은 커서 위치에 삽입됩니다.
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="mainContent" class="hidden w-full" style="min-height: 400px; background-color: #ffffff;">
@@ -315,10 +600,37 @@
             </div>
         </div>
         
+    <!-- 2. 기존 app-info 수정 -->
+    <!-- 기존 코드를 찾아서 class에 "transition-opacity duration-500" 추가 -->
+
         <div class="fixed bottom-1 left-0 w-full flex justify-center z-40 pointer-events-none">
-            <p id="app-info" class="text-[10px] text-gray-400 bg-white/90 backdrop-blur-sm px-3 py-0.5 rounded-t-md shadow-sm border border-b-0 border-gray-200"></p>
+            <p id="app-info" class="text-[10px] text-gray-400 bg-white/90 backdrop-blur-sm px-3 py-0.5 rounded-t-md shadow-sm border border-b-0 border-gray-200 transition-opacity duration-500"></p>
         </div>
     </div>
+    
+    <!-- ========================================
+        킨들 스타일 읽기 진행률 표시 UI
+        ebook_viewer.html에 추가할 코드
+        ======================================== -->
+
+    <!-- 1. 좌측 하단 진행률 표시 영역 -->
+    <!-- reading-progress-container 바로 위에 추가 -->
+
+    <!-- 독서 진행률 표시 (킨들 스타일) -->
+    <div id="reading-stats-container" class="fixed bottom-5 left-4 z-40 pointer-events-none transition-opacity duration-300" style="display: none;">
+        <div class="theme-panel-bg px-3 py-1.5 rounded-md shadow-sm">
+            <div class="flex items-center gap-3 text-xs">
+                <span class="theme-text-body opacity-80">
+                    <span class="font-semibold">위치</span> <span id="current-location">0</span>
+                </span>
+                <span class="theme-text-body opacity-30">|</span>
+                <span class="theme-text-body opacity-80">
+                    <span id="reading-percentage">0</span>%
+                </span>
+            </div>
+        </div>
+    </div>
+
 
     <!-- 독서 진행률 프로그래스바 -->
     <div id="reading-progress-container" class="fixed bottom-0 left-0 w-full h-1 bg-gray-200 z-50">
@@ -351,6 +663,39 @@
             <div id="ctxNote" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
                 <span>📝</span> 각주/메모 달기
             </div>
+            
+            <!-- 편집 서브메뉴 -->
+            <div class="context-menu-item relative px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span>✏️</span>
+                        <span>편집</span>
+                    </div>
+                    <span class="text-xs opacity-50">▶</span>
+                </div>
+                
+                <!-- 서브메뉴 -->
+                <div class="submenu hidden absolute left-full top-0 ml-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 min-w-[180px] z-50">
+                    <div class="submenu-item px-4 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between" onclick="handleEditAction('copy')">
+                        <span class="text-sm">복사</span>
+                        <span class="text-xs text-gray-400">Ctrl+C</span>
+                    </div>
+                    <div class="submenu-item px-4 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between" onclick="handleEditAction('cut')">
+                        <span class="text-sm">잘라내기</span>
+                        <span class="text-xs text-gray-400">Ctrl+X</span>
+                    </div>
+                    <div class="submenu-item px-4 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between" onclick="handleEditAction('paste')">
+                        <span class="text-sm">붙여넣기</span>
+                        <span class="text-xs text-gray-400">Ctrl+V</span>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                    <div class="submenu-item px-4 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between" onclick="handleEditAction('selectAll')">
+                        <span class="text-sm">전체 선택</span>
+                        <span class="text-xs text-gray-400">Ctrl+A</span>
+                    </div>
+                </div>
+            </div>
+            
             <div id="ctxShare" class="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors border-b border-gray-100 dark:border-gray-700">
                 <span>📤</span> 텍스트 공유
             </div>

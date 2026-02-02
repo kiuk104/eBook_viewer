@@ -203,7 +203,7 @@ async function pickerCallback(data) {
             
             // 파일 배열 업데이트
             if (setFiles) {
-                setFiles(downloadedFiles);
+            setFiles(downloadedFiles);
             } else {
                 console.error('❌ setFiles 함수를 찾을 수 없습니다.');
                 alert('파일 로드 실패: setFiles 함수를 찾을 수 없습니다.');
@@ -211,13 +211,13 @@ async function pickerCallback(data) {
             }
             
             if (setCurrentFileIndex) {
-                setCurrentFileIndex(0);
+            setCurrentFileIndex(0);
             }
             
             document.getElementById('mainContent').classList.remove('hidden');
             
             if (displayFileContent) {
-                displayFileContent(downloadedFiles[0]);
+            displayFileContent(downloadedFiles[0]);
             } else {
                 console.error('❌ displayFileContent 함수를 찾을 수 없습니다.');
                 alert('파일 로드 실패: displayFileContent 함수를 찾을 수 없습니다.');
@@ -228,7 +228,7 @@ async function pickerCallback(data) {
             const uploadContent = document.getElementById('uploadSectionContent');
             if (uploadContent && !uploadContent.classList.contains('hidden')) {
                 if (toggleUploadSection) {
-                    toggleUploadSection();
+                toggleUploadSection();
                 }
             }
         }
@@ -439,7 +439,7 @@ export async function loadLastReadGoogleDriveFile(fileId) {
         
         setFiles([fileObj]);
         if (setCurrentFileIndex) {
-            setCurrentFileIndex(0);
+        setCurrentFileIndex(0);
         }
         
         document.getElementById('mainContent').classList.remove('hidden');
@@ -454,7 +454,7 @@ export async function loadLastReadGoogleDriveFile(fileId) {
         const uploadContent = document.getElementById('uploadSectionContent');
         if (uploadContent && !uploadContent.classList.contains('hidden')) {
             if (toggleUploadSection) {
-                toggleUploadSection();
+            toggleUploadSection();
             }
         }
         

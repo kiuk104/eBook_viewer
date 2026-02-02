@@ -23,6 +23,13 @@ export class ContentRenderer {
     #isMarkdownMode = false;
 
     /**
+     * @private
+     * @type {boolean | null}
+     * 외부 디버깅 서비스 사용 가능 여부 (null: 미확인, true: 사용 가능, false: 사용 불가)
+     */
+    #debugServiceAvailable = null;
+
+    /**
      * 뷰어 요소 설정
      * @param {string} elementId - 뷰어 요소 ID (기본: 'viewerContent')
      */
@@ -55,6 +62,23 @@ export class ContentRenderer {
      * @param {boolean} [options.wrapMode='auto'] - 줄바꿈 모드 ('auto' | 'original')
      */
     render(content, fileName, options = {}) {
+        // 디버깅 로그 전송 (조건부)
+        this.#sendDebugLog({
+            location: 'ContentRenderer.js:57',
+            message: 'render entry',
+            data: {
+                hasViewerElement: !!this.#viewerElement,
+                fileName: fileName,
+                fileNameType: typeof fileName,
+                contentLength: content?.length,
+                hasMarked: typeof marked !== 'undefined'
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H1,H5'
+        });
+        
         if (!this.#viewerElement) {
             console.error('뷰어 요소가 설정되지 않았습니다.');
             return;
@@ -62,6 +86,21 @@ export class ContentRenderer {
 
         const { wrapMode = 'auto' } = options;
         this.#isMarkdownMode = this.#isMarkdownFile(fileName);
+        
+        // 디버깅 로그 전송 (조건부)
+        this.#sendDebugLog({
+            location: 'ContentRenderer.js:64',
+            message: 'Markdown mode check',
+            data: {
+                isMarkdownMode: this.#isMarkdownMode,
+                fileName: fileName,
+                willRenderMarkdown: this.#isMarkdownMode && typeof marked !== 'undefined'
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            runId: 'run1',
+            hypothesisId: 'H1,H5'
+        });
 
         if (this.#isMarkdownMode && typeof marked !== 'undefined') {
             this.#renderMarkdown(content);
@@ -71,11 +110,57 @@ export class ContentRenderer {
     }
 
     /**
+     * 외부 디버깅 서비스 사용 가능 여부 확인 (1회만 체크)
+     * @private
+     * @returns {Promise<boolean>} 서비스 사용 가능 여부
+     */
+    async #checkDebugService() {
+        // 이미 확인했으면 캐시된 값 반환
+        if (this.#debugServiceAvailable !== null) {
+            return this.#debugServiceAvailable;
+        }
+        
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 500); // 0.5초 타임아웃
+            
+            const response = await fetch('http://127.0.0.1:7242/health', {
+                method: 'GET',
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            this.#debugServiceAvailable = response.ok;
+        } catch (error) {
+            // 연결 실패 시 디버깅 서비스 사용 안 함 (에러 로그 없음)
+            this.#debugServiceAvailable = false;
+        }
+        
+        return this.#debugServiceAvailable;
+    }
+
+    /**
+     * 디버깅 로그 전송 (조건부)
+     * @private
+     * @param {Object} logData - 로그 데이터
+     */
+    async #sendDebugLog(logData) {
+        const serviceAvailable = await this.#checkDebugService();
+        if (serviceAvailable) {
+            fetch('http://127.0.0.1:7242/ingest/5e932710-e410-434a-9147-6530d2b93666', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(logData)
+            }).catch(() => {}); // 에러 무시
+        }
+    }
+
+    /**
      * 마크다운 렌더링
      * @private
      * @param {string} content - 마크다운 내용
      */
-    #renderMarkdown(content) {
+    async #renderMarkdown(content) {
         if (!this.#viewerElement) return;
 
         try {
@@ -83,10 +168,54 @@ export class ContentRenderer {
                 breaks: true,
                 gfm: true
             });
+            
+            // 디버깅 로그 전송 (조건부)
+            this.#sendDebugLog({
+                location: 'ContentRenderer.js:88',
+                message: 'Before setting innerHTML',
+                data: {
+                    htmlLength: html?.length,
+                    viewerElementId: this.#viewerElement?.id,
+                    isHidden: this.#viewerElement?.classList?.contains('hidden'),
+                    displayStyle: this.#viewerElement?.style?.display,
+                    parentHidden: this.#viewerElement?.parentElement?.classList?.contains('hidden')
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run3',
+                hypothesisId: 'H7,H8'
+            });
+            
             this.#viewerElement.innerHTML = html;
             this.#viewerElement.classList.add('markdown-mode');
             this.#viewerElement.style.whiteSpace = 'normal';
+            
+            // 디버깅 로그 전송 (조건부)
+            this.#sendDebugLog({
+                location: 'ContentRenderer.js:95',
+                message: 'After setting innerHTML',
+                data: {
+                    innerHTMLLength: this.#viewerElement?.innerHTML?.length,
+                    textContentLength: this.#viewerElement?.textContent?.length,
+                    hasMarkdownMode: this.#viewerElement?.classList?.contains('markdown-mode')
+                },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run3',
+                hypothesisId: 'H7,H8'
+            });
         } catch (error) {
+            // 디버깅 로그 전송 (조건부)
+            this.#sendDebugLog({
+                location: 'ContentRenderer.js:97',
+                message: 'Markdown render error',
+                data: { error: error.message },
+                timestamp: Date.now(),
+                sessionId: 'debug-session',
+                runId: 'run3',
+                hypothesisId: 'H7'
+            });
+            
             console.error('마크다운 렌더링 실패:', error);
             this.#viewerElement.textContent = content;
         }

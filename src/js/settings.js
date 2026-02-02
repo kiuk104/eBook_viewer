@@ -540,3 +540,58 @@ export function saveGeminiApiKey() {
 export function getGeminiKey() {
     return localStorage.getItem('geminiApiKey');
 }
+
+/**
+ * 모든 설정 초기화
+ */
+export function resetAllSettings() {
+    try {
+        // 1. 테마 설정 초기화
+        localStorage.removeItem('readerTheme');
+        setTheme('light', true);
+        
+        // 2. 폰트 크기 초기화
+        localStorage.removeItem('readerFontSize');
+        setFontSize(16, true);
+        
+        // 3. 마크다운 스타일 초기화
+        localStorage.removeItem('markdownHeadingFont');
+        localStorage.removeItem('headingSize');
+        localStorage.removeItem('headingColor');
+        localStorage.removeItem('tocColor');
+        
+        // 4. 본문 스타일 초기화
+        localStorage.removeItem('bodyLineHeight');
+        localStorage.removeItem('bodyFontFamily');
+        localStorage.removeItem('bodyTextColor');
+        localStorage.removeItem('textStroke');
+        
+        // 5. 뷰어 너비 초기화
+        localStorage.removeItem('viewerWidth');
+        localStorage.removeItem('fullWidth');
+        
+        // 6. 읽기 진행률 표시 설정 초기화
+        localStorage.removeItem('showReadingStats');
+        
+        const statsToggle = document.getElementById('showReadingStatsToggle');
+        if (statsToggle) {
+            statsToggle.checked = true; // 기본값: 표시
+        }
+        
+        const statsContainer = document.getElementById('reading-stats-container');
+        if (statsContainer) {
+            statsContainer.style.display = 'block';
+        }
+        
+        console.log('✅ 모든 설정이 초기화되었습니다.');
+        alert('모든 설정이 초기화되었습니다. 페이지를 새로고침하면 완전히 적용됩니다.');
+        
+        // 페이지 새로고침 권장
+        if (confirm('페이지를 새로고침하시겠습니까?')) {
+            window.location.reload();
+        }
+    } catch (e) {
+        console.error('❌ 설정 초기화 실패:', e);
+        alert('설정 초기화에 실패했습니다.');
+    }
+}

@@ -74,6 +74,25 @@ export class FileManager {
     }
 
     /**
+     * 현재 파일 설정 (단일 파일 표시용)
+     * @param {File} file - 설정할 파일 객체
+     */
+    setCurrentFile(file) {
+        if (!file) return;
+        
+        // 파일 배열에 추가/교체
+        if (this.#currentFileIndex >= 0 && this.#currentFileIndex < this.#files.length) {
+            this.#files[this.#currentFileIndex] = file;
+        } else {
+            this.#files = [file];
+            this.#currentFileIndex = 0;
+        }
+        
+        // 파일 키 업데이트
+        this.#updateCurrentFileKey(file);
+    }
+
+    /**
      * 파일 목록 처리 및 현재 파일 설정
      * @param {FileList} fileList - 파일 목록
      * @returns {File | null} 첫 번째 파일 또는 null
