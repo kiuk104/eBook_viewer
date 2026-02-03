@@ -8,6 +8,9 @@
 
 - **[PROJECT_BRIEF.md](./PROJECT_BRIEF.md)** - 프로젝트 전체 브리핑 (개발자 인수인계 문서)
 
+> ⚠️ **중요**: 향후 모든 신규 기능은 **Electron 버전**을 중심으로 개발됩니다.  
+> 개발 환경 설정은 [Electron 가이드](./04_guides/electron/README.md)를 참고하세요.
+
 ---
 
 ## 📁 문서 구조
