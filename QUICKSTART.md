@@ -1,6 +1,74 @@
 # 이북 뷰어 v0.3.0 - 빠른 시작 가이드
 
-## 🎯 3단계로 시작하기
+## 📦 두 가지 버전
+
+이북 뷰어는 **웹 버전**과 **Electron 데스크톱 앱 버전** 두 가지로 제공됩니다.
+
+- **웹 버전**: 브라우저에서 실행 (로컬 서버 필요)
+- **Electron 버전**: 독립 실행형 데스크톱 앱 (권장) ⭐
+
+---
+
+## 🖥️ Electron 데스크톱 앱 버전 (권장)
+
+### 🎯 3단계로 시작하기
+
+### 1️⃣ 필수 요구사항
+- **Node.js** 18.x 이상 ([다운로드](https://nodejs.org/))
+- **npm** (Node.js와 함께 설치됨)
+
+### 2️⃣ 설치 및 실행
+```bash
+# 프로젝트 클론
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+cd YOUR_REPO_NAME
+
+# 의존성 설치 (처음 한 번만)
+npm install
+
+# 개발 모드 실행 (개발자 도구 자동 열림)
+npm run dev
+
+# 또는 일반 실행
+npm start
+```
+
+### 3️⃣ 빌드 (배포용 실행 파일 생성)
+```bash
+# Windows 버전 빌드
+npm run build:win
+
+# macOS 버전 빌드 (macOS에서만 가능)
+npm run build:mac
+
+# Linux 버전 빌드
+npm run build:linux
+```
+
+빌드된 실행 파일은 `dist/` 폴더에 생성됩니다.
+
+### ✨ Electron 전용 기능
+- ✅ 독립 실행형 데스크톱 애플리케이션
+- ✅ 파일 메뉴에서 파일 열기 (Ctrl+O)
+- ✅ 네이티브 파일 저장 다이얼로그
+- ✅ 애플리케이션 메뉴 (파일, 편집, 보기, 도움말)
+- ✅ 키보드 단축키 (Ctrl+O, Ctrl+H, Ctrl+R, F11)
+- ✅ 창 관리 (최소/최대화, 크기 조절, 전체화면)
+
+### ⌨️ Electron 단축키
+| 기능 | 단축키 |
+|------|--------|
+| 파일 열기 | Ctrl+O |
+| 홈으로 이동 | Ctrl+H |
+| 새로고침 | Ctrl+R |
+| 전체화면 | F11 |
+| 개발자 도구 | Ctrl+Shift+I |
+
+---
+
+## 🌐 웹 버전
+
+### 🎯 3단계로 시작하기
 
 ### 1️⃣ 파일 다운로드
 ```bash
@@ -58,7 +126,7 @@ http://localhost:8000/ebook_viewer.html
 2. API Key 입력 ([발급 방법](https://aistudio.google.com/app/apikey))
 3. 파일 열기 → **🤖 AI 변환 & 저장** 클릭
 
-## ⌨️ 단축키
+## ⌨️ 웹 버전 단축키
 
 | 기능 | 단축키 |
 |------|--------|
@@ -90,6 +158,11 @@ http://localhost:8000/ebook_viewer.html
 
 ## 📚 더 알아보기
 
+### Electron 버전
+- [Electron 버전 전체 가이드](./docs/04_guides/electron/README.md) - 상세한 사용법 및 개발 가이드
+- [Electron 통합 가이드](./docs/04_guides/electron/INTEGRATION.md) - 웹 앱과 Electron 통합 방법
+
+### 웹 버전
 - [전체 배포 가이드](./GITHUB_DEPLOY_GUIDE.md)
 - [GitHub 이슈](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/issues)
 
