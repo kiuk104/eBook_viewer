@@ -1,32 +1,49 @@
-# 로그 파일 무시
-*.log
-*.txt
-logs/
-
-# 시스템 파일 무시
-.DS_Store
-Thumbs.db
-
-# 에디터 설정 무시 (선택)
-.vscode/
-.cursor/
-
-# Next.js
-.next/
-out/
-build/
+# Electron build output
 dist/
+out/
 
-# 의존성
+# Node modules
 node_modules/
 
-# 환경 변수
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+HTTP_Server_Log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+FILE_LIST.txt
+
+# Environment variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
-# 기타
-*.tsbuildinfo
-next-env.d.ts
+# Build cache
+.cache/
+.parcel-cache/
+
+# Package manager lock files (optional)
+# package-lock.json
+# yarn.lock
+
+# Electron specific
+.webpack/

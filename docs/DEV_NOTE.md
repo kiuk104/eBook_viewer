@@ -169,6 +169,67 @@
 
 ## 2. 오늘의 배움
 
+### 2026-02-01: Electron 데스크톱 앱 통합 (v0.2.4.14)
+
+#### 🎯 주요 작업
+
+1. **Electron 프로젝트 구조 구축**
+   - `package.json` 생성 및 설정
+   - `electron/main.js`: 메인 프로세스 구현
+   - `electron/preload.js`: 보안 브리지 스크립트
+   - `build/` 폴더: 빌드 리소스 및 아이콘 가이드
+
+2. **Electron 앱 기능 구현**
+   - 네이티브 파일 시스템 접근 (파일 열기/저장 다이얼로그)
+   - 애플리케이션 메뉴 (파일, 편집, 보기, 개발자, 도움말)
+   - 키보드 단축키 (Ctrl+O, Ctrl+H, Ctrl+R, F11)
+   - 창 관리 (최소/최대화, 크기 조절, 전체화면)
+
+3. **빌드 시스템 구축**
+   - electron-builder 통합
+   - Windows, macOS, Linux 빌드 설정
+   - npm 스크립트로 간편한 빌드
+
+4. **문서 작성**
+   - `README_ELECTRON.md`: Electron 버전 메인 문서
+   - `ELECTRON_QUICKSTART.md`: 빠른 시작 가이드
+   - `ELECTRON_INTEGRATION.md`: 웹 앱과 Electron 통합 방법
+   - `ELECTRON_CONVERSION_COMPLETE.md`: 변환 완료 요약
+
+#### 배운 점
+
+- **Electron 아키텍처 이해**
+  - 메인 프로세스와 렌더러 프로세스 분리
+  - IPC (Inter-Process Communication) 통신
+  - 보안 컨텍스트 브리지 (preload.js)
+
+- **웹 앱과 데스크톱 앱 통합**
+  - 기존 웹 기능 100% 유지
+  - 환경 감지 (`window.isElectron`)
+  - 조건부 코드 분기
+
+- **빌드 시스템**
+  - electron-builder 설정
+  - 플랫폼별 빌드 타겟
+  - 아이콘 및 메타데이터 설정
+
+#### 해결 과정
+
+1. Electron 프로젝트 초기화
+2. 메인 프로세스 구현 (창 생성, 메뉴, 파일 다이얼로그)
+3. Preload 스크립트 구현 (IPC 브리지)
+4. 빌드 시스템 설정
+5. 문서 작성
+
+#### 개선 사항
+
+- 네이티브 앱처럼 동작
+- 시스템 메뉴 통합
+- 파일 시스템 직접 접근
+- 독립 실행형 앱
+
+---
+
 ### 2026-02-01: 편집 패널 UI 개선 및 자동 저장 시스템 구현 (v0.2.4.13)
 
 #### 🎯 주요 작업
@@ -2086,5 +2147,5 @@ git push origin main
 ---
 
 **마지막 업데이트**: 2026-02-01  
-**버전**: v0.2.4.13  
+**버전**: v0.2.4.14  
 **작성자**: Development Team
