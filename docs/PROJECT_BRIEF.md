@@ -912,21 +912,11 @@ bookmarks = {
 
 ## 8. 개발 가이드
 
-### 웹 버전 실행
-```powershell
-# PowerShell
-.\scripts\start_server.ps1
+### ⚠️ 중요: 개발 플랫폼 우선순위
 
-# 또는 직접 실행
-python -m http.server 8000
-```
+**향후 모든 신규 기능은 Electron 버전을 중심으로 개발됩니다.**
 
-### 브라우저 접속
-```
-http://localhost:8000/ebook_viewer.html
-```
-
-### Electron 버전 실행 (v0.3.0 추가)
+### Electron 버전 실행 (메인 개발 환경)
 ```bash
 # 의존성 설치 (처음 한 번만)
 npm install
@@ -945,15 +935,31 @@ npm run build:linux  # Linux
 
 ### Electron 전용 기능 사용
 ```javascript
-// 환경 감지
-if (window.isElectron) {
-    // Electron 전용 코드
+// 환경 감지 및 분기 처리
+if (window.isElectron && window.electronAPI) {
+    // Electron 전용 코드 (메인 개발 플랫폼)
     await window.electronAPI.saveFile(fileName, content);
 } else {
-    // 웹 브라우저 코드
+    // 웹 브라우저 코드 (호환성 유지)
     downloadFile(fileName, content);
 }
 ```
+
+### 웹 버전 실행 (호환성 확인용)
+```powershell
+# PowerShell
+.\scripts\start_server.ps1
+
+# 또는 직접 실행
+python -m http.server 8000
+```
+
+### 브라우저 접속
+```
+http://localhost:8000/ebook_viewer.html
+```
+
+**주의**: 웹 버전은 기존 기능 유지용이며, 신규 기능은 Electron 우선 개발
 
 ### 주요 개발 파일
 - **HTML**: `ebook_viewer.html`
