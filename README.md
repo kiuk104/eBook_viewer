@@ -2,6 +2,9 @@
 
 로컬 텍스트 파일과 Google Drive 파일을 읽을 수 있는 웹 기반 이북 뷰어입니다.
 
+> 💡 **Electron 데스크톱 앱 버전도 사용 가능합니다!**  
+> 독립 실행형 데스크톱 앱으로 사용하려면 [Electron 버전 가이드](./docs/04_guides/electron/README.md)를 참고하세요.
+
 ## 🚀 빠른 시작
 
 ### 방법 1: 스크립트 사용 (가장 간단)
@@ -133,6 +136,11 @@ taskkill /PID <프로세스ID> /F
 ### 빠른 시작
 - [빠른 시작 가이드](./QUICKSTART.md) - 3단계로 시작하기
 - [변경 이력](./CHANGELOG.md) - 버전별 변경 사항
+
+### Electron 데스크톱 앱
+- [Electron 버전 가이드](./docs/04_guides/electron/README.md) - Electron 앱 전체 가이드 (빠른 시작 포함)
+- [Electron 통합 가이드](./docs/04_guides/electron/INTEGRATION.md) - 웹 앱과 Electron 통합 방법
+- [Electron 변환 완료 요약](./docs/04_guides/electron/CONVERSION_COMPLETE.md) - 변환 작업 요약
 
 ### 개발자 문서
 - [프로젝트 브리핑](./docs/PROJECT_BRIEF.md) - 프로젝트 전체 개요 및 아키텍처

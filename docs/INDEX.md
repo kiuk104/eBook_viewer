@@ -68,6 +68,11 @@
 - 개발 환경 설정
 - 배포 가이드
 
+#### Electron 가이드
+- **[electron/README.md](./04_guides/electron/README.md)** - Electron 앱 전체 가이드
+- **[electron/INTEGRATION.md](./04_guides/electron/INTEGRATION.md)** - 웹 앱과 Electron 통합 방법
+- **[electron/CONVERSION_COMPLETE.md](./04_guides/electron/CONVERSION_COMPLETE.md)** - 변환 완료 요약
+
 **관련 문서:**
 - `docs/local_server_setup.md` - 로컬 서버 구동 가이드
 - `docs/google_oauth_setup_guide.md` - Google OAuth 설정 가이드
@@ -97,5 +102,5 @@
 
 ---
 
-**마지막 업데이트**: 2026-01-02
+**마지막 업데이트**: 2026-02-01
 

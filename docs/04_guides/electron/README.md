@@ -4,29 +4,59 @@
 
 ## 🚀 빠른 시작
 
+### 📋 체크리스트
+
+시작하기 전에 다음 항목을 확인하세요:
+
+- [ ] Node.js 18.x 이상 설치 ([다운로드](https://nodejs.org/))
+- [ ] npm이 설치되어 있는지 확인 (`npm --version`)
+- [ ] 프로젝트 파일이 모두 있는지 확인
+
 ### 1️⃣ 필수 요구사항
 
 - **Node.js** 18.x 이상 ([다운로드](https://nodejs.org/))
 - **npm** (Node.js와 함께 설치됨)
 
-### 2️⃣ 설치
+### 2️⃣ 설치 (처음 한 번만)
 
 ```bash
 # 의존성 설치
 npm install
 ```
 
+**설치 중 문제가 발생하면:**
+```bash
+# 캐시 정리
+npm cache clean --force
+
+# 재설치
+npm install
+```
+
 ### 3️⃣ 개발 모드 실행
 
-```bash
-# 개발자 도구와 함께 실행
+**Windows:**
+```cmd
+# 방법 1: npm 명령어
 npm run dev
 
-# 또는 일반 실행
-npm start
-
-# Windows에서 배치 파일 사용
+# 방법 2: 배치 파일
 electron\start.bat
+```
+
+**macOS/Linux:**
+```bash
+npm run dev
+```
+
+**개발 모드 특징:**
+- 개발자 도구 자동 열림
+- 코드 변경 시 수동 새로고침 (Ctrl+R)
+- 디버깅 용이
+
+**일반 실행:**
+```bash
+npm start
 ```
 
 ### 4️⃣ 빌드 (배포용 실행 파일 생성)
@@ -50,6 +80,11 @@ electron\build.bat
 
 빌드된 실행 파일은 `dist/` 폴더에 생성됩니다.
 
+**빌드 결과물:**
+- Windows: `dist/eBook Viewer Setup.exe` (설치 프로그램), `dist/eBook Viewer.exe` (포터블)
+- macOS: `dist/eBook Viewer.dmg`, `dist/eBook Viewer-mac.zip`
+- Linux: `dist/eBook Viewer.AppImage`, `dist/ebook-viewer_0.3.0_amd64.deb`
+
 ## 📁 프로젝트 구조
 
 ```
@@ -69,7 +104,11 @@ eBook_viewer/
 ├── ebook_viewer.html      # 메인 뷰어 페이지
 ├── index.html             # 랜딩 페이지
 ├── package.json           # Node.js 프로젝트 설정
-└── README_ELECTRON.md     # 이 문서
+└── docs/04_guides/electron/  # Electron 문서
+    ├── README.md          # 이 문서
+    ├── QUICKSTART.md      # 빠른 시작 가이드
+    ├── INTEGRATION.md     # 통합 가이드
+    └── CONVERSION_COMPLETE.md  # 변환 완료 요약
 ```
 
 ## 🎨 앱 아이콘 설정
