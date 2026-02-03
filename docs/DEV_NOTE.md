@@ -169,67 +169,6 @@
 
 ## 2. 오늘의 배움
 
-### 2026-02-01: Electron 데스크톱 앱 통합 (v0.3.0)
-
-#### 🎯 주요 작업
-
-1. **Electron 프로젝트 구조 구축**
-   - `package.json` 생성 및 설정
-   - `electron/main.js`: 메인 프로세스 구현
-   - `electron/preload.js`: 보안 브리지 스크립트
-   - `build/` 폴더: 빌드 리소스 및 아이콘 가이드
-
-2. **Electron 앱 기능 구현**
-   - 네이티브 파일 시스템 접근 (파일 열기/저장 다이얼로그)
-   - 애플리케이션 메뉴 (파일, 편집, 보기, 개발자, 도움말)
-   - 키보드 단축키 (Ctrl+O, Ctrl+H, Ctrl+R, F11)
-   - 창 관리 (최소/최대화, 크기 조절, 전체화면)
-
-3. **빌드 시스템 구축**
-   - electron-builder 통합
-   - Windows, macOS, Linux 빌드 설정
-   - npm 스크립트로 간편한 빌드
-
-4. **문서 작성**
-   - `README_ELECTRON.md`: Electron 버전 메인 문서
-   - `ELECTRON_QUICKSTART.md`: 빠른 시작 가이드
-   - `ELECTRON_INTEGRATION.md`: 웹 앱과 Electron 통합 방법
-   - `ELECTRON_CONVERSION_COMPLETE.md`: 변환 완료 요약
-
-#### 배운 점
-
-- **Electron 아키텍처 이해**
-  - 메인 프로세스와 렌더러 프로세스 분리
-  - IPC (Inter-Process Communication) 통신
-  - 보안 컨텍스트 브리지 (preload.js)
-
-- **웹 앱과 데스크톱 앱 통합**
-  - 기존 웹 기능 100% 유지
-  - 환경 감지 (`window.isElectron`)
-  - 조건부 코드 분기
-
-- **빌드 시스템**
-  - electron-builder 설정
-  - 플랫폼별 빌드 타겟
-  - 아이콘 및 메타데이터 설정
-
-#### 해결 과정
-
-1. Electron 프로젝트 초기화
-2. 메인 프로세스 구현 (창 생성, 메뉴, 파일 다이얼로그)
-3. Preload 스크립트 구현 (IPC 브리지)
-4. 빌드 시스템 설정
-5. 문서 작성
-
-#### 개선 사항
-
-- 네이티브 앱처럼 동작
-- 시스템 메뉴 통합
-- 파일 시스템 직접 접근
-- 독립 실행형 앱
-
----
-
 ### 2026-02-01: 편집 패널 UI 개선 및 자동 저장 시스템 구현 (v0.2.4.13)
 
 #### 🎯 주요 작업
@@ -1975,47 +1914,16 @@ npx http-server -p 8000
 
 ## 6. 개발 워크플로우
 
-### ⚠️ 중요: 개발 플랫폼 우선순위
-
-**향후 모든 신규 기능은 Electron 버전을 중심으로 개발됩니다.**
-
-#### 개발 우선순위
-1. **Electron 버전** (메인 개발 플랫폼)
-   - 모든 신규 기능은 Electron 환경에서 먼저 개발 및 테스트
-   - Electron 전용 기능 (네이티브 파일 시스템, 메뉴 등) 우선 구현
-   - 개발 환경: `npm run dev`로 실행하여 테스트
-
-2. **웹 버전** (호환성 유지)
-   - 기존 기능은 유지
-   - Electron 전용 기능은 `window.isElectron` 플래그로 조건부 처리
-   - 웹 버전에서 사용 불가능한 기능은 자동으로 비활성화
-
-#### 환경별 분기 처리
-```javascript
-// Electron 전용 기능
-if (window.isElectron && window.electronAPI) {
-    // Electron API 사용
-    await window.electronAPI.saveFile(fileName, content);
-} else {
-    // 웹 브라우저 폴백
-    downloadFile(fileName, content);
-}
-```
-
 ### 새 기능 추가 시
 1. **계획 수립**: 어떤 클래스에 추가할지 결정
-2. **Electron 환경에서 개발**: `npm run dev`로 실행하여 개발
-3. **클래스 수정**: 해당 클래스에 메서드 추가
-4. **환경 분기 처리**: Electron 전용 기능은 조건부 처리
-5. **export 추가**: 필요 시 viewer.js에 export 함수 추가
-6. **import 추가**: main.js에 import 추가
-7. **window 할당**: HTML onclick 사용 시 window에 할당
-8. **테스트**: 
-   - Electron 버전: `npm run dev`로 테스트
-   - 웹 버전: 로컬 서버로 테스트 (호환성 확인)
-9. **문서화**: 
+2. **클래스 수정**: 해당 클래스에 메서드 추가
+3. **export 추가**: 필요 시 viewer.js에 export 함수 추가
+4. **import 추가**: main.js에 import 추가
+5. **window 할당**: HTML onclick 사용 시 window에 할당
+6. **테스트**: test_modules.html로 모듈 로딩 확인
+7. **문서화**: 
    - `CHANGELOG.md` 업데이트
-   - 버전 번호 업데이트 (`config.js`, `viewer.js`, HTML 타이틀, `package.json`)
+   - 버전 번호 업데이트 (`config.js`, `viewer.js`, HTML 타이틀)
    - 관련 문서 업데이트 (`PROJECT_BRIEF.md`, `DEV_NOTE.md` 등)
 
 ### 코드 리뷰 체크리스트
@@ -2177,6 +2085,6 @@ git push origin main
 
 ---
 
-**마지막 업데이트**: 2026-02-01  
+**마지막 업데이트**: 2024-02-03  
 **버전**: v0.3.0  
 **작성자**: Development Team

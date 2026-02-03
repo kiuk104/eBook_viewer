@@ -1497,7 +1497,7 @@ export class ViewerCoordinator {
      */
     #restoreFromLocalStorage() {
         const fileKey = this.#fileManager.getCurrentFileKey();
-        if (!fileKey) return false;
+    if (!fileKey) return false;
         
         try {
             const savedContent = localStorage.getItem(`edited_${fileKey}`);

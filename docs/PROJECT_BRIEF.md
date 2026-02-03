@@ -1,7 +1,7 @@
 # 📚 eBook Viewer 프로젝트 브리핑
 
 **버전**: v0.3.0  
-**최종 업데이트**: 2026-02-01  
+**최종 업데이트**: 2024-02-03  
 **목적**: 개발자용 인수인계 문서 - AI가 프로젝트 맥락을 빠르게 파악할 수 있도록 작성
 
 ---
@@ -10,12 +10,6 @@
 
 ### 프로젝트명
 **eBook Viewer** (또는 **Web eBook Viewer**)
-
-### 배포 형태
-- **Electron 데스크톱 앱** (메인 개발 플랫폼): 독립 실행형 애플리케이션 (v0.3.0)
-  - 향후 모든 신규 기능은 Electron 버전을 중심으로 개발됩니다
-  - 네이티브 파일 시스템 접근, 애플리케이션 메뉴, 키보드 단축키 지원
-- **웹 버전** (유지): 브라우저에서 실행 (기존 기능 유지, 호환성 유지)
 
 ### 핵심 기능 요약
 웹 기반 이북 텍스트 뷰어로, 다음 기능을 제공합니다:
@@ -30,7 +24,6 @@
 - ✅ **데이터 백업/복원**: 북마크, 히스토리, 하이라이트를 JSON 파일로 백업 및 복원
 - ✅ **테마 지원**: 라이트, 다크, 세피아, 그린, 사용자 지정 테마
 - ✅ **스타일 커스터마이징**: 폰트 크기, 본문 스타일, 마크다운 스타일, 뷰어 넓이 조절
-- ✅ **Electron 데스크톱 앱** (v0.3.0): 네이티브 파일 시스템 접근, 애플리케이션 메뉴, 키보드 단축키
 
 ### 주요 사용 사례
 - 로컬 텍스트 파일 읽기 및 편집
@@ -44,27 +37,10 @@
 
 ```
 eBook_viewer/
-├── package.json                # [Electron] Node.js 프로젝트 설정
-├── .gitignore                  # [Electron] Git 무시 파일
-│
 ├── ebook_viewer.html          # 메인 애플리케이션 HTML 파일
 ├── index.html                  # 랜딩 페이지
-├── README.md                   # 사용자 가이드 (웹 버전)
-├── README_ELECTRON.md          # [Electron] Electron 버전 메인 문서
-├── ELECTRON_QUICKSTART.md      # [Electron] 빠른 시작 가이드
-├── ELECTRON_INTEGRATION.md     # [Electron] 웹 앱 통합 가이드
-├── ELECTRON_CONVERSION_COMPLETE.md  # [Electron] 변환 완료 요약
+├── README.md                   # 사용자 가이드
 ├── CHANGELOG.md               # 버전별 변경 이력
-│
-├── electron/                   # [Electron] Electron 메인 프로세스
-│   ├── main.js                # Electron 메인 진입점
-│   ├── preload.js             # 보안 브리지 스크립트
-│   ├── start.bat              # Windows 실행 스크립트
-│   └── build.bat              # Windows 빌드 스크립트
-│
-├── build/                      # [Electron] 빌드 리소스
-│   ├── ICON_GUIDE.md          # 앱 아이콘 생성 가이드
-│   └── create_placeholder_icons.sh  # 임시 아이콘 생성 스크립트
 │
 ├── src/
 │   ├── css/
@@ -226,64 +202,6 @@ https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?
 ---
 
 ## 4. 최근 변경 내역 (Recent Changes)
-
-### v0.3.0 (2026-02-01)
-
-#### 🚀 주요 변경사항
-- **Electron 데스크톱 앱 통합**
-  - 웹 앱을 Electron 데스크톱 애플리케이션으로 변환
-  - 기존 웹 기능 100% 유지 (Google Drive, AI 변환, 북마크 등)
-  - 독립 실행형 앱으로 브라우저 없이 실행 가능
-
-#### ✨ 새로운 기능
-1. **Electron 프로젝트 구조**
-   - `package.json`: Node.js 프로젝트 설정 및 빌드 스크립트
-   - `electron/main.js`: Electron 메인 프로세스 (창 관리, 메뉴, 파일 다이얼로그)
-   - `electron/preload.js`: 보안 컨텍스트 브리지 (IPC 통신)
-   - `electron/start.bat`, `electron/build.bat`: Windows 실행/빌드 스크립트
-   - `build/`: 빌드 리소스 및 아이콘 가이드
-
-2. **Electron 앱 기능**
-   - 네이티브 파일 시스템 접근 (파일 열기/저장 다이얼로그)
-   - 애플리케이션 메뉴 (파일, 편집, 보기, 개발자, 도움말)
-   - 키보드 단축키 (Ctrl+O: 파일 열기, Ctrl+H: 홈으로, Ctrl+R: 새로고침, F11: 전체화면)
-   - 창 관리 (최소/최대화, 크기 조절, 전체화면)
-   - 독립 실행형 앱 (브라우저 없이 단독 실행)
-
-3. **빌드 시스템**
-   - electron-builder 통합
-   - Windows: NSIS 설치 프로그램 + 포터블 버전
-   - macOS: DMG 이미지 + ZIP 압축
-   - Linux: AppImage + DEB 패키지
-
-4. **문서 추가**
-   - `README_ELECTRON.md`: Electron 버전 메인 문서
-   - `ELECTRON_QUICKSTART.md`: 빠른 시작 가이드
-   - `ELECTRON_INTEGRATION.md`: 웹 앱과 Electron 통합 방법
-   - `ELECTRON_CONVERSION_COMPLETE.md`: 변환 완료 요약
-   - `build/ICON_GUIDE.md`: 앱 아이콘 생성 가이드
-
-#### 🔧 개선된 기능
-1. **개발 환경**
-   - Node.js 기반 개발 환경 구축
-   - npm 스크립트로 간편한 실행 및 빌드
-   - 개발 모드와 프로덕션 모드 분리
-
-2. **사용자 경험**
-   - 네이티브 앱처럼 동작
-   - 시스템 메뉴 통합
-   - 파일 시스템 직접 접근
-
-#### 📝 기술 스택 확장
-- **기존**: HTML5, CSS3, JavaScript (ES6 Modules)
-- **추가**: Electron (데스크톱 앱 프레임워크), Node.js (런타임), electron-builder (빌드 도구)
-
-#### 🔄 호환성
-- **웹 버전**: 기존 기능 100% 유지
-- **Electron 버전**: 모든 웹 기능 동작
-- **환경 감지**: `window.isElectron` 플래그로 환경별 분기 가능
-
----
 
 ### v0.2.4.13 (2026-02-01)
 
@@ -831,13 +749,8 @@ https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?
   - 마지막 읽은 파일 정보
 
 ### 개발 환경
-- **웹 버전**: Python HTTP Server (포트 8000)
-  - 스크립트: PowerShell (`start_server.ps1`), 배치 파일 (`start_server.bat`)
-- **Electron 버전** (v0.3.0 추가):
-  - Node.js 18.x 이상
-  - npm (Node.js와 함께 설치됨)
-  - 실행: `npm start` 또는 `npm run dev`
-  - 빌드: `npm run build:win` (Windows), `npm run build:mac` (macOS), `npm run build:linux` (Linux)
+- **로컬 서버**: Python HTTP Server (포트 8000)
+- **스크립트**: PowerShell (`start_server.ps1`), 배치 파일 (`start_server.bat`)
 
 ---
 
@@ -912,40 +825,7 @@ bookmarks = {
 
 ## 8. 개발 가이드
 
-### ⚠️ 중요: 개발 플랫폼 우선순위
-
-**향후 모든 신규 기능은 Electron 버전을 중심으로 개발됩니다.**
-
-### Electron 버전 실행 (메인 개발 환경)
-```bash
-# 의존성 설치 (처음 한 번만)
-npm install
-
-# 개발 모드 실행 (개발자 도구 자동 열림)
-npm run dev
-
-# 일반 실행
-npm start
-
-# 빌드 (배포용)
-npm run build:win    # Windows
-npm run build:mac    # macOS
-npm run build:linux  # Linux
-```
-
-### Electron 전용 기능 사용
-```javascript
-// 환경 감지 및 분기 처리
-if (window.isElectron && window.electronAPI) {
-    // Electron 전용 코드 (메인 개발 플랫폼)
-    await window.electronAPI.saveFile(fileName, content);
-} else {
-    // 웹 브라우저 코드 (호환성 유지)
-    downloadFile(fileName, content);
-}
-```
-
-### 웹 버전 실행 (호환성 확인용)
+### 로컬 서버 실행
 ```powershell
 # PowerShell
 .\scripts\start_server.ps1
@@ -958,8 +838,6 @@ python -m http.server 8000
 ```
 http://localhost:8000/ebook_viewer.html
 ```
-
-**주의**: 웹 버전은 기존 기능 유지용이며, 신규 기능은 Electron 우선 개발
 
 ### 주요 개발 파일
 - **HTML**: `ebook_viewer.html`

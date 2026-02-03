@@ -8,9 +8,6 @@
 
 - **[PROJECT_BRIEF.md](./PROJECT_BRIEF.md)** - 프로젝트 전체 브리핑 (개발자 인수인계 문서)
 
-> ⚠️ **중요**: 향후 모든 신규 기능은 **Electron 버전**을 중심으로 개발됩니다.  
-> 개발 환경 설정은 [Electron 가이드](./04_guides/electron/README.md)를 참고하세요.
-
 ---
 
 ## 📁 문서 구조
@@ -71,11 +68,6 @@
 - 개발 환경 설정
 - 배포 가이드
 
-#### Electron 가이드
-- **[electron/README.md](./04_guides/electron/README.md)** - Electron 앱 전체 가이드
-- **[electron/INTEGRATION.md](./04_guides/electron/INTEGRATION.md)** - 웹 앱과 Electron 통합 방법
-- **[electron/CONVERSION_COMPLETE.md](./04_guides/electron/CONVERSION_COMPLETE.md)** - 변환 완료 요약
-
 **관련 문서:**
 - `docs/local_server_setup.md` - 로컬 서버 구동 가이드
 - `docs/google_oauth_setup_guide.md` - Google OAuth 설정 가이드
@@ -105,5 +97,5 @@
 
 ---
 
-**마지막 업데이트**: 2026-02-01
+**마지막 업데이트**: 2024-02-03
 

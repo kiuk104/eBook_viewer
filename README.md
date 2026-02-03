@@ -141,11 +141,6 @@ taskkill /PID <프로세스ID> /F
 - [빠른 시작 가이드](./QUICKSTART.md) - 3단계로 시작하기
 - [변경 이력](./CHANGELOG.md) - 버전별 변경 사항
 
-### Electron 데스크톱 앱
-- [Electron 버전 가이드](./docs/04_guides/electron/README.md) - Electron 앱 전체 가이드 (빠른 시작 포함)
-- [Electron 통합 가이드](./docs/04_guides/electron/INTEGRATION.md) - 웹 앱과 Electron 통합 방법
-- [Electron 변환 완료 요약](./docs/04_guides/electron/CONVERSION_COMPLETE.md) - 변환 작업 요약
-
 ### 개발자 문서
 - [프로젝트 브리핑](./docs/PROJECT_BRIEF.md) - 프로젝트 전체 개요 및 아키텍처
 - [개발 규칙 및 문제 해결](./docs/DEV_NOTE.md) - 개발 규칙 및 트러블슈팅 가이드

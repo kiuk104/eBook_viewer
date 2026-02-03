@@ -21,5 +21,5 @@ export const APP_DESCRIPTION = '로컬 및 Google Drive 텍스트 파일 뷰어'
 /**
  * 릴리스 날짜
  */
-export const RELEASE_DATE = '2026-02-01';
+export const RELEASE_DATE = '2024-02-03';
 
