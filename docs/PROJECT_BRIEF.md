@@ -1,6 +1,6 @@
 # 📚 eBook Viewer 프로젝트 브리핑
 
-**버전**: v0.2.4.14  
+**버전**: v0.3.0  
 **최종 업데이트**: 2026-02-01  
 **목적**: 개발자용 인수인계 문서 - AI가 프로젝트 맥락을 빠르게 파악할 수 있도록 작성
 
@@ -28,7 +28,7 @@
 - ✅ **데이터 백업/복원**: 북마크, 히스토리, 하이라이트를 JSON 파일로 백업 및 복원
 - ✅ **테마 지원**: 라이트, 다크, 세피아, 그린, 사용자 지정 테마
 - ✅ **스타일 커스터마이징**: 폰트 크기, 본문 스타일, 마크다운 스타일, 뷰어 넓이 조절
-- ✅ **Electron 데스크톱 앱** (v0.2.4.14): 네이티브 파일 시스템 접근, 애플리케이션 메뉴, 키보드 단축키
+- ✅ **Electron 데스크톱 앱** (v0.3.0): 네이티브 파일 시스템 접근, 애플리케이션 메뉴, 키보드 단축키
 
 ### 주요 사용 사례
 - 로컬 텍스트 파일 읽기 및 편집
@@ -225,7 +225,7 @@ https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?
 
 ## 4. 최근 변경 내역 (Recent Changes)
 
-### v0.2.4.14 (2026-02-01)
+### v0.3.0 (2026-02-01)
 
 #### 🚀 주요 변경사항
 - **Electron 데스크톱 앱 통합**
@@ -831,7 +831,7 @@ https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?
 ### 개발 환경
 - **웹 버전**: Python HTTP Server (포트 8000)
   - 스크립트: PowerShell (`start_server.ps1`), 배치 파일 (`start_server.bat`)
-- **Electron 버전** (v0.2.4.14 추가):
+- **Electron 버전** (v0.3.0 추가):
   - Node.js 18.x 이상
   - npm (Node.js와 함께 설치됨)
   - 실행: `npm start` 또는 `npm run dev`
@@ -924,7 +924,7 @@ python -m http.server 8000
 http://localhost:8000/ebook_viewer.html
 ```
 
-### Electron 버전 실행 (v0.2.4.14 추가)
+### Electron 버전 실행 (v0.3.0 추가)
 ```bash
 # 의존성 설치 (처음 한 번만)
 npm install

@@ -2473,7 +2473,7 @@ export const exportData = () => {
             theme: localStorage.getItem('readerTheme'),
             fontSize: localStorage.getItem('readerFontSize'),
         },
-        version: '0.2.4.14',
+        version: '0.3.0',
         exportDate: new Date().toISOString()
     };
     

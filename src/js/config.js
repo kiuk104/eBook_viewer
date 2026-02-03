@@ -6,7 +6,7 @@
  * 애플리케이션 버전
  * Semantic Versioning (MAJOR.MINOR.PATCH) 형식 사용
  */
-export const APP_VERSION = '0.2.4.14';
+export const APP_VERSION = '0.3.0';
 
 /**
  * 애플리케이션 이름
